@@ -1,0 +1,17 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+autopep8 = "*"
+pylint = "*"
+cloudformation-cli-python-plugin = "*"
+
+[packages]
+boto3 = "*"
+cloudformation-cli-python-lib = "*"
+cloudformation-cli-python-plugin = "*"
+
+[requires]
+python_version = "3.7"
