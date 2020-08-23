@@ -126,4 +126,7 @@ dmypy.json
 # contains credentials
 sam-tests/
 
+# auto-generated code
+src/**/models.py
+
 rpdk.log*
