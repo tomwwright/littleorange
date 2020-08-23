@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "4aba89b50116601aeae2ad0656954f1d1205f22b9c4660a3c6c6d9f4cf27d38a"
+            "sha256": "4dcdd169715c85f79d469c52f7aa925bd25a73387911aed4fd1954b39c1eb13a"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -30,6 +30,17 @@
             ],
             "index": "pypi",
             "version": "==1.14.47"
+        },
+        "boto3-stubs": {
+            "extras": [
+                "organizations"
+            ],
+            "hashes": [
+                "sha256:1600a3da48a7d582ff0e515bce4d45a2b8e053810c83aa8a2d4f3a7b5d0235ca",
+                "sha256:f9298e70f8a5ca4b0e028a2a6aa9319a5fbc7b6c029c8b1a1ab47170a57e532c"
+            ],
+            "index": "pypi",
+            "version": "==1.14.47.0"
         },
         "botocore": {
             "hashes": [
@@ -199,6 +210,20 @@
             ],
             "version": "==8.4.0"
         },
+        "mypy-boto3": {
+            "hashes": [
+                "sha256:6a5890d860b86a7019f430401e3e4bf52fdfee5b8be3461f903e0831a13aea39",
+                "sha256:e02ef70ec4f01644e3756973b50127c1f8c4f7035408707ed14910c4d4dbff43"
+            ],
+            "version": "==1.14.47.0"
+        },
+        "mypy-boto3-organizations": {
+            "hashes": [
+                "sha256:32c7ec3ef7504ff9bcc15ccb7ae6100c0871fc43cb594c8131f02953ebc68cbc",
+                "sha256:4c8f7e5beacb8ca1862463ecbf5cd8dd066b8650fba714b11bf0824d94eb3e01"
+            ],
+            "version": "==1.14.47.0"
+        },
         "packaging": {
             "hashes": [
                 "sha256:4357f74f47b9c12db93624a82154e9b120fa8293699949152b22065d556079f8",
@@ -310,6 +335,15 @@
                 "sha256:bda89d5935c2eac546d648028b9901107a595863cb36bae0c73ac804a9b4ce88"
             ],
             "version": "==0.10.1"
+        },
+        "typing-extensions": {
+            "hashes": [
+                "sha256:6e95524d8a547a91e08f404ae485bbb71962de46967e1b71a0cb89af24e761c5",
+                "sha256:79ee589a3caca649a9bfd2a8de4709837400dfa00b6cc81962a1e6a1815969ae",
+                "sha256:f8d2bd89d25bc39dabe7d23df520442fa1d8969b82544370e03d88b5a591c392"
+            ],
+            "markers": "python_version < '3.8'",
+            "version": "==3.7.4.2"
         },
         "urllib3": {
             "hashes": [

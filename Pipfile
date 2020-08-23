@@ -12,6 +12,7 @@ cloudformation-cli-python-plugin = "*"
 boto3 = "*"
 cloudformation-cli-python-lib = "*"
 cloudformation-cli-python-plugin = "*"
+boto3-stubs = {extras = ["organizations"],version = "*"}
 
 [requires]
 python_version = "3.7"
