@@ -1,5 +1,5 @@
 {
-  "typeName": "LilOrange::Organizations::Organization",
+  "typeName": "AWS::Organizations::Organization",
   "description": "Resource schema for AWS Organizations Organization resource",
   "sourceUrl": "https://github.com/tomwwright/lilorange.git",
   "definitions": {},

@@ -1,9 +1,9 @@
 {
-    "typeName": "LilOrange::Organizations::Organization",
+    "typeName": "AWS::Organizations::Organization",
     "language": "python37",
     "runtime": "python3.7",
-    "entrypoint": "lilorange_organizations_organization.handlers.resource",
-    "testEntrypoint": "lilorange_organizations_organization.handlers.test_entrypoint",
+    "entrypoint": "aws_organizations_organization.handlers.resource",
+    "testEntrypoint": "aws_organizations_organization.handlers.test_entrypoint",
     "settings": {
         "use_docker": true,
         "protocolVersion": "2.0.0"
