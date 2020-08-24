@@ -1,4 +1,4 @@
-# AWS::Organizations::Organization AvailablePolicyTypes
+# LilOrange::Organizations::Organization AvailablePolicyTypes
 
 ## Syntax
 

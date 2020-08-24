@@ -23,6 +23,7 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
+                - "iam:CreateServiceLinkedRole"
                 - "organizations:CreateOrganization"
                 - "organizations:DeleteOrganization"
                 - "organizations:DescribeOrganization"

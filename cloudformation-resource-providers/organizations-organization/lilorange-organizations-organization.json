@@ -1,5 +1,5 @@
 {
-  "typeName": "AWS::Organizations::Organization",
+  "typeName": "LilOrange::Organizations::Organization",
   "description": "Resource schema for AWS Organizations Organization resource",
   "sourceUrl": "https://github.com/tomwwright/lilorange.git",
   "definitions": {},
@@ -68,7 +68,8 @@
   "handlers": {
     "create": {
       "permissions": [
-        "organizations:CreateOrganization"
+        "organizations:CreateOrganization",
+        "iam:CreateServiceLinkedRole"
       ]
     },
     "read": {
