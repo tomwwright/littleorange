@@ -1,5 +1,5 @@
 import logging
-from typing import Any, List, MutableMapping, Optional
+from typing import cast, Any, List, MutableMapping, Optional
 
 from cloudformation_cli_python_lib import (
     Action,
@@ -29,25 +29,27 @@ def create_handler(
     request: ResourceHandlerRequest,
     callback_context: MutableMapping[str, Any],
 ) -> ProgressEvent:
+
+  LOG.info(request)
+
   model = request.desiredResourceState
-  progress: ProgressEvent = ProgressEvent(
-      status=OperationStatus.IN_PROGRESS,
+
+  if not session:
+    raise exceptions.InternalFailure(f"boto3 session unavailable")
+
+  if not request.desiredResourceState:
+    raise exceptions.InternalFailure("Desired resource state unavailable")
+
+  organizations: Organizations.Client = session.client('organizations')
+  organization = organizations.create_organization(
+      FeatureSet=cast(Any, request.desiredResourceState.FeatureSet)  # generated model doesn't represent type of enums correctly
+  )["Organization"]
+  model = ResourceModel._deserialize(organization)
+
+  return ProgressEvent(
+      status=OperationStatus.SUCCESS,
       resourceModel=model,
   )
-  # TODO: put code here
-
-  # Example:
-  try:
-    if isinstance(session, SessionProxy):
-      client = session.client("s3")
-    # Setting Status to success will signal to cfn that the operation is complete
-    progress.status = OperationStatus.SUCCESS
-  except TypeError as e:
-    # exceptions module lets CloudFormation know the type of failure that occurred
-    raise exceptions.InternalFailure(f"was not expecting type {e}")
-    # this can also be done by returning a failed progress event
-    # return ProgressEvent.failed(HandlerErrorCode.InternalFailure, f"was not expecting type {e}")
-  return progress
 
 
 @resource.handler(Action.DELETE)
@@ -56,13 +58,23 @@ def delete_handler(
     request: ResourceHandlerRequest,
     callback_context: MutableMapping[str, Any],
 ) -> ProgressEvent:
-  model = request.desiredResourceState
-  progress: ProgressEvent = ProgressEvent(
-      status=OperationStatus.IN_PROGRESS,
-      resourceModel=model,
+
+  LOG.info(request)
+
+  if not session:
+    raise exceptions.InternalFailure(f"boto3 session unavailable")
+
+  organizations: Organizations.Client = session.client('organizations')
+
+  try:
+    organizations.delete_organization()
+  except organizations.exceptions.AWSOrganizationsNotInUseException:
+    raise exceptions.NotFound(TYPE_NAME, "any")
+
+  return ProgressEvent(
+      status=OperationStatus.SUCCESS,
+      resourceModel=None,
   )
-  # TODO: put code here
-  return progress
 
 
 @resource.handler(Action.READ)
@@ -73,46 +85,46 @@ def read_handler(
 ) -> ProgressEvent:
   model = request.desiredResourceState
 
+  if not request.desiredResourceState or not request.desiredResourceState.Id:
+    raise exceptions.InternalFailure("Desired resource state unavailable")
+
   if not session:
     raise exceptions.InternalFailure(f"boto3 session unavailable")
 
   organizations: Organizations.Client = session.client('organizations')
-  model = None
 
   try:
-    organization = organizations.describe_organization()
-    model = ResourceModel._deserialize(organization["Organization"])]
+    organization = organizations.describe_organization()["Organization"]
+    model = ResourceModel._deserialize(organization)
   except organizations.exceptions.AWSOrganizationsNotInUseException:
-    pass
+    raise exceptions.NotFound(TYPE_NAME, request.desiredResourceState.Id)
 
   return ProgressEvent(
-      status = OperationStatus.SUCCESS,
-      resourceModel = model,
+      status=OperationStatus.SUCCESS,
+      resourceModel=model,
   )
 
 
-@ resource.handler(Action.LIST)
+@resource.handler(Action.LIST)
 def list_handler(
     session: Optional[SessionProxy],
     request: ResourceHandlerRequest,
     callback_context: MutableMapping[str, Any],
-
-
 ) -> ProgressEvent:
 
   if not session:
     raise exceptions.InternalFailure(f"boto3 session unavailable")
 
-  organizations: Organizations.Client=session.client('organizations')
-  models: List[Any]=[]
+  organizations: Organizations.Client = session.client('organizations')
+  models: List[Any] = []
 
   try:
-    organization=organizations.describe_organization()
-    models=[ResourceModel._deserialize(organization["Organization"])]
+    organization = organizations.describe_organization()["Organization"]
+    models = [ResourceModel._deserialize(organization)]
   except organizations.exceptions.AWSOrganizationsNotInUseException:
-    models=[]
+    models = []
 
   return ProgressEvent(
-      status = OperationStatus.SUCCESS,
-      resourceModels = models,
+      status=OperationStatus.SUCCESS,
+      resourceModels=models,
   )
