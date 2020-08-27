@@ -1,4 +1,5 @@
 {
   "python.linting.mypyEnabled": true,
-  "python.linting.mypyCategorySeverity.error": "Warning"
+  "python.linting.mypyCategorySeverity.error": "Warning",
+  "python.pythonPath": ".venv/bin/python"
 }
