@@ -1,8 +1,0 @@
-AWSTemplateFormatVersion: "2010-09-09"
-Description: Testing LilOrange::Organizations:Organization resource provider
-
-Resources:
-  Organization:
-    Type: LilOrange::Organizations::Organization
-    Properties:
-      FeatureSet: ALL
