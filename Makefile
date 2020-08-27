@@ -26,6 +26,6 @@ help: ## Help documentation
 	@ echo ""
 	@ echo "Available targets:"
 	@ echo ""
-	@ awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-%]+:.*?## / {printf "\033[36m%-30s\033[0m \n > %s\n\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@ cat $(MAKEFILE_LIST) | grep '##' | sort | awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-%]+:.*?## / {printf "\033[36m%-30s\033[0m%s\n\n", $$1, $$2}'
 
 .DEFAULT_GOAL := help
