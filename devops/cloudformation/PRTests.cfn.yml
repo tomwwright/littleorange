@@ -1,0 +1,55 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange Pull Request testing
+Parameters:
+  GitHubUrl:
+    Default: https://github.com/tomwwright/littleorange.git
+    Description: GitHub Repository URL, e.g. https://github.com/example/example.git
+    Type: String
+  GitHubBranch:
+    Default: master
+    Description: PRs against this branch with trigger tests in CodeBuild via webhook
+    Type: String
+Resources:
+  PRTestProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      ServiceRole: !GetAtt Role.Arn
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:3.0
+      Source:
+        Type: GITHUB
+        Location: !Ref GitHubUrl
+        BuildSpec: devops/buildspec/test.buildspec.yml
+      Triggers:
+        Webhook: true
+        FilterGroups:
+          - - Type: EVENT
+              Pattern: PULL_REQUEST_CREATED,PULL_REQUEST_UPDATED
+            - Type: BASE_REF
+              Pattern: !Sub "^refs/heads/${GitHubBranch}$"
+
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+      Policies:
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+          PolicyName: CloudWatchLogs
