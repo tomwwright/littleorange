@@ -9,4 +9,4 @@ phases:
       - make pipenv
   build:
     commands:
-      - make lint
+      - pipenv run make lint
