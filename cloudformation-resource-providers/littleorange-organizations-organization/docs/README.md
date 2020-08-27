@@ -1,4 +1,4 @@
-# LilOrange::Organizations::Organization
+# LittleOrange::Organizations::Organization
 
 Resource schema for AWS Organizations Organization resource
 
@@ -10,7 +10,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 {
-    "Type" : "LilOrange::Organizations::Organization",
+    "Type" : "LittleOrange::Organizations::Organization",
     "Properties" : {
         "<a href="#featureset" title="FeatureSet">FeatureSet</a>" : <i>String</i>,
     }
@@ -20,7 +20,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 ### YAML
 
 <pre>
-Type: LilOrange::Organizations::Organization
+Type: LittleOrange::Organizations::Organization
 Properties:
     <a href="#featureset" title="FeatureSet">FeatureSet</a>: <i>String</i>
 </pre>

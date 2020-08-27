@@ -1,4 +1,4 @@
-# LilOrange::Organizations::Organization AvailablePolicyTypes
+# LittleOrange::Organizations::Organization AvailablePolicyTypes
 
 ## Syntax
 
