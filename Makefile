@@ -17,7 +17,7 @@ lint-yaml:	## Run YAML linting with yamllint (see .yamllint.yml for config)
 pipenv:	## Install Pipenv and use it to create virtual environment of Python dependencies
 	$(info [+] Initialising Pipenv...)
 	pip install pipenv
-	pipenv install
+	pipenv install --dev
 	pipenv run python --version
 
 #
