@@ -3,6 +3,8 @@ extends: default
 
 ignore: |
   .venv
+  cloudformation-resource-providers/*/resource-role.yaml
+  cloudformation-resource-providers/*/template.yml
 
 rules:
   braces:
