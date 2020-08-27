@@ -1,7 +1,7 @@
 {
-  "typeName": "LilOrange::Organizations::Organization",
+  "typeName": "LittleOrange::Organizations::Organization",
   "description": "Resource schema for AWS Organizations Organization resource",
-  "sourceUrl": "https://github.com/tomwwright/lilorange.git",
+  "sourceUrl": "https://github.com/tomwwright/littleorange.git",
   "definitions": {},
   "properties": {
     "Arn": {

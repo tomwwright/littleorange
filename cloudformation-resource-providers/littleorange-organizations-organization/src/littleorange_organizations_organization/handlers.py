@@ -17,7 +17,7 @@ from .models import BaseModel, ResourceHandlerRequest, ResourceModel
 
 # Use this logger to forward log messages to CloudWatch Logs.
 LOG = logging.getLogger(__name__)
-TYPE_NAME = "LilOrange::Organizations::Organization"
+TYPE_NAME = "LittleOrange::Organizations::Organization"
 
 resource = Resource(TYPE_NAME, ResourceModel)
 test_entrypoint = resource.test_entrypoint
