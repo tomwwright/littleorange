@@ -25,6 +25,9 @@ pipenv:	## Install Pipenv and use it to create virtual environment of Python dep
 # Utils
 #
 
+check-%: ## Helper target that errors if % isn't set -- i.e. check-TOKEN ensures TOKEN is set
+	@: $(if $(value $*),,$(error $* is a required parameter!))
+
 help: ## Help documentation
 	@ echo ""
 	@ echo "+------------------------------------+"
