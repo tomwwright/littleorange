@@ -1,0 +1,4 @@
+{
+  "python.linting.mypyEnabled": true,
+  "python.linting.mypyCategorySeverity.error": "Warning"
+}
