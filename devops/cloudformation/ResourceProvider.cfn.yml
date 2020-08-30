@@ -26,6 +26,7 @@ Resources:
           - Name: ResourceProvider
             Value: !Ref ResourceProvider
         Image: aws/codebuild/standard:3.0
+        PrivilegedMode: true
         Type: LINUX_CONTAINER
       Source:
         Type: GITHUB
