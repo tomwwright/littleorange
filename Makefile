@@ -2,6 +2,7 @@
 #	Makefile
 #
 
+include cloudformation-resource-providers/Makefile
 include devops/Makefile
 
 lint: lint-yaml lint-cloudformation ## Run all linting

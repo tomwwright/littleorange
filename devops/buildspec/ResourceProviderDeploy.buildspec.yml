@@ -1,0 +1,14 @@
+---
+version: 0.2
+env:
+  variables:
+    ResourceProvider: ""
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+    commands:
+      - make pipenv
+  build:
+    commands:
+      - pipenv run make validate-resource-provider submit-resource-provider ResourceProvider=${ResourceProvider}

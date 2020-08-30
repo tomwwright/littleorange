@@ -1,0 +1,116 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange CloudFormation Resource Provider DevOps
+Parameters:
+  GitHubUrl:
+    Default: https://github.com/tomwwright/littleorange.git
+    Description: GitHub Repository URL, e.g. https://github.com/example/example.git
+    Type: String
+  GitHubBranch:
+    Default: master
+    Description: Branch to monitor for PRs and pushes
+    Type: String
+  ResourceProvider:
+    Description: CloudFormation Resource Provider to deploy tests and automated deployment for
+    Type: String
+Resources:
+  DeployProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      ServiceRole: !GetAtt Role.Arn
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        EnvironmentVariables:
+          - Name: ResourceProvider
+            Value: !Ref ResourceProvider
+        Image: aws/codebuild/standard:3.0
+        Type: LINUX_CONTAINER
+      Source:
+        Type: GITHUB
+        Location: !Ref GitHubUrl
+        BuildSpec: devops/buildspec/ResourceProviderDeploy.buildspec.yml
+      Triggers:
+        Webhook: true
+        FilterGroups:
+          - - Type: EVENT
+              Pattern: PUSH
+            - Type: HEAD_REF
+              Pattern: !Sub "^refs/heads/${GitHubBranch}$"
+            - Type: FILE_PATH
+              Pattern: !Sub ^cloudformation-resource-providers/${ResourceProvider}/.*
+
+  PRTestProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      ServiceRole: !GetAtt Role.Arn
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        EnvironmentVariables:
+          - Name: ResourceProvider
+            Value: !Ref ResourceProvider
+        Image: aws/codebuild/standard:3.0
+        Type: LINUX_CONTAINER
+      Source:
+        Type: GITHUB
+        Location: !Ref GitHubUrl
+        BuildSpec: devops/buildspec/ResourceProviderPR.buildspec.yml
+      Triggers:
+        Webhook: true
+        FilterGroups:
+          - - Type: EVENT
+              Pattern: PULL_REQUEST_CREATED,PULL_REQUEST_UPDATED
+            - Type: BASE_REF
+              Pattern: !Sub "^refs/heads/${GitHubBranch}$"
+            - Type: FILE_PATH
+              Pattern: !Sub ^cloudformation-resource-providers/${ResourceProvider}/.*
+
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+      Policies:
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Effect: "Allow"
+                Resource: "*"
+          PolicyName: CloudWatchLogs
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - cloudformation:ListTypeRegistrations
+                  - cloudformation:ListTypeVersions
+                  - cloudformation:ListTypes
+                  - cloudformation:RegisterType
+                  - cloudformation:SetTypeDefaultVersion
+                  - cloudformation:DescribeType
+                  - cloudformation:DescribeTypeRegistration
+                  - cloudformation:DeregisterType
+                Effect: Allow
+                Resource: "*"
+          PolicyName: CloudFormationTypes
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - cloudformation:*
+                  - iam:*
+                  - s3:*
+                Effect: "Allow"
+                Resource: "*"
+          PolicyName: CloudFormationManagedUploadInfrastructure

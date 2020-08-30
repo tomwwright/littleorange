@@ -19,3 +19,13 @@ deploy-pull-request-tests: ## Deploy CodeBuild project with webhook that runs te
 		--stack-name LittleOrangePRTests \
 		--capabilities CAPABILITY_IAM \
 		--no-fail-on-empty-changeset
+
+deploy-resource-provider-devops: needs-ResourceProvider ## Deploy CodeBuild projects with webhooks for running tests and deployments for a CloudFormation Resource Provider
+	$(info [+] Deploying DevOps for CloudFormation Resource Provider '${ResourceProvider}')
+	aws cloudformation deploy \
+		--template-file devops/cloudformation/ResourceProvider.cfn.yml \
+		--stack-name LitleOrangeResourceProvider-${ResourceProvider} \
+		--capabilities CAPABILITY_IAM \
+		--no-fail-on-empty-changeset \
+		--parameter-overrides \
+			$(call CloudFormationParam,ResourceProvider)
