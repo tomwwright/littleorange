@@ -24,6 +24,10 @@ Submit resource provider to CloudFormation
 
 ```
 cfn submit
+
+# or, to submit and also set default version
+
+cfn submit --set-default
 ```
 
 Update default version of submitted type
