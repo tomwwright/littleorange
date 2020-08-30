@@ -37,7 +37,7 @@ help: ## Help documentation
 	@ echo ""
 	@ echo "Available targets:"
 	@ echo ""
-	@ cat $(MAKEFILE_LIST) | grep '##' | sort | awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-%]+:.*?## / {printf "\033[36m%-30s\033[0m%s\n\n", $$1, $$2}'
+	@ cat $(MAKEFILE_LIST) | grep '##' | sort | awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-%]+:.*?## / {printf "\033[36m%-30s\033[0m%s\n", $$1, $$2}'
 
 # Helper function that prints variable out in format MyParameter=${MyParameter} if set, otherwise prints nothing
 CloudFormationParam = $(if $(value $(1)), $(1)=$(value $(1)),)
