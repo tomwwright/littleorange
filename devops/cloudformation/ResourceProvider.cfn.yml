@@ -111,6 +111,7 @@ Resources:
               - Action:
                   - cloudformation:*
                   - iam:*
+                  - kms:*
                   - s3:*
                 Effect: "Allow"
                 Resource: "*"

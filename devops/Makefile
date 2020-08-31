@@ -2,7 +2,7 @@
 # DevOps Makefile
 # 
 
-deploy-github-credentials: ## Deploy stack to store GitHub credentials in Secrets Manager
+deploy-github-credentials: ## Deploy stack to store GitHub credentials in Secrets Manager and create CodeBuild credentials
 	$(info [+] Deploying GitHub credentials...)
 	aws cloudformation deploy \
 		--template-file devops/cloudformation/GithubCredentials.cfn.yml \
