@@ -1,0 +1,11 @@
+{
+    "typeName": "LittleOrange::Organizations::ServiceControlPolicy",
+    "language": "python37",
+    "runtime": "python3.7",
+    "entrypoint": "littleorange_organizations_servicecontrolpolicy.handlers.resource",
+    "testEntrypoint": "littleorange_organizations_servicecontrolpolicy.handlers.test_entrypoint",
+    "settings": {
+        "use_docker": true,
+        "protocolVersion": "2.0.0"
+    }
+}

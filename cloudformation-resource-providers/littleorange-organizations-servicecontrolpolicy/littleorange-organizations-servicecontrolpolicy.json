@@ -1,0 +1,75 @@
+{
+  "typeName": "LittleOrange::Organizations::ServiceControlPolicy",
+  "description": "Resource schema for AWS Organizations Service Control Policy (SCP) resource",
+  "sourceUrl": "https://github.com/tomwwright/littleorange.git",
+  "definitions": {},
+  "properties": {
+    "Arn": {
+      "description": "The Amazon Resource Name (ARN) of the policy.",
+      "type": "string"
+    },
+    "Content": {
+      "description": "The JSON policy content of the policy.",
+      "examples": [
+        "{\"Version\": \"2012-10-17\", \"Statement\": {\"Effect\": \"Deny\", \"Action\": [ \"iam:*\", \"ec2:*\", \"rds:*\" ], \"Resource\": \"*\"}}",
+        "{\"Version\": \"2012-10-17\", \"Statement\": {\"Effect\": \"Allow\", \"Action\": [ \"iam:*\", \"ec2:*\", \"cloudformation:*\" ], \"Resource\": \"*\"}}"
+      ],
+      "type": "string"
+    },
+    "Description": {
+      "description": "The description of the policy.",
+      "examples": [
+        "This is a Service Control Policy description"
+      ],
+      "type": "string"
+    },
+    "Id": {
+      "description": "The unique identifier (ID) of the policy.",
+      "type": "string",
+      "pattern": "^p-[a-z0-9]{8,128}$"
+    },
+    "Name": {
+      "description": "The friendly name of the policy.",
+      "examples": [
+        "Serverless",
+        "CloudMode0",
+        "Data"
+      ],
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "Content",
+    "Name"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/Id"
+  ],
+  "primaryIdentifier": [
+    "/properties/Id"
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "organizations:CreatePolicy"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "organizations:DescribePolicy"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "organizations:UpdatePolicy"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "organizations:DeletePolicy"
+      ]
+    }
+  }
+}
