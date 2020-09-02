@@ -1,0 +1,46 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange Organizations
+Resources:
+  Organization:
+    Type: LittleOrange::Organizations::Organization
+    Properties:
+      FeatureSet: ALL
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E3001 # E3001: Invalid or unsupported Type LittleOrange::Organizations::Organization -- user-defined type
+
+  ServerlessSCP:
+    DependsOn: [Organization]
+    Type: LittleOrange::Organizations::ServiceControlPolicy
+    Properties:
+      Content: |
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:*",
+                "iam:*",
+                "lambda:*",
+                "sns:*",
+                "sqs:*"
+              ],
+              "Effect": "Allow",
+              "Resource": "*"
+            }
+          ]
+        }
+      Description: Access to all services
+      Name: Open
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E3001 # E3001: Invalid or unsupported Type LittleOrange::Organizations::ServiceControlPolicy -- user-defined type
+
+Outputs:
+  OrganizationId:
+    Value: !Ref Organization

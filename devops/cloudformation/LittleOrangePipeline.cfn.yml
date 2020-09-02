@@ -11,6 +11,29 @@ Parameters:
     Description: PRs against this branch with trigger tests in CodeBuild via webhook
     Type: String
 Resources:
+  DeployProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      ServiceRole: !GetAtt Role.Arn
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:3.0
+        PrivilegedMode: true
+        Type: LINUX_CONTAINER
+      Source:
+        Type: GITHUB
+        Location: !Ref GitHubUrl
+        BuildSpec: devops/buildspec/LittleOrangeDeploy.buildspec.yml
+      Triggers:
+        Webhook: true
+        FilterGroups:
+          - - Type: EVENT
+              Pattern: PUSH
+            - Type: HEAD_REF
+              Pattern: !Sub "^refs/heads/${GitHubBranch}$"
+
   PRTestProject:
     Type: AWS::CodeBuild::Project
     Properties:
@@ -54,3 +77,13 @@ Resources:
                   - logs:PutLogEvents
                 Resource: "*"
           PolicyName: CloudWatchLogs
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - iam:*
+                  - codebuild:*
+                  - cloudformation:*
+                Resource: "*"
+          PolicyName: Deploy

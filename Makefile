@@ -3,7 +3,11 @@
 #
 
 include cloudformation-resource-providers/Makefile
+include core/Makefile
 include devops/Makefile
+
+deploy: deploy-pipeline deploy-core ## Deploy Little Orange
+	
 
 lint: lint-yaml lint-cloudformation ## Run all linting
 
