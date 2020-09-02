@@ -12,11 +12,11 @@ deploy-github-credentials: ## Deploy stack to store GitHub credentials in Secret
 			$(call CloudFormationParam,GitHubToken) \
 			$(call CloudFormationParam,GitHubUsername)
 
-deploy-pull-request-tests: ## Deploy CodeBuild project with webhook that runs tests on GitHub pull requests
+deploy-pipeline: ## Deploy CodeBuild projects with webhook to run tests on GitHub pull requests and deploy on merge
 	$(info [+] Deploying GitHub Pull Request tests)
 	aws cloudformation deploy \
-		--template-file devops/cloudformation/PRTests.cfn.yml \
-		--stack-name LittleOrangePRTests \
+		--template-file devops/cloudformation/LittleOrangePipeline.cfn.yml \
+		--stack-name LittleOrangePipeline \
 		--capabilities CAPABILITY_IAM \
 		--no-fail-on-empty-changeset
 

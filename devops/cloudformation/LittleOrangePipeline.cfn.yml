@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Little Orange Pull Request testing
+Description: Little Orange DevOps Pipeline
 Parameters:
   GitHubUrl:
     Default: https://github.com/tomwwright/littleorange.git
@@ -24,7 +24,7 @@ Resources:
       Source:
         Type: GITHUB
         Location: !Ref GitHubUrl
-        BuildSpec: devops/buildspec/test.buildspec.yml
+        BuildSpec: devops/buildspec/LittleOrangePRTest.buildspec.yml
       Triggers:
         Webhook: true
         FilterGroups:
