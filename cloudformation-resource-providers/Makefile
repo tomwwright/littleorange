@@ -6,4 +6,4 @@ validate-resource-provider: needs-ResourceProvider ## Run validation on Resource
 	cd cloudformation-resource-providers/${ResourceProvider} && cfn validate
 
 submit-resource-provider: needs-ResourceProvider ## Submit Resource Provider using CFN CLI, e.g. submit-resouce-provider ResourceProvider=littleorange-organizations-organization
-	cd cloudformation-resource-providers/${ResourceProvider} && cfn submit --set-default
+	cd cloudformation-resource-providers/${ResourceProvider} && cfn submit --set-default -v
