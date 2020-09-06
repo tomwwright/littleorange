@@ -1,16 +1,16 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
 Description: Little Orange Organizations
+Metadata:
+  cfn-lint:
+    config:
+      ignore_checks:
+        - E3001 # E3001: Invalid or unsupported Type -- user-defined types from CloudFormation Resource Types
 Resources:
   Organization:
     Type: LittleOrange::Organizations::Organization
     Properties:
       FeatureSet: ALL
-    Metadata:
-      cfn-lint:
-        config:
-          ignore_checks:
-            - E3001 # E3001: Invalid or unsupported Type LittleOrange::Organizations::Organization -- user-defined type
 
   ServerlessSCP:
     DependsOn: [Organization]
@@ -35,11 +35,6 @@ Resources:
         }
       Description: Access to all services
       Name: Open
-    Metadata:
-      cfn-lint:
-        config:
-          ignore_checks:
-            - E3001 # E3001: Invalid or unsupported Type LittleOrange::Organizations::ServiceControlPolicy -- user-defined type
 
 Outputs:
   OrganizationId:
