@@ -12,7 +12,8 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 {
     "Type" : "LittleOrange::Organizations::Organization",
     "Properties" : {
-        "<a href="#featureset" title="FeatureSet">FeatureSet</a>" : <i>String</i>,
+        "<a href="#enabledpolicytypes" title="EnabledPolicyTypes">EnabledPolicyTypes</a>" : <i>[ <a href="enabledpolicytypes.md">EnabledPolicyTypes</a>, ... ]</i>,
+        "<a href="#featureset" title="FeatureSet">FeatureSet</a>" : <i>String</i>
     }
 }
 </pre>
@@ -22,10 +23,22 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <pre>
 Type: LittleOrange::Organizations::Organization
 Properties:
+    <a href="#enabledpolicytypes" title="EnabledPolicyTypes">EnabledPolicyTypes</a>: <i>
+      - <a href="enabledpolicytypes.md">EnabledPolicyTypes</a></i>
     <a href="#featureset" title="FeatureSet">FeatureSet</a>: <i>String</i>
 </pre>
 
 ## Properties
+
+#### EnabledPolicyTypes
+
+The enabled policy types of the Organization root
+
+_Required_: No
+
+_Type_: List of <a href="enabledpolicytypes.md">EnabledPolicyTypes</a>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
 #### FeatureSet
 
@@ -54,10 +67,6 @@ For more information about using the `Fn::GetAtt` intrinsic function, see [Fn::G
 #### Arn
 
 Returns the <code>Arn</code> value.
-
-#### AvailablePolicyTypes
-
-The policy types and associated status for this Organization
 
 #### Id
 

@@ -21,6 +21,25 @@
     "MasterAccountEmail": {
       "type": "string"
     },
+    "EnabledPolicyTypes": {
+      "description": "The enabled policy types of the Organization root",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "Type": {
+            "description": "The policy type",
+            "type": "string",
+            "enum": [
+              "AISERVICES_OPT_OUT_POLICY",
+              "BACKUP_POLICY",
+              "SERVICE_CONTROL_POLICY",
+              "TAG_POLICY"
+            ]
+          }
+        }
+      }
+    },
     "FeatureSet": {
       "description": "Specifies the feature set supported by the organization. Each feature set supports different levels of functionality.",
       "type": "string",
@@ -28,30 +47,12 @@
         "ALL",
         "CONSOLIDATED_BILLING"
       ]
-    },
-    "AvailablePolicyTypes": {
-      "description": "The policy types and associated status for this Organization",
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "Type": {
-            "description": "The name of the policy type.",
-            "type": "string"
-          },
-          "Status": {
-            "description": "The status of the policy type as it relates to the associated root. To attach a policy of the specified type to a root or to an OU or account in that root, it must be available in the organization and enabled for that root.",
-            "type": "string"
-          }
-        }
-      }
     }
   },
   "additionalProperties": false,
   "required": [],
   "readOnlyProperties": [
     "/properties/Arn",
-    "/properties/AvailablePolicyTypes",
     "/properties/Id",
     "/properties/MasterAccountArn",
     "/properties/MasterAccountId",

@@ -14,6 +14,7 @@ from cloudformation_cli_python_lib import (
 import mypy_boto3_organizations as Organizations
 
 from .models import BaseModel, ResourceHandlerRequest, ResourceModel
+from .provisioner import OrganizationsOrganizationProvisioner
 
 # Use this logger to forward log messages to CloudWatch Logs.
 LOG = logging.getLogger(__name__)
@@ -32,23 +33,19 @@ def create_handler(
 
   LOG.info(request)
 
-  model = request.desiredResourceState
-
   if not session:
     raise exceptions.InternalFailure(f"boto3 session unavailable")
 
   if not request.desiredResourceState:
     raise exceptions.InternalFailure("Desired resource state unavailable")
 
-  organizations: Organizations.Client = session.client('organizations')
-  organization = organizations.create_organization(
-      FeatureSet=cast(Any, request.desiredResourceState.FeatureSet)  # generated model doesn't represent type of enums correctly
-  )["Organization"]
-  model = ResourceModel._deserialize(organization)
+  provisioner = OrganizationsOrganizationProvisioner(LOG, session)
+
+  organization = provisioner.create(request.desiredResourceState)
 
   return ProgressEvent(
       status=OperationStatus.SUCCESS,
-      resourceModel=model,
+      resourceModel=organization,
   )
 
 
