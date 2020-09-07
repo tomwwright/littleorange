@@ -51,6 +51,9 @@
   },
   "additionalProperties": false,
   "required": [],
+  "createOnlyProperties": [
+    "/properties/FeatureSet"
+  ],
   "readOnlyProperties": [
     "/properties/Arn",
     "/properties/Id",
