@@ -1,7 +1,7 @@
-from cloudformation_cli_python_lib import SessionProxy
+from cloudformation_cli_python_lib import SessionProxy, exceptions
 from logging import Logger
 import mypy_boto3_organizations as Organizations
-from typing import cast, Any, Dict, get_type_hints, Type
+from typing import cast, get_type_hints, Any, Dict, Sequence, Type
 from .models import ResourceModel
 
 
@@ -38,7 +38,17 @@ class OrganizationsOrganizationProvisioner(object):
 
     raise Exception('Root with name \'Root\' not found')
 
-  def __setEnabledPolicyTypes(self, organizations, policyTypes):
+  def __handleEnabledPolicyTypes(self, organizations: Organizations.Client, desired: ResourceModel):
+    if not desired.EnabledPolicyTypes:
+      policyTypes = []
+    else:
+      policyTypes = [policy.Type for policy in desired.EnabledPolicyTypes]
+
+    self.__setEnabledPolicyTypes(organizations, policyTypes)
+
+    return [policyType._serialize() for policyType in (desired.EnabledPolicyTypes or [])]
+
+  def __setEnabledPolicyTypes(self, organizations: Organizations.Client, policyTypes: Sequence[str]):
     root = self.__findRoot(organizations)
 
     enabledPolicyTypes = [policy['Type'] for policy in root['PolicyTypes'] if policy['Status'] == 'ENABLED']
@@ -66,16 +76,24 @@ class OrganizationsOrganizationProvisioner(object):
         FeatureSet=cast(Any, desired.FeatureSet)  # generated model doesn't represent type of enums correctly
     )
 
-    if not desired.EnabledPolicyTypes:
-      policyTypes = []
-    else:
-      policyTypes = [policy.Type for policy in desired.EnabledPolicyTypes]
+    enabledPolicyTypes = self.__handleEnabledPolicyTypes(organizations, desired)
 
-    self.__setEnabledPolicyTypes(organizations, policyTypes)
-
-    data: Any = {
+    modelData: Any = {
         **response['Organization'],
-        'EnabledPolicyTypes': [policyType._serialize() for policyType in (desired.EnabledPolicyTypes or [])]
+        'EnabledPolicyTypes': enabledPolicyTypes
     }
 
-    return safeDeserialise(ResourceModel, data)
+    return safeDeserialise(ResourceModel, modelData)
+
+  def update(self, current: ResourceModel, desired: ResourceModel) -> ResourceModel:
+
+    organizations: Organizations.Client = self.boto3.client('organizations')
+
+    self.__handleEnabledPolicyTypes(organizations, desired)
+
+    modelData: Any = {
+        **current._serialize(),
+        **desired._serialize()
+    }
+
+    return safeDeserialise(ResourceModel, modelData)

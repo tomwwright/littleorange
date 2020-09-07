@@ -49,6 +49,34 @@ def create_handler(
   )
 
 
+@resource.handler(Action.UPDATE)
+def update_handler(
+    session: Optional[SessionProxy],
+    request: ResourceHandlerRequest,
+    callback_context: MutableMapping[str, Any],
+) -> ProgressEvent:
+
+  LOG.info(request)
+
+  if not session:
+    raise exceptions.InternalFailure(f"boto3 session unavailable")
+
+  if not request.previousResourceState:
+    raise exceptions.InternalFailure("Previous resource state unavailable")
+
+  if not request.desiredResourceState:
+    raise exceptions.InternalFailure("Desired resource state unavailable")
+
+  provisioner = OrganizationsOrganizationProvisioner(LOG, session)
+
+  organization = provisioner.update(request.previousResourceState, request.desiredResourceState)
+
+  return ProgressEvent(
+      status=OperationStatus.SUCCESS,
+      resourceModel=organization,
+  )
+
+
 @resource.handler(Action.DELETE)
 def delete_handler(
     session: Optional[SessionProxy],
