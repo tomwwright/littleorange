@@ -5,13 +5,12 @@ verify_ssl = true
 
 [dev-packages]
 autopep8 = "*"
-pylint = "*"
+cloudformation-cli = "*"
 cloudformation-cli-python-plugin = "*"
+mypy = "*"
 
 [packages]
 boto3 = "*"
-cloudformation-cli-python-lib = "*"
-cloudformation-cli-python-plugin = "*"
 boto3-stubs = {extras = ["organizations"],version = "*"}
 cfn-lint = "*"
 yamllint = "*"
