@@ -37,7 +37,10 @@
               "TAG_POLICY"
             ]
           }
-        }
+        },
+        "required": [
+          "Type"
+        ]
       }
     },
     "FeatureSet": {
@@ -50,7 +53,9 @@
     }
   },
   "additionalProperties": false,
-  "required": [],
+  "required": [
+    "/properties/Id"
+  ],
   "createOnlyProperties": [
     "/properties/FeatureSet"
   ],

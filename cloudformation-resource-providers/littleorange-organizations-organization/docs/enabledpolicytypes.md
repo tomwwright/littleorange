@@ -24,7 +24,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 The policy type
 
-_Required_: No
+_Required_: Yes
 
 _Type_: String
 
