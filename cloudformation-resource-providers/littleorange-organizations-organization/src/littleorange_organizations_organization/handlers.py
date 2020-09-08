@@ -134,16 +134,10 @@ def list_handler(
   if not session:
     raise exceptions.InternalFailure(f"boto3 session unavailable")
 
-  organizations: Organizations.Client = session.client('organizations')
-  models: List[Any] = []
-
-  try:
-    organization = organizations.describe_organization()["Organization"]
-    models = [ResourceModel._deserialize(organization)]
-  except organizations.exceptions.AWSOrganizationsNotInUseException:
-    models = []
+  provisioner = OrganizationsOrganizationProvisioner(LOG, session)
+  organizations = provisioner.listResources()
 
   return ProgressEvent(
       status=OperationStatus.SUCCESS,
-      resourceModels=models,
+      resourceModels=organizations,
   )

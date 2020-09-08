@@ -104,6 +104,23 @@ class OrganizationsOrganizationProvisioner(object):
 
     return safeDeserialise(ResourceModel, modelData)
 
+  def listResources(self) -> Sequence[ResourceModel]:
+
+    organizations: Organizations.Client = self.boto3.client('organizations')
+
+    try:
+      organization = organizations.describe_organization()["Organization"]
+      root = self.__findRoot(organizations)
+    except organizations.exceptions.AWSOrganizationsNotInUseException:
+      raise exceptions.NotFound(self.TYPE, 'NoID')
+
+    modelData: Any = {
+        **organization,
+        'EnabledPolicyTypes': [{'Type': policy['Type']} for policy in root['PolicyTypes'] if policy['Status'] == 'ENABLED']
+    }
+
+    return [safeDeserialise(ResourceModel, modelData)]
+
   def update(self, current: ResourceModel, desired: ResourceModel) -> ResourceModel:
 
     organizations: Organizations.Client = self.boto3.client('organizations')
