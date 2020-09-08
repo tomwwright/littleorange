@@ -16,6 +16,9 @@ Resources:
     DependsOn: [OrganizationsServiceLinkedRole]
     Type: LittleOrange::Organizations::Organization
     Properties:
+      EnabledPolicyTypes:
+        - Type: SERVICE_CONTROL_POLICY
+        - Type: TAG_POLICY
       FeatureSet: ALL
 
   ServerlessSCP:
