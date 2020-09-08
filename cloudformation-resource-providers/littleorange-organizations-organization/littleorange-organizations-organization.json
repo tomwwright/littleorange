@@ -83,6 +83,13 @@
         "organizations:ListRoots"
       ]
     },
+    "update": {
+      "permissions": [
+        "organizations:DisablePolicyType",
+        "organizations:EnablePolicyType",
+        "organizations:ListRoots"
+      ]
+    },
     "read": {
       "permissions": [
         "organizations:DescribeOrganization",
