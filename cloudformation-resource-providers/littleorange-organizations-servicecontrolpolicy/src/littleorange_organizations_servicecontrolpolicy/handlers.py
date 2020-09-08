@@ -33,8 +33,6 @@ def create_handler(
 
   LOG.info(request)
 
-  print(request)
-
   if not session:
     raise exceptions.InternalFailure(f"boto3 session unavailable")
 
