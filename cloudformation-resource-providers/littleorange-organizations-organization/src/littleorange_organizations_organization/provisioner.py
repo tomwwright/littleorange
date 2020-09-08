@@ -1,7 +1,7 @@
 from cloudformation_cli_python_lib import SessionProxy, exceptions
 from logging import Logger
 import mypy_boto3_organizations as Organizations
-from typing import cast, get_type_hints, Any, Dict, Sequence, Type
+from typing import cast, get_type_hints, Any, Dict, Optional, Sequence, Type
 from .models import ResourceModel
 
 
@@ -48,7 +48,7 @@ class OrganizationsOrganizationProvisioner(object):
 
     return [policyType._serialize() for policyType in (desired.EnabledPolicyTypes or [])]
 
-  def __setEnabledPolicyTypes(self, organizations: Organizations.Client, policyTypes: Sequence[str]):
+  def __setEnabledPolicyTypes(self, organizations: Organizations.Client, policyTypes: Sequence[Optional[str]]):
     root = self.__findRoot(organizations)
 
     enabledPolicyTypes = [policy['Type'] for policy in root['PolicyTypes'] if policy['Status'] == 'ENABLED']
