@@ -77,13 +77,17 @@
   "handlers": {
     "create": {
       "permissions": [
+        "iam:CreateServiceLinkedRole",
         "organizations:CreateOrganization",
-        "iam:CreateServiceLinkedRole"
+        "organizations:DisablePolicyType",
+        "organizations:EnablePolicyType",
+        "organizations:ListRoots"
       ]
     },
     "read": {
       "permissions": [
-        "organizations:DescribeOrganization"
+        "organizations:DescribeOrganization",
+        "organizations:ListRoots"
       ]
     },
     "delete": {
@@ -93,7 +97,8 @@
     },
     "list": {
       "permissions": [
-        "organizations:DescribeOrganization"
+        "organizations:DescribeOrganization",
+        "organizations:ListRoots"
       ]
     }
   }

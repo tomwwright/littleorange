@@ -27,6 +27,9 @@ Resources:
                 - "organizations:CreateOrganization"
                 - "organizations:DeleteOrganization"
                 - "organizations:DescribeOrganization"
+                - "organizations:DisablePolicyType"
+                - "organizations:EnablePolicyType"
+                - "organizations:ListRoots"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:
