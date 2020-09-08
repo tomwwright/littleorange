@@ -108,7 +108,6 @@ def read_handler(
     request: ResourceHandlerRequest,
     callback_context: MutableMapping[str, Any],
 ) -> ProgressEvent:
-  model = request.desiredResourceState
 
   if not request.desiredResourceState or not request.desiredResourceState.Id:
     raise exceptions.InternalFailure("Desired resource state unavailable")
@@ -116,17 +115,13 @@ def read_handler(
   if not session:
     raise exceptions.InternalFailure(f"boto3 session unavailable")
 
-  organizations: Organizations.Client = session.client('organizations')
+  provisioner = OrganizationsOrganizationProvisioner(LOG, session)
 
-  try:
-    organization = organizations.describe_organization()["Organization"]
-    model = ResourceModel._deserialize(organization)
-  except organizations.exceptions.AWSOrganizationsNotInUseException:
-    raise exceptions.NotFound(TYPE_NAME, request.desiredResourceState.Id)
+  organization = provisioner.get(request.desiredResourceState)
 
   return ProgressEvent(
       status=OperationStatus.SUCCESS,
-      resourceModel=model,
+      resourceModel=organization,
   )
 
 
