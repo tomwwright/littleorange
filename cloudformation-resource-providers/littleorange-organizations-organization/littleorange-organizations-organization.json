@@ -77,7 +77,6 @@
   "handlers": {
     "create": {
       "permissions": [
-        "iam:CreateServiceLinkedRole",
         "organizations:CreateOrganization",
         "organizations:DisablePolicyType",
         "organizations:EnablePolicyType",

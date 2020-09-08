@@ -7,7 +7,13 @@ Metadata:
       ignore_checks:
         - E3001 # E3001: Invalid or unsupported Type -- user-defined types from CloudFormation Resource Types
 Resources:
+  OrganizationsServiceLinkedRole:
+    Type: AWS::IAM::ServiceLinkedRole
+    Properties:
+      AWSServiceName: organizations.amazonaws.com
+
   Organization:
+    DependsOn: [OrganizationsServiceLinkedRole]
     Type: LittleOrange::Organizations::Organization
     Properties:
       FeatureSet: ALL
