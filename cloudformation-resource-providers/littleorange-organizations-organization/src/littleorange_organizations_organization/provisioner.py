@@ -23,6 +23,8 @@ def safeDeserialise(cls: Type[ResourceModel], data: Dict) -> ResourceModel:
 
 class OrganizationsOrganizationProvisioner(object):
 
+  TYPE: str = "LittleOrange::Organizations::Organization"
+
   def __init__(self, logger: Logger, boto3: SessionProxy):
     self.logger = logger
     self.boto3 = boto3

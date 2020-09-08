@@ -18,9 +18,8 @@ from .provisioner import OrganizationsOrganizationProvisioner
 
 # Use this logger to forward log messages to CloudWatch Logs.
 LOG = logging.getLogger(__name__)
-TYPE_NAME = "LittleOrange::Organizations::Organization"
 
-resource = Resource(TYPE_NAME, ResourceModel)
+resource = Resource(OrganizationsOrganizationProvisioner.TYPE, ResourceModel)
 test_entrypoint = resource.test_entrypoint
 
 
@@ -94,7 +93,7 @@ def delete_handler(
   try:
     organizations.delete_organization()
   except organizations.exceptions.AWSOrganizationsNotInUseException:
-    raise exceptions.NotFound(TYPE_NAME, "any")
+    raise exceptions.NotFound(OrganizationsOrganizationProvisioner.TYPE, "any")
 
   return ProgressEvent(
       status=OperationStatus.SUCCESS,
