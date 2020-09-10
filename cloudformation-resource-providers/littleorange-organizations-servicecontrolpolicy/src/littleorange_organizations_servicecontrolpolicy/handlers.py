@@ -14,13 +14,11 @@ from cloudformation_cli_python_lib import (
 import mypy_boto3_organizations as Organizations
 
 from .models import ResourceHandlerRequest, ResourceModel
+from .provisioner import OrganizationsServiceControlPolicyProvisioner
 
 LOG = logging.getLogger(__name__)
-TYPE_NAME = "LittleOrange::Organizations::ServiceControlPolicy"
 
-SERVICE_CONTROL_POLICY = "SERVICE_CONTROL_POLICY"
-
-resource = Resource(TYPE_NAME, ResourceModel)
+resource = Resource(OrganizationsServiceControlPolicyProvisioner.TYPE, ResourceModel)
 test_entrypoint = resource.test_entrypoint
 
 
@@ -39,23 +37,8 @@ def create_handler(
   if not request.desiredResourceState:
     raise exceptions.InternalFailure("Desired resource state unavailable")
 
-  model = request.desiredResourceState
-
-  organizations: Organizations.Client = session.client('organizations')
-  scp = organizations.create_policy(
-      Name=model.Name,
-      Description=model.Description or "",
-      Content=model.Content,
-      Type=SERVICE_CONTROL_POLICY
-  )["Policy"]
-
-  model = ResourceModel._deserialize({
-      "Arn": scp["PolicySummary"]["Arn"],
-      "Description": scp["PolicySummary"]["Description"],
-      "Content": scp["Content"],
-      "Id": scp["PolicySummary"]["Id"],
-      "Name": scp["PolicySummary"]["Name"]
-  })
+  provisioner = OrganizationsServiceControlPolicyProvisioner(LOG, session)
+  model = provisioner.create(request.desiredResourceState)
 
   return ProgressEvent(
       status=OperationStatus.SUCCESS,
@@ -89,7 +72,7 @@ def update_handler(
         Name=model.Name
     )["Policy"]
   except organizations.exceptions.PolicyNotFoundException:
-    raise exceptions.NotFound(TYPE_NAME, model.Id)
+    raise exceptions.NotFound(OrganizationsServiceControlPolicyProvisioner.TYPE, model.Id)
 
   model = ResourceModel._deserialize({
       "Arn": scp["PolicySummary"]["Arn"],
@@ -126,7 +109,7 @@ def delete_handler(
     organizations: Organizations.Client = session.client('organizations')
     organizations.delete_policy(PolicyId=model.Id)
   except organizations.exceptions.PolicyNotFoundException:
-    raise exceptions.NotFound(TYPE_NAME, model.Id)
+    raise exceptions.NotFound(OrganizationsServiceControlPolicyProvisioner.TYPE, model.Id)
 
   return ProgressEvent(
       status=OperationStatus.SUCCESS,
@@ -156,7 +139,7 @@ def read_handler(
   try:
     scp = organizations.describe_policy(PolicyId=model.Id)["Policy"]
   except organizations.exceptions.PolicyNotFoundException:
-    raise exceptions.NotFound(TYPE_NAME, model.Id)
+    raise exceptions.NotFound(OrganizationsServiceControlPolicyProvisioner.TYPE, model.Id)
 
   model = ResourceModel._deserialize({
       "Arn": scp["PolicySummary"]["Arn"],
