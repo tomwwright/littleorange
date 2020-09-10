@@ -8,6 +8,7 @@ autopep8 = "*"
 cloudformation-cli = "*"
 cloudformation-cli-python-plugin = "*"
 mypy = "*"
+moto = "*"
 
 [packages]
 boto3 = "*"

@@ -29,7 +29,7 @@ class OrganizationsOrganizationProvisioner(object):
     self.logger = logger
     self.boto3 = boto3
 
-  def __findRoot(self, organizations):
+  def findRoot(self, organizations):
 
     pages = organizations.get_paginator('list_roots').paginate()
     roots = [root for page in pages for root in page['Roots']]
@@ -51,7 +51,7 @@ class OrganizationsOrganizationProvisioner(object):
     return [policyType._serialize() for policyType in (desired.EnabledPolicyTypes or [])]
 
   def __setEnabledPolicyTypes(self, organizations: Organizations.Client, policyTypes: Sequence[Optional[str]]):
-    root = self.__findRoot(organizations)
+    root = self.findRoot(organizations)
 
     enabledPolicyTypes = [policy['Type'] for policy in root['PolicyTypes'] if policy['Status'] == 'ENABLED']
 
@@ -93,7 +93,7 @@ class OrganizationsOrganizationProvisioner(object):
 
     try:
       organization = organizations.describe_organization()["Organization"]
-      root = self.__findRoot(organizations)
+      root = self.findRoot(organizations)
     except organizations.exceptions.AWSOrganizationsNotInUseException:
       raise exceptions.NotFound(self.TYPE, desired.Id or 'NoID')
 
@@ -110,7 +110,7 @@ class OrganizationsOrganizationProvisioner(object):
 
     try:
       organization = organizations.describe_organization()["Organization"]
-      root = self.__findRoot(organizations)
+      root = self.findRoot(organizations)
     except organizations.exceptions.AWSOrganizationsNotInUseException:
       raise exceptions.NotFound(self.TYPE, 'NoID')
 
