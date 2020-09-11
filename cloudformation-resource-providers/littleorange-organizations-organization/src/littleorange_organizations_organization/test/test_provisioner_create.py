@@ -4,7 +4,6 @@ from moto import mock_organizations
 import mypy_boto3_organizations as Organizations
 from typing import Any, get_type_hints
 from unittest import TestCase
-from unittest.mock import Mock
 
 from ..models import ResourceModel
 from ..provisioner import OrganizationsOrganizationProvisioner

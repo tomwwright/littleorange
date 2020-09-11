@@ -1,4 +1,3 @@
-from boto3.session import Session
 import logging
 import mypy_boto3_organizations as Organizations
 from typing import Any, get_type_hints
