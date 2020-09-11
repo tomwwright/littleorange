@@ -31,3 +31,25 @@ class OrganizationsServiceControlPolicyProvisioner(object):
         "Id": scp["PolicySummary"]["Id"],
         "Name": scp["PolicySummary"]["Name"]
     })
+
+  def update(self, current: ResourceModel, desired: ResourceModel):
+
+    organizations: Organizations.Client = self.boto3.client('organizations')
+
+    try:
+      scp = organizations.update_policy(
+          PolicyId=desired.Id,
+          Description=desired.Description,
+          Content=desired.Content,
+          Name=desired.Name
+      )["Policy"]
+    except organizations.exceptions.PolicyNotFoundException:
+      raise exceptions.NotFound(OrganizationsServiceControlPolicyProvisioner.TYPE, desired.Id)
+
+    return ResourceModel._deserialize({
+        "Arn": scp["PolicySummary"]["Arn"],
+        "Description": scp["PolicySummary"]["Description"],
+        "Content": scp["Content"],
+        "Id": scp["PolicySummary"]["Id"],
+        "Name": scp["PolicySummary"]["Name"]
+    })

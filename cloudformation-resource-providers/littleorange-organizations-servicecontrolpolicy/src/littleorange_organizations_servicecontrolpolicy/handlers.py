@@ -58,29 +58,14 @@ def update_handler(
   if not session:
     raise exceptions.InternalFailure(f"boto3 session unavailable")
 
+  if not request.previousResourceState:
+    raise exceptions.InternalFailure("Previous resource state unavailable")
+
   if not request.desiredResourceState:
     raise exceptions.InternalFailure("Desired resource state unavailable")
 
-  model = request.desiredResourceState
-
-  try:
-    organizations: Organizations.Client = session.client('organizations')
-    scp = organizations.update_policy(
-        PolicyId=model.Id,
-        Description=model.Description,
-        Content=model.Content,
-        Name=model.Name
-    )["Policy"]
-  except organizations.exceptions.PolicyNotFoundException:
-    raise exceptions.NotFound(OrganizationsServiceControlPolicyProvisioner.TYPE, model.Id)
-
-  model = ResourceModel._deserialize({
-      "Arn": scp["PolicySummary"]["Arn"],
-      "Description": scp["PolicySummary"]["Description"],
-      "Content": scp["Content"],
-      "Id": scp["PolicySummary"]["Id"],
-      "Name": scp["PolicySummary"]["Name"]
-  })
+  provisioner = OrganizationsServiceControlPolicyProvisioner(LOG, session)
+  model = provisioner.update(request.previousResourceState, request.desiredResourceState)
 
   return ProgressEvent(
       status=OperationStatus.SUCCESS,
