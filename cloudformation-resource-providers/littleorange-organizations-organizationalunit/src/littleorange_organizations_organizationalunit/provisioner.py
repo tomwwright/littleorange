@@ -38,3 +38,15 @@ class OrganizationsOrganizationalUnitProvisioner(object):
         "Name": ou["OrganizationalUnit"]["Name"],
         "ParentId": parents["Parents"][0]["Id"]
     })
+
+  def update(self, current: ResourceModel, desired: ResourceModel) -> ResourceModel:
+
+    try:
+      self.organizations.update_organizational_unit(
+          OrganizationalUnitId=desired.Id,
+          Name=desired.Name
+      )
+    except self.organizations.exceptions.OrganizationalUnitNotFoundException:
+      raise exceptions.NotFound(self.TYPE, desired.Id)
+
+    return self.get(desired)
