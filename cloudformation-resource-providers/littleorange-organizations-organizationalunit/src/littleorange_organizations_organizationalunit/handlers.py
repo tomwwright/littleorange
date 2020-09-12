@@ -83,9 +83,19 @@ def read_handler(
     request: ResourceHandlerRequest,
     callback_context: MutableMapping[str, Any],
 ) -> ProgressEvent:
-  model = request.desiredResourceState
-  # TODO: put code here
+
+  if not request.desiredResourceState or not request.desiredResourceState.Id:
+    raise exceptions.InternalFailure("Desired resource state unavailable")
+
+  if not session:
+    raise exceptions.InternalFailure(f"boto3 session unavailable")
+
+  organizations: Organizations.Client = session.client('organizations')
+
+  provisioner = OrganizationsOrganizationalUnitProvisioner(LOG, organizations)
+  ou = provisioner.get(request.desiredResourceState)
+
   return ProgressEvent(
       status=OperationStatus.SUCCESS,
-      resourceModel=model,
+      resourceModel=ou,
   )

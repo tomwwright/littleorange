@@ -26,3 +26,15 @@ class OrganizationsOrganizationalUnitProvisioner(object):
         "Name": ou["OrganizationalUnit"]["Name"],
         "ParentId": desired.ParentId
     })
+
+  def get(self, desired: ResourceModel) -> ResourceModel:
+
+    ou = self.organizations.describe_organizational_unit(OrganizationalUnitId=desired.Id)
+    parents = self.organizations.list_parents(ChildId=desired.Id)
+
+    return ResourceModel._deserialize({
+        "Arn": ou["OrganizationalUnit"]["Arn"],
+        "Id": ou["OrganizationalUnit"]["Id"],
+        "Name": ou["OrganizationalUnit"]["Name"],
+        "ParentId": parents["Parents"][0]["Id"]
+    })
