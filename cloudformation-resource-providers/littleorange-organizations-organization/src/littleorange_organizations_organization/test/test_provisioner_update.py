@@ -19,43 +19,6 @@ class TestOrganizationsOrganizationProvisionerUpdate(TestCase):
   @mock_organizations
   def testUpdateEnabledPolicyTypes(self):
 
-    # mockBoto3: Any = Mock()
-    # mockClient: Any = Mock()
-    # mockBoto3.client.return_value = mockClient
-
-    # # list_roots
-    # mockClient.get_paginator.return_value.paginate.return_value = [
-    #     {
-    #         'Roots': [
-    #             {
-    #                 'Id': 'r-2345',
-    #                 'Arn': 'arn:aws:organizations::111222333444:root/o-abcd123456/r-2345',
-    #                 'Name': 'NotRoot',
-    #                 'PolicyTypes': []
-    #             }
-    #         ]
-    #     },
-    #     {
-    #         'Roots': [
-    #             {
-    #                 'Id': 'r-1234',
-    #                 'Arn': 'arn:aws:organizations::111222333444:root/o-abcd123456/r-1234',
-    #                 'Name': 'Root',
-    #                 'PolicyTypes': [
-    #                     {
-    #                         'Type': 'SERVICE_CONTROL_POLICY',
-    #                         'Status': 'ENABLED'
-    #                     },
-    #                     {
-    #                         'Type': 'BACKUP_POLICY',
-    #                         'Status': 'ENABLED'
-    #                     }
-    #                 ]
-    #             }
-    #         ]
-    #     }
-    # ]
-
     current = ResourceModel._deserialize({
         'Id': 'o-abcd123456',
         'Arn': 'arn:aws:organizations::111222333444:organization/o-abcd123456',
