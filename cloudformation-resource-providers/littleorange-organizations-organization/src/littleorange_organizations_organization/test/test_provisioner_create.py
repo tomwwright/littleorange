@@ -30,6 +30,10 @@ class TestOrganizationsOrganizationProvisionerCreate(TestCase):
     model = provisioner.create(desired)
 
     assert model.Id is not None
+    assert len(model.EnabledPolicyTypes) == 2
+    modelEnabledPolicyTypes = [policy.Type for policy in model.EnabledPolicyTypes]
+    assert "SERVICE_CONTROL_POLICY" in modelEnabledPolicyTypes
+    assert "TAG_POLICY" in modelEnabledPolicyTypes
 
     organizations: Organizations.Client = boto3.client('organizations')
 

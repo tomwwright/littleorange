@@ -11,6 +11,10 @@
       "type": "string",
       "pattern": "^o-[a-z0-9]{10,32}$"
     },
+    "RootId": {
+      "type": "string",
+      "pattern": "^r-[a-z0-9]{4,32}$"
+    },
     "MasterAccountArn": {
       "type": "string"
     },
@@ -62,6 +66,7 @@
   "readOnlyProperties": [
     "/properties/Arn",
     "/properties/Id",
+    "/properties/RootId",
     "/properties/MasterAccountArn",
     "/properties/MasterAccountId",
     "/properties/MasterAccountEmail"

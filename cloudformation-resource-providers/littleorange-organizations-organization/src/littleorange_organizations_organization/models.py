@@ -41,6 +41,7 @@ class ResourceHandlerRequest(BaseResourceHandlerRequest):
 class ResourceModel(BaseModel):
     Arn: Optional[str]
     Id: Optional[str]
+    RootId: Optional[str]
     MasterAccountArn: Optional[str]
     MasterAccountId: Optional[str]
     MasterAccountEmail: Optional[str]
@@ -59,6 +60,7 @@ class ResourceModel(BaseModel):
         return cls(
             Arn=json_data.get("Arn"),
             Id=json_data.get("Id"),
+            RootId=json_data.get("RootId"),
             MasterAccountArn=json_data.get("MasterAccountArn"),
             MasterAccountId=json_data.get("MasterAccountId"),
             MasterAccountEmail=json_data.get("MasterAccountEmail"),

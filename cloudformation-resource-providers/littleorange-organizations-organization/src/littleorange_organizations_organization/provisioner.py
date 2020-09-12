@@ -46,9 +46,9 @@ class OrganizationsOrganizationProvisioner(object):
     else:
       policyTypes = [policy.Type for policy in desired.EnabledPolicyTypes]
 
-    self.__setEnabledPolicyTypes(organizations, policyTypes)
+    root = self.__setEnabledPolicyTypes(organizations, policyTypes)
 
-    return [policyType._serialize() for policyType in (desired.EnabledPolicyTypes or [])]
+    return root
 
   def __setEnabledPolicyTypes(self, organizations: Organizations.Client, policyTypes: Sequence[Optional[str]]):
     root = self.findRoot(organizations)
@@ -70,6 +70,9 @@ class OrganizationsOrganizationProvisioner(object):
           PolicyType=policy
       )
 
+    # return refreshed to reflect policy changes
+    return self.findRoot(organizations)
+
   def create(self, desired: ResourceModel) -> ResourceModel:
 
     organizations: Organizations.Client = self.boto3.client('organizations')
@@ -78,11 +81,12 @@ class OrganizationsOrganizationProvisioner(object):
         FeatureSet=cast(Any, desired.FeatureSet)  # generated model doesn't represent type of enums correctly
     )
 
-    enabledPolicyTypes = self.__handleEnabledPolicyTypes(organizations, desired)
+    root = self.__handleEnabledPolicyTypes(organizations, desired)
 
     modelData: Any = {
         **response['Organization'],
-        'EnabledPolicyTypes': enabledPolicyTypes
+        'RootId': root['Id'],
+        'EnabledPolicyTypes': [{'Type': policy['Type']} for policy in root['PolicyTypes'] if policy['Status'] == 'ENABLED']
     }
 
     return safeDeserialise(ResourceModel, modelData)
@@ -108,6 +112,7 @@ class OrganizationsOrganizationProvisioner(object):
 
     modelData: Any = {
         **organization,
+        'RootId': root['Id'],
         'EnabledPolicyTypes': [{'Type': policy['Type']} for policy in root['PolicyTypes'] if policy['Status'] == 'ENABLED']
     }
 
@@ -125,6 +130,7 @@ class OrganizationsOrganizationProvisioner(object):
 
     modelData: Any = {
         **organization,
+        'RootId': root['Id'],
         'EnabledPolicyTypes': [{'Type': policy['Type']} for policy in root['PolicyTypes'] if policy['Status'] == 'ENABLED']
     }
 

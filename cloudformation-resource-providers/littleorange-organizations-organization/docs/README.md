@@ -72,6 +72,10 @@ Returns the <code>Arn</code> value.
 
 Returns the <code>Id</code> value.
 
+#### RootId
+
+Returns the <code>RootId</code> value.
+
 #### MasterAccountArn
 
 Returns the <code>MasterAccountArn</code> value.
