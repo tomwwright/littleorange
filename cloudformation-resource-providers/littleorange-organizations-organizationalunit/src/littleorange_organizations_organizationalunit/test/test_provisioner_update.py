@@ -9,7 +9,7 @@ from ..models import ResourceModel
 from ..provisioner import OrganizationsOrganizationalUnitProvisioner
 
 
-class TestProvisionerCreate(TestCase):
+class TestProvisionerUpdate(TestCase):
 
   def setUp(self):
     self.logger = logging.getLogger(__name__)

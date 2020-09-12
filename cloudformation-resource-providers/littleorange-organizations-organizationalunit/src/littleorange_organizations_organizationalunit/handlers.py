@@ -82,13 +82,24 @@ def delete_handler(
     request: ResourceHandlerRequest,
     callback_context: MutableMapping[str, Any],
 ) -> ProgressEvent:
-  model = request.desiredResourceState
-  progress: ProgressEvent = ProgressEvent(
-      status=OperationStatus.IN_PROGRESS,
-      resourceModel=model,
+
+  LOG.info(request)
+
+  if not session:
+    raise exceptions.InternalFailure(f"boto3 session unavailable")
+
+  if not request.desiredResourceState:
+    raise exceptions.InternalFailure("Desired resource state unavailable")
+
+  organizations: Organizations.Client = session.client('organizations')
+
+  provisioner = OrganizationsOrganizationalUnitProvisioner(LOG, organizations)
+  provisioner.delete(request.desiredResourceState)
+
+  return ProgressEvent(
+      status=OperationStatus.SUCCESS,
+      resourceModel=None,
   )
-  # TODO: put code here
-  return progress
 
 
 @resource.handler(Action.READ)

@@ -27,6 +27,15 @@ class OrganizationsOrganizationalUnitProvisioner(object):
         "ParentId": desired.ParentId
     })
 
+  def delete(self, desired: ResourceModel):
+
+    try:
+      self.organizations.delete_organizational_unit(OrganizationalUnitId=desired.Id)
+    except self.organizations.exceptions.OrganizationalUnitNotFoundException:
+      raise exceptions.NotFound(self.TYPE, desired.Id)
+    except self.organizations.exceptions.OrganizationalUnitNotEmptyException:
+      raise exceptions.ResourceConflict(f"Organizational Unit {desired.Id} cannot be deleted as it is not empty")
+
   def get(self, desired: ResourceModel) -> ResourceModel:
 
     ou = self.organizations.describe_organizational_unit(OrganizationalUnitId=desired.Id)
