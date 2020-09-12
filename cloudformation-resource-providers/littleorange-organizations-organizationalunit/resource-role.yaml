@@ -26,7 +26,6 @@ Resources:
                 - "organizations:CreateOrganizationalUnit"
                 - "organizations:DeleteOrganizationalUnit"
                 - "organizations:DescribeOrganizationalUnit"
-                - "organizations:ListOrganizationalUnitsForParent"
                 - "organizations:UpdateOrganizationalUnit"
                 Resource: "*"
 Outputs:

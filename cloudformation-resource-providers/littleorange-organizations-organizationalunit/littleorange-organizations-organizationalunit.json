@@ -60,11 +60,6 @@
       "permissions": [
         "organizations:DeleteOrganizationalUnit"
       ]
-    },
-    "list": {
-      "permissions": [
-        "organizations:ListOrganizationalUnitsForParent"
-      ]
     }
   }
 }

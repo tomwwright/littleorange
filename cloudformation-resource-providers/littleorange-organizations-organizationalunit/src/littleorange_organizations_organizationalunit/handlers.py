@@ -89,16 +89,3 @@ def read_handler(
       status=OperationStatus.SUCCESS,
       resourceModel=model,
   )
-
-
-@resource.handler(Action.LIST)
-def list_handler(
-    session: Optional[SessionProxy],
-    request: ResourceHandlerRequest,
-    callback_context: MutableMapping[str, Any],
-) -> ProgressEvent:
-  # TODO: put code here
-  return ProgressEvent(
-      status=OperationStatus.SUCCESS,
-      resourceModels=[],
-  )
