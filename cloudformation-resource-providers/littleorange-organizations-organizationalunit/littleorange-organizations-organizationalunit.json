@@ -1,104 +1,69 @@
 {
   "typeName": "LittleOrange::Organizations::OrganizationalUnit",
-  "description": "An example resource schema demonstrating some basic constructs and validation rules.",
-  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
-  "definitions": {
-    "InitechDateFormat": {
-      "$comment": "Use the `definitions` block to provide shared resource property schemas",
-      "type": "string",
-      "format": "date-time"
-    },
-    "Memo": {
-      "type": "object",
-      "properties": {
-        "Heading": {
-          "type": "string"
-        },
-        "Body": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false
-    }
-  },
+  "description": "Resource schema for AWS Organizations Organizational Unit resource",
+  "sourceUrl": "https://github.com/tomwwright/littleorange.git",
+  "definitions": {},
   "properties": {
-    "TPSCode": {
-      "description": "A TPS Code is automatically generated on creation and assigned as the unique identifier.",
+    "Arn": {
+      "description": "The ARN of this Organizational Unit (OU).",
+      "type": "string"
+    },
+    "Id": {
+      "description": "The unique identifier (ID) of this Organizational Unit (OU).",
       "type": "string",
-      "pattern": "^[A-Z]{3,5}[0-9]{8}-[0-9]{4}$"
+      "pattern": "^ou-[a-z0-9]{4,32}-[a-z0-9]{8,32}$"
     },
-    "Title": {
-      "description": "The title of the TPS report is a mandatory element.",
+    "ParentId": {
+      "description": "The unique identifier (ID) of the parent root or OU that this OU resides in (Root ID or OU ID allowed)",
       "type": "string",
-      "minLength": 20,
-      "maxLength": 250
+      "pattern": "^(ou-[a-z0-9]{4,32}-[a-z0-9]{8,32}|r-[a-z0-9]{4,32})$"
     },
-    "CoverSheetIncluded": {
-      "description": "Required for all TPS Reports submitted after 2/19/1999",
-      "type": "boolean"
-    },
-    "DueDate": {
-      "$ref": "#/definitions/InitechDateFormat"
-    },
-    "ApprovalDate": {
-      "$ref": "#/definitions/InitechDateFormat"
-    },
-    "Memo": {
-      "$ref": "#/definitions/Memo"
-    },
-    "SecondCopyOfMemo": {
-      "description": "In case you didn't get the first one.",
-      "$ref": "#/definitions/Memo"
-    },
-    "TestCode": {
-      "type": "string",
-      "enum": [
-        "NOT_STARTED",
-        "CANCELLED"
-      ]
-    },
-    "Authors": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
+    "Name": {
+      "description": "The friendly name of this Organizational Unit (OU)",
+      "type": "string"
     }
   },
   "additionalProperties": false,
   "required": [
-    "TestCode",
-    "Title"
+    "Name",
+    "ParentId"
   ],
   "readOnlyProperties": [
-    "/properties/TPSCode"
+    "/properties/Arn",
+    "/properties/Id"
   ],
   "primaryIdentifier": [
-    "/properties/TPSCode"
+    "/properties/Id"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/Arn"
+    ]
   ],
   "handlers": {
     "create": {
       "permissions": [
-        "initech:CreateReport"
+        "organizations:CreateOrganizationalUnit"
       ]
     },
     "read": {
       "permissions": [
-        "initech:DescribeReport"
+        "organizations:DescribeOrganizationalUnit"
       ]
     },
     "update": {
       "permissions": [
-        "initech:UpdateReport"
+        "organizations:UpdateOrganizationalUnit"
       ]
     },
     "delete": {
       "permissions": [
-        "initech:DeleteReport"
+        "organizations:DeleteOrganizationalUnit"
       ]
     },
     "list": {
       "permissions": [
-        "initech:ListReports"
+        "organizations:ListOrganizationalUnitsForParent"
       ]
     }
   }
