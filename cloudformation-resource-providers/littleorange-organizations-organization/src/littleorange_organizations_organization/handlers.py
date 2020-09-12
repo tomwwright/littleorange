@@ -88,12 +88,8 @@ def delete_handler(
   if not session:
     raise exceptions.InternalFailure(f"boto3 session unavailable")
 
-  organizations: Organizations.Client = session.client('organizations')
-
-  try:
-    organizations.delete_organization()
-  except organizations.exceptions.AWSOrganizationsNotInUseException:
-    raise exceptions.NotFound(OrganizationsOrganizationProvisioner.TYPE, "any")
+  provisioner = OrganizationsOrganizationProvisioner(LOG, session)
+  provisioner.delete()
 
   return ProgressEvent(
       status=OperationStatus.SUCCESS,
