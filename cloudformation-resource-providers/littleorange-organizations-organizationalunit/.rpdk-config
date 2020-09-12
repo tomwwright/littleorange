@@ -1,0 +1,11 @@
+{
+    "typeName": "LittleOrange::Organizations::OrganizationalUnit",
+    "language": "python37",
+    "runtime": "python3.7",
+    "entrypoint": "littleorange_organizations_organizationalunit.handlers.resource",
+    "testEntrypoint": "littleorange_organizations_organizationalunit.handlers.test_entrypoint",
+    "settings": {
+        "use_docker": true,
+        "protocolVersion": "2.0.0"
+    }
+}
