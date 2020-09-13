@@ -25,8 +25,10 @@ Resources:
   QuarantineOU:
     Type: LittleOrange::Organizations::OrganizationalUnit
     Properties:
-      ParentId: !GetAtt Organization.RootId
       Name: Quarantine
+      ParentId: !GetAtt Organization.RootId
+      PolicyIds:
+        - !Ref QuarantineSCP
 
   ServerlessSCP:
     DependsOn: [Organization]
@@ -51,6 +53,24 @@ Resources:
         }
       Description: Access to all services
       Name: Open
+
+  QuarantineSCP:
+    DependsOn: [Organization]
+    Type: LittleOrange::Organizations::ServiceControlPolicy
+    Properties:
+      Content: |
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Action": "*",
+              "Effect": "Deny",
+              "Resource": "*"
+            }
+          ]
+        }
+      Description: Deny all services
+      Name: Quarantine
 
 Outputs:
   OrganizationId:
