@@ -35,16 +35,16 @@ class OrganizationsOrganizationalUnitProvisioner(object):
 
     currentPolicyIds = self.__listServiceControlPolicyIds(organizationalUnitId)
 
-    policyIdsToDetach = set(currentPolicyIds) - set(desiredPolicyIds)
-    for policyId in policyIdsToDetach:
-      self.organizations.detach_policy(
+    policyIdsToAttach = set(desiredPolicyIds) - set(currentPolicyIds)
+    for policyId in policyIdsToAttach:
+      self.organizations.attach_policy(
           PolicyId=policyId,
           TargetId=organizationalUnitId
       )
 
-    policyIdsToAttach = set(desiredPolicyIds) - set(currentPolicyIds)
-    for policyId in policyIdsToAttach:
-      self.organizations.attach_policy(
+    policyIdsToDetach = set(currentPolicyIds) - set(desiredPolicyIds)
+    for policyId in policyIdsToDetach:
+      self.organizations.detach_policy(
           PolicyId=policyId,
           TargetId=organizationalUnitId
       )
