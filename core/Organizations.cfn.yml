@@ -6,6 +6,7 @@ Metadata:
     config:
       ignore_checks:
         - E3001 # E3001: Invalid or unsupported Type -- user-defined types from CloudFormation Resource Types
+        - E1010 # Invalid GetAtt -- user-defined types from CloudFormation Resource Types
 Resources:
   OrganizationsServiceLinkedRole:
     Type: AWS::IAM::ServiceLinkedRole
@@ -20,6 +21,12 @@ Resources:
         - Type: SERVICE_CONTROL_POLICY
         - Type: TAG_POLICY
       FeatureSet: ALL
+
+  QuarantineOU:
+    Type: LittleOrange::Organizations::OrganizationalUnit
+    Properties:
+      ParentId: !GetAtt Organization.RootId
+      Name: Quarantine
 
   ServerlessSCP:
     DependsOn: [Organization]
@@ -48,3 +55,5 @@ Resources:
 Outputs:
   OrganizationId:
     Value: !Ref Organization
+  RootId:
+    Value: !GetAtt Organization.RootId
