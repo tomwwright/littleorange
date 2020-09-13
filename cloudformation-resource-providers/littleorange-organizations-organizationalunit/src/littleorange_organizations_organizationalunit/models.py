@@ -42,6 +42,7 @@ class ResourceModel(BaseModel):
     Arn: Optional[str]
     Id: Optional[str]
     ParentId: Optional[str]
+    PolicyIds: Optional[Sequence[str]]
     Name: Optional[str]
 
     @classmethod
@@ -57,6 +58,7 @@ class ResourceModel(BaseModel):
             Arn=json_data.get("Arn"),
             Id=json_data.get("Id"),
             ParentId=json_data.get("ParentId"),
+            PolicyIds=json_data.get("PolicyIds"),
             Name=json_data.get("Name"),
         )
 

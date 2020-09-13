@@ -40,6 +40,7 @@ class TestProvisionerGet(TestCase):
     assert model.Id is not None
     assert model.Name is not None
     assert model.ParentId == root['Id']
+    assert model.PolicyIds == OrganizationsOrganizationalUnitProvisioner.DEFAULT_POLICY_IDS
 
   @mock_organizations
   def testGetWithOURoot(self):
@@ -72,3 +73,4 @@ class TestProvisionerGet(TestCase):
     assert model.Id is not None
     assert model.Name is not None
     assert model.ParentId == outerModel.Id
+    assert model.PolicyIds == OrganizationsOrganizationalUnitProvisioner.DEFAULT_POLICY_IDS

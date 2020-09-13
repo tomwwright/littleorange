@@ -18,6 +18,14 @@
       "type": "string",
       "pattern": "^(ou-[a-z0-9]{4,32}-[a-z0-9]{8,32}|r-[a-z0-9]{4,32})$"
     },
+    "PolicyIds": {
+      "description": "List of IDs of Policy resources to attach to this OU",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^p-[a-z0-9]{8,128}$"
+      }
+    },
     "Name": {
       "description": "The friendly name of this Organizational Unit (OU)",
       "type": "string"
@@ -46,19 +54,24 @@
   "handlers": {
     "create": {
       "permissions": [
+        "organizations:AttachPolicy",
         "organizations:CreateOrganizationalUnit"
       ]
     },
     "read": {
       "permissions": [
         "organizations:DescribeOrganizationalUnit",
-        "organizations:ListParents"
+        "organizations:ListParents",
+        "organizations:ListPoliciesForTarget"
       ]
     },
     "update": {
       "permissions": [
+        "organizations:AttachPolicy",
+        "organizations:DetachPolicy",
         "organizations:UpdateOrganizationalUnit",
-        "organizations:ListParents"
+        "organizations:ListParents",
+        "organizations:ListPoliciesForTarget"
       ]
     },
     "delete": {
