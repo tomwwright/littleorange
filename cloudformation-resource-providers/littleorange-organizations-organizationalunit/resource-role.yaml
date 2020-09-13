@@ -23,10 +23,13 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
+                - "organizations:AttachPolicy"
                 - "organizations:CreateOrganizationalUnit"
                 - "organizations:DeleteOrganizationalUnit"
                 - "organizations:DescribeOrganizationalUnit"
+                - "organizations:DetachPolicy"
                 - "organizations:ListParents"
+                - "organizations:ListPoliciesForTarget"
                 - "organizations:UpdateOrganizationalUnit"
                 Resource: "*"
 Outputs:
