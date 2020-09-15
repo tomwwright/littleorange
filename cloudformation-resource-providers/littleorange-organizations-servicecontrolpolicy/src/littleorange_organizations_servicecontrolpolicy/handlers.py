@@ -37,7 +37,8 @@ def create_handler(
   if not request.desiredResourceState:
     raise exceptions.InternalFailure("Desired resource state unavailable")
 
-  provisioner = OrganizationsServiceControlPolicyProvisioner(LOG, session)
+  organizations: Organizations.Client = session.client('organizations')
+  provisioner = OrganizationsServiceControlPolicyProvisioner(LOG, organizations)
   model = provisioner.create(request.desiredResourceState)
 
   return ProgressEvent(
@@ -64,7 +65,8 @@ def update_handler(
   if not request.desiredResourceState:
     raise exceptions.InternalFailure("Desired resource state unavailable")
 
-  provisioner = OrganizationsServiceControlPolicyProvisioner(LOG, session)
+  organizations: Organizations.Client = session.client('organizations')
+  provisioner = OrganizationsServiceControlPolicyProvisioner(LOG, organizations)
   model = provisioner.update(request.previousResourceState, request.desiredResourceState)
 
   return ProgressEvent(

@@ -17,10 +17,7 @@ class TestProvisionerCreate(TestCase):
 
   def testCreate(self):
 
-    mockBoto3: Any = Mock()
     mockClient: Any = Mock()
-    mockBoto3.client.return_value = mockClient
-
     mockClient.create_policy.return_value = {
         "Policy": {
             "PolicySummary": {
@@ -41,7 +38,7 @@ class TestProvisionerCreate(TestCase):
         "Description": "Access to all services"
     })
 
-    provisioner = OrganizationsServiceControlPolicyProvisioner(self.logger, mockBoto3)
+    provisioner = OrganizationsServiceControlPolicyProvisioner(self.logger, mockClient)
     model = provisioner.create(desired)
 
     assert mockClient.create_policy.call_count == 1

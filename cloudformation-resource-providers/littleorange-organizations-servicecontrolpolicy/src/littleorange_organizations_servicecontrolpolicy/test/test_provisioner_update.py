@@ -42,7 +42,7 @@ class TestProvisionerUpdate(TestCase):
         "Description": current.Description
     })
 
-    provisioner = OrganizationsServiceControlPolicyProvisioner(self.logger, boto3)
+    provisioner = OrganizationsServiceControlPolicyProvisioner(self.logger, organizations)
     model = provisioner.update(current, desired)
 
     updatedPolicy = organizations.describe_policy(PolicyId=policy["PolicySummary"]["Id"])["Policy"]
@@ -75,7 +75,7 @@ class TestProvisionerUpdate(TestCase):
         "Description": current.Description
     })
 
-    provisioner = OrganizationsServiceControlPolicyProvisioner(self.logger, boto3)
+    provisioner = OrganizationsServiceControlPolicyProvisioner(self.logger, organizations)
     model = provisioner.update(current, desired)
 
     updatedPolicy = organizations.describe_policy(PolicyId=policy["PolicySummary"]["Id"])["Policy"]
@@ -109,7 +109,7 @@ class TestProvisionerUpdate(TestCase):
         "Description": "Updated description"
     })
 
-    provisioner = OrganizationsServiceControlPolicyProvisioner(self.logger, boto3)
+    provisioner = OrganizationsServiceControlPolicyProvisioner(self.logger, organizations)
     model = provisioner.update(current, desired)
 
     updatedPolicy = organizations.describe_policy(PolicyId=policy["PolicySummary"]["Id"])["Policy"]
