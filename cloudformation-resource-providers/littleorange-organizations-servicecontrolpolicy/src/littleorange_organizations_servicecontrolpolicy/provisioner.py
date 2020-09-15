@@ -39,6 +39,20 @@ class OrganizationsServiceControlPolicyProvisioner(object):
     except self.organizations.exceptions.PolicyInUseException:
       raise exceptions.ResourceConflict(f"Policy {desired.Id} cannot be deleted as it is currently in use")
 
+  def get(self, desired: ResourceModel):
+
+    try:
+      scp = self.organizations.describe_policy(PolicyId=desired.Id)["Policy"]
+    except self.organizations.exceptions.PolicyNotFoundException:
+      raise exceptions.NotFound(OrganizationsServiceControlPolicyProvisioner.TYPE, desired.Id)
+
+    return ResourceModel._deserialize({
+        "Arn": scp["PolicySummary"]["Arn"],
+        "Description": scp["PolicySummary"]["Description"],
+        "Content": scp["Content"],
+        "Id": scp["PolicySummary"]["Id"],
+        "Name": scp["PolicySummary"]["Name"]
+    })
 
   def update(self, current: ResourceModel, desired: ResourceModel):
 
