@@ -31,7 +31,14 @@ class OrganizationsServiceControlPolicyProvisioner(object):
     })
 
   def delete(self, desired: ResourceModel):
-    pass
+
+    try:
+      self.organizations.delete_policy(PolicyId=desired.Id)
+    except self.organizations.exceptions.PolicyNotFoundException:
+      raise exceptions.NotFound(OrganizationsServiceControlPolicyProvisioner.TYPE, desired.Id)
+    except self.organizations.exceptions.PolicyInUseException:
+      raise exceptions.ResourceConflict(f"Policy {desired.Id} cannot be deleted as it is currently in use")
+
 
   def update(self, current: ResourceModel, desired: ResourceModel):
 

@@ -90,13 +90,9 @@ def delete_handler(
   if not request.desiredResourceState:
     raise exceptions.InternalFailure("Desired resource state unavailable")
 
-  model = request.desiredResourceState
-
-  try:
-    organizations: Organizations.Client = session.client('organizations')
-    organizations.delete_policy(PolicyId=model.Id)
-  except organizations.exceptions.PolicyNotFoundException:
-    raise exceptions.NotFound(OrganizationsServiceControlPolicyProvisioner.TYPE, model.Id)
+  organizations: Organizations.Client = session.client('organizations')
+  provisioner = OrganizationsServiceControlPolicyProvisioner(LOG, organizations)
+  provisioner.delete(request.desiredResourceState)
 
   return ProgressEvent(
       status=OperationStatus.SUCCESS,
