@@ -14,6 +14,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     "Properties" : {
         "<a href="#email" title="Email">Email</a>" : <i>String</i>,
         "<a href="#name" title="Name">Name</a>" : <i>String</i>,
+        "<a href="#parentid" title="ParentId">ParentId</a>" : <i>String</i>,
     }
 }
 </pre>
@@ -25,6 +26,7 @@ Type: LittleOrange::Organizations::Account
 Properties:
     <a href="#email" title="Email">Email</a>: <i>String</i>
     <a href="#name" title="Name">Name</a>: <i>String</i>
+    <a href="#parentid" title="ParentId">ParentId</a>: <i>String</i>
 </pre>
 
 ## Properties
@@ -37,7 +39,7 @@ _Required_: Yes
 
 _Type_: String
 
-_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+_Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 
 #### Name
 
@@ -46,6 +48,18 @@ The friendly name of this Account
 _Required_: Yes
 
 _Type_: String
+
+_Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
+
+#### ParentId
+
+The unique identifier (ID) of the parent root or OU that this Account resides in (Root ID or OU ID allowed)
+
+_Required_: No
+
+_Type_: String
+
+_Pattern_: <code>^(ou-[a-z0-9]{4,32}-[a-z0-9]{8,32}|r-[a-z0-9]{4,32})$</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 

@@ -43,6 +43,7 @@ class ResourceModel(BaseModel):
     Email: Optional[str]
     Id: Optional[str]
     Name: Optional[str]
+    ParentId: Optional[str]
     Status: Optional[str]
 
     @classmethod
@@ -59,6 +60,7 @@ class ResourceModel(BaseModel):
             Email=json_data.get("Email"),
             Id=json_data.get("Id"),
             Name=json_data.get("Name"),
+            ParentId=json_data.get("ParentId"),
             Status=json_data.get("Status"),
         )
 

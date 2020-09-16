@@ -21,6 +21,11 @@
       "description": "The friendly name of this Account",
       "type": "string"
     },
+    "ParentId": {
+      "description": "The unique identifier (ID) of the parent root or OU that this Account resides in (Root ID or OU ID allowed)",
+      "type": "string",
+      "pattern": "^(ou-[a-z0-9]{4,32}-[a-z0-9]{8,32}|r-[a-z0-9]{4,32})$"
+    },
     "Status": {
       "description": "The status of this Account in the organization",
       "type": "string",
@@ -34,6 +39,10 @@
   "required": [
     "Email",
     "Name"
+  ],
+  "createOnlyProperties": [
+    "/properties/Email",
+    "/properties/Name"
   ],
   "readOnlyProperties": [
     "/properties/Arn",
