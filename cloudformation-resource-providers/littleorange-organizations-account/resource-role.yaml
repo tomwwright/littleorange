@@ -23,11 +23,13 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                - "initech:CreateReport"
-                - "initech:DeleteReport"
-                - "initech:DescribeReport"
-                - "initech:ListReports"
-                - "initech:UpdateReport"
+                - "organizations:DeregisterDelegatedAdministrator"
+                - "organizations:DescribeAccount"
+                - "organizations:ListParents"
+                - "organizations:ListRoots"
+                - "organizations:MoveAccount"
+                - "organizations:RegisterDelegatedAdministrator"
+                - "organziations:CreateAccount"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:

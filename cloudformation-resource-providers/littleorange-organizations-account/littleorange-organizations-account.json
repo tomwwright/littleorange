@@ -1,105 +1,79 @@
 {
-    "typeName": "LittleOrange::Organizations::Account",
-    "description": "An example resource schema demonstrating some basic constructs and validation rules.",
-    "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
-    "definitions": {
-        "InitechDateFormat": {
-            "$comment": "Use the `definitions` block to provide shared resource property schemas",
-            "type": "string",
-            "format": "date-time"
-        },
-        "Memo": {
-            "type": "object",
-            "properties": {
-                "Heading": {
-                    "type": "string"
-                },
-                "Body": {
-                    "type": "string"
-                }
-            },
-            "additionalProperties": false
-        }
+  "typeName": "LittleOrange::Organizations::Account",
+  "description": "Resource schema for an AWS Organizations Account resource",
+  "sourceUrl": "https://github.com/tomwwright/littleorange.git",
+  "definitions": {},
+  "properties": {
+    "Arn": {
+      "description": "The ARN of this Organizational Unit (OU).",
+      "type": "string"
     },
-    "properties": {
-        "TPSCode": {
-            "description": "A TPS Code is automatically generated on creation and assigned as the unique identifier.",
-            "type": "string",
-            "pattern": "^[A-Z]{3,5}[0-9]{8}-[0-9]{4}$"
-        },
-        "Title": {
-            "description": "The title of the TPS report is a mandatory element.",
-            "type": "string",
-            "minLength": 20,
-            "maxLength": 250
-        },
-        "CoverSheetIncluded": {
-            "description": "Required for all TPS Reports submitted after 2/19/1999",
-            "type": "boolean"
-        },
-        "DueDate": {
-            "$ref": "#/definitions/InitechDateFormat"
-        },
-        "ApprovalDate": {
-            "$ref": "#/definitions/InitechDateFormat"
-        },
-        "Memo": {
-            "$ref": "#/definitions/Memo"
-        },
-        "SecondCopyOfMemo": {
-            "description": "In case you didn't get the first one.",
-            "$ref": "#/definitions/Memo"
-        },
-        "TestCode": {
-            "type": "string",
-            "enum": [
-                "NOT_STARTED",
-                "CANCELLED"
-            ]
-        },
-        "Authors": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        }
+    "Email": {
+      "description": "The email address associated with this Account",
+      "type": "string"
     },
-    "additionalProperties": false,
-    "required": [
-        "TestCode",
-        "Title"
-    ],
-    "readOnlyProperties": [
-        "/properties/TPSCode"
-    ],
-    "primaryIdentifier": [
-        "/properties/TPSCode"
-    ],
-    "handlers": {
-        "create": {
-            "permissions": [
-                "initech:CreateReport"
-            ]
-        },
-        "read": {
-            "permissions": [
-                "initech:DescribeReport"
-            ]
-        },
-        "update": {
-            "permissions": [
-                "initech:UpdateReport"
-            ]
-        },
-        "delete": {
-            "permissions": [
-                "initech:DeleteReport"
-            ]
-        },
-        "list": {
-            "permissions": [
-                "initech:ListReports"
-            ]
-        }
+    "Id": {
+      "description": "The unique identifier (ID) of this Organizational Unit (OU).",
+      "type": "string",
+      "pattern": "^[0-9]{12}$"
+    },
+    "Name": {
+      "description": "The friendly name of this Account",
+      "type": "string"
+    },
+    "Status": {
+      "description": "The status of this Account in the organization",
+      "type": "string",
+      "enum": [
+        "ACTIVE",
+        "SUSPENDED"
+      ]
     }
+  },
+  "additionalProperties": false,
+  "required": [
+    "Email",
+    "Name"
+  ],
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/Id",
+    "/properties/Status"
+  ],
+  "primaryIdentifier": [
+    "/properties/Id"
+  ],
+  "additionalIdentifiers": [
+    [
+      "/properties/Arn"
+    ]
+  ],
+  "handlers": {
+    "create": {
+      "permissions": [
+        "organziations:CreateAccount",
+        "organizations:DescribeAccount",
+        "organizations:ListParents",
+        "organizations:ListRoots",
+        "organizations:DeregisterDelegatedAdministrator",
+        "organizations:RegisterDelegatedAdministrator",
+        "organizations:MoveAccount"
+      ]
+    },
+    "read": {
+      "permissions": [
+        "organizations:DescribeAccount",
+        "organizations:ListParents"
+      ]
+    },
+    "delete": {
+      "permissions": [
+        "organizations:DeregisterDelegatedAdministrator",
+        "organizations:DescribeAccount",
+        "organizations:ListParents",
+        "organizations:ListRoots",
+        "organizations:MoveAccount"
+      ]
+    }
+  }
 }
