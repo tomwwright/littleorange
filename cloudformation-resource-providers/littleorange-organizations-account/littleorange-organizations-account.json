@@ -72,6 +72,7 @@
     "read": {
       "permissions": [
         "organizations:DescribeAccount",
+        "organizations:ListDelegatedServicesForAccount",
         "organizations:ListParents"
       ]
     },
@@ -79,6 +80,7 @@
       "permissions": [
         "organizations:DeregisterDelegatedAdministrator",
         "organizations:DescribeAccount",
+        "organizations:ListDelegatedServicesForAccount",
         "organizations:ListParents",
         "organizations:ListRoots",
         "organizations:MoveAccount"
@@ -88,6 +90,7 @@
       "permissions": [
         "organizations:DeregisterDelegatedAdministrator",
         "organizations:DescribeAccount",
+        "organizations:ListDelegatedServicesForAccount",
         "organizations:ListParents",
         "organizations:ListRoots",
         "organizations:MoveAccount",

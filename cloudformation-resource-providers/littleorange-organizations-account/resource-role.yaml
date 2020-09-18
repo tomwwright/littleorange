@@ -25,6 +25,7 @@ Resources:
                 Action:
                 - "organizations:DeregisterDelegatedAdministrator"
                 - "organizations:DescribeAccount"
+                - "organizations:ListDelegatedServicesForAccount"
                 - "organizations:ListParents"
                 - "organizations:ListRoots"
                 - "organizations:MoveAccount"
