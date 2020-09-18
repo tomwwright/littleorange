@@ -31,7 +31,7 @@ Resources:
       Source:
         Type: GITHUB
         Location: !Ref GitHubUrl
-        BuildSpec: devops/buildspec/ResourceProviderDeploy.buildspec.yml
+        BuildSpec: cloudformation-resource-providers/devops/buildspec/ResourceProviderDeploy.buildspec.yml
       Triggers:
         Webhook: true
         FilterGroups:
@@ -58,7 +58,7 @@ Resources:
       Source:
         Type: GITHUB
         Location: !Ref GitHubUrl
-        BuildSpec: devops/buildspec/ResourceProviderPR.buildspec.yml
+        BuildSpec: cloudformation-resource-providers/devops/buildspec/ResourceProviderPR.buildspec.yml
       Triggers:
         Webhook: true
         FilterGroups:
