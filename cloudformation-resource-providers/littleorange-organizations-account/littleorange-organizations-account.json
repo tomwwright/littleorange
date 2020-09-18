@@ -83,6 +83,16 @@
         "organizations:ListRoots",
         "organizations:MoveAccount"
       ]
+    },
+    "update": {
+      "permissions": [
+        "organizations:DeregisterDelegatedAdministrator",
+        "organizations:DescribeAccount",
+        "organizations:ListParents",
+        "organizations:ListRoots",
+        "organizations:MoveAccount",
+        "organizations:RegisterDelegatedAdministrator"
+      ]
     }
   }
 }
