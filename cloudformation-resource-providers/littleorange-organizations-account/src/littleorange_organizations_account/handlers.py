@@ -1,6 +1,6 @@
 import logging
 from typing import Any, MutableMapping, Optional
-
+import mypy_boto3_organizations as Organizations
 from cloudformation_cli_python_lib import (
     Action,
     HandlerErrorCode,
@@ -12,12 +12,12 @@ from cloudformation_cli_python_lib import (
 )
 
 from .models import ResourceHandlerRequest, ResourceModel
+from .provisioner import OrganizationsAccountProvisioner
 
 # Use this logger to forward log messages to CloudWatch Logs.
 LOG = logging.getLogger(__name__)
-TYPE_NAME = "LittleOrange::Organizations::Account"
 
-resource = Resource(TYPE_NAME, ResourceModel)
+resource = Resource(OrganizationsAccountProvisioner.TYPE, ResourceModel)
 test_entrypoint = resource.test_entrypoint
 
 
@@ -27,25 +27,24 @@ def create_handler(
     request: ResourceHandlerRequest,
     callback_context: MutableMapping[str, Any],
 ) -> ProgressEvent:
-    model = request.desiredResourceState
-    progress: ProgressEvent = ProgressEvent(
-        status=OperationStatus.IN_PROGRESS,
-        resourceModel=model,
-    )
-    # TODO: put code here
 
-    # Example:
-    try:
-        if isinstance(session, SessionProxy):
-            client = session.client("s3")
-        # Setting Status to success will signal to cfn that the operation is complete
-        progress.status = OperationStatus.SUCCESS
-    except TypeError as e:
-        # exceptions module lets CloudFormation know the type of failure that occurred
-        raise exceptions.InternalFailure(f"was not expecting type {e}")
-        # this can also be done by returning a failed progress event
-        # return ProgressEvent.failed(HandlerErrorCode.InternalFailure, f"was not expecting type {e}")
-    return progress
+  LOG.info(request)
+
+  if not session:
+    raise exceptions.InternalFailure(f"boto3 session unavailable")
+
+  if not request.desiredResourceState:
+    raise exceptions.InternalFailure("Desired resource state unavailable")
+
+  organizations: Organizations.Client = session.client('organizations')
+
+  provisioner = OrganizationsAccountProvisioner(LOG, organizations)
+  model = provisioner.create(request.desiredResourceState)
+
+  return ProgressEvent(
+      status=OperationStatus.SUCCESS,
+      resourceModel=model,
+  )
 
 
 @resource.handler(Action.UPDATE)
@@ -54,13 +53,27 @@ def update_handler(
     request: ResourceHandlerRequest,
     callback_context: MutableMapping[str, Any],
 ) -> ProgressEvent:
-    model = request.desiredResourceState
-    progress: ProgressEvent = ProgressEvent(
-        status=OperationStatus.IN_PROGRESS,
-        resourceModel=model,
-    )
-    # TODO: put code here
-    return progress
+
+  LOG.info(request)
+
+  if not session:
+    raise exceptions.InternalFailure(f"boto3 session unavailable")
+
+  if not request.desiredResourceState:
+    raise exceptions.InternalFailure("Desired resource state unavailable")
+
+  if not request.previousResourceState:
+    raise exceptions.InternalFailure("Previous resource state unavailable")
+
+  organizations: Organizations.Client = session.client('organizations')
+
+  provisioner = OrganizationsAccountProvisioner(LOG, organizations)
+  model = provisioner.update(request.previousResourceState, request.desiredResourceState)
+
+  return ProgressEvent(
+      status=OperationStatus.SUCCESS,
+      resourceModel=model,
+  )
 
 
 @resource.handler(Action.DELETE)
@@ -69,13 +82,24 @@ def delete_handler(
     request: ResourceHandlerRequest,
     callback_context: MutableMapping[str, Any],
 ) -> ProgressEvent:
-    model = request.desiredResourceState
-    progress: ProgressEvent = ProgressEvent(
-        status=OperationStatus.IN_PROGRESS,
-        resourceModel=model,
-    )
-    # TODO: put code here
-    return progress
+
+  LOG.info(request)
+
+  if not session:
+    raise exceptions.InternalFailure(f"boto3 session unavailable")
+
+  if not request.desiredResourceState:
+    raise exceptions.InternalFailure("Desired resource state unavailable")
+
+  organizations: Organizations.Client = session.client('organizations')
+
+  provisioner = OrganizationsAccountProvisioner(LOG, organizations)
+  provisioner.delete(request.desiredResourceState)
+
+  return ProgressEvent(
+      status=OperationStatus.SUCCESS,
+      resourceModel=None,
+  )
 
 
 @resource.handler(Action.READ)
@@ -84,22 +108,21 @@ def read_handler(
     request: ResourceHandlerRequest,
     callback_context: MutableMapping[str, Any],
 ) -> ProgressEvent:
-    model = request.desiredResourceState
-    # TODO: put code here
-    return ProgressEvent(
-        status=OperationStatus.SUCCESS,
-        resourceModel=model,
-    )
 
+  LOG.info(request)
 
-@resource.handler(Action.LIST)
-def list_handler(
-    session: Optional[SessionProxy],
-    request: ResourceHandlerRequest,
-    callback_context: MutableMapping[str, Any],
-) -> ProgressEvent:
-    # TODO: put code here
-    return ProgressEvent(
-        status=OperationStatus.SUCCESS,
-        resourceModels=[],
-    )
+  if not session:
+    raise exceptions.InternalFailure(f"boto3 session unavailable")
+
+  if not request.desiredResourceState:
+    raise exceptions.InternalFailure("Desired resource state unavailable")
+
+  organizations: Organizations.Client = session.client('organizations')
+
+  provisioner = OrganizationsAccountProvisioner(LOG, organizations)
+  model = provisioner.get(request.desiredResourceState)
+
+  return ProgressEvent(
+      status=OperationStatus.SUCCESS,
+      resourceModel=model,
+  )
