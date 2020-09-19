@@ -14,6 +14,23 @@ class OrganizationsAccountProvisioner(object):
     self.logger = logger
     self.organizations = organizations
 
+  def findAccountByNameOrEmail(self, name: str, email: str):
+    pages = self.organizations.get_paginator("list_accounts").paginate()
+    for account in [account for page in pages for account in page["Accounts"]]:
+      if account["Name"] == name and account["Email"] == email:
+        return account
+      elif account["Name"] == name or account["Email"] == email:
+        raise Exception(f"Existing account with (name={account['Name']} email={account['Email']}) instead of ({name=} {email=})")
+
+    return None
+
+  def listDelegatedAdministratorServices(self, accountId):
+    try:
+      pages = self.organizations.get_paginator("list_delegated_services_for_account").paginate(AccountId=accountId)
+      return [service["ServicePrincipal"] for page in pages for service in page["DelegatedServices"]]
+    except self.organizations.exceptions.AccountNotRegisteredException:
+      return []
+      
   def findOrganizationRoot(self):
 
     pages = self.organizations.get_paginator('list_roots').paginate()
@@ -26,6 +43,16 @@ class OrganizationsAccountProvisioner(object):
     raise Exception('Root with name \'Root\' not found')
 
   def create(self, desired: ResourceModel):
+
+    # if account already exists execute update path to adopt it into stack
+    existingAccount = self.findAccountByNameOrEmail(desired.Name, desired.Email)
+    if existingAccount:
+      query = ResourceModel._deserialize({
+          "Id": existingAccount["Id"]
+      })
+      existingModel = self.get(query)
+
+      return self.update(existingModel, desired)
 
     createAccountStatus = self.organizations.create_account(
         AccountName=desired.Name,
@@ -48,6 +75,13 @@ class OrganizationsAccountProvisioner(object):
           SourceParentId=organizationRootId,
           DestinationParentId=desired.ParentId)
 
+    delegatedAdministratorServices = desired.DelegatedAdministratorServices or []
+    for service in delegatedAdministratorServices:
+      self.organizations.register_delegated_administrator(
+          AccountId=createAccountStatus["AccountId"],
+          ServicePrincipal=service
+      )
+
     query = ResourceModel._deserialize({
         "Id": createAccountStatus["AccountId"]
     })
@@ -63,6 +97,14 @@ class OrganizationsAccountProvisioner(object):
       self.organizations.move_account(AccountId=desired.Id, SourceParentId=account.ParentId,
                                       DestinationParentId=organizationRootId)
 
+    delegatedAdministratorServices = self.listDelegatedAdministratorServices(desired.Id)
+    for service in delegatedAdministratorServices:
+      self.organizations.deregister_delegated_administrator(
+          AccountId=desired.Id,
+          ServicePrincipal=service
+      )
+
+
   def get(self, desired: ResourceModel):
 
     try:
@@ -72,8 +114,11 @@ class OrganizationsAccountProvisioner(object):
 
     parents = self.organizations.list_parents(ChildId=desired.Id)
 
+    delegatedAdministratorServices = self.listDelegatedAdministratorServices(desired.Id)
+
     return ResourceModel._deserialize({
         "Arn": account["Account"]["Arn"],
+        "DelegatedAdministratorServices": delegatedAdministratorServices,
         "Email": account["Account"]["Email"],
         "Id": account["Account"]["Id"],
         "Name": account["Account"]["Name"],
@@ -98,5 +143,22 @@ class OrganizationsAccountProvisioner(object):
     if sourceParentId != destinationParentId:
       self.organizations.move_account(AccountId=desired.Id, SourceParentId=sourceParentId,
                                       DestinationParentId=destinationParentId)
+
+    currentDelegatedAdministratorServices = self.listDelegatedAdministratorServices(desired.Id)
+    desiredDelegatedAdministratorServices = desired.DelegatedAdministratorServices or []
+
+    servicesToDeregister = set(currentDelegatedAdministratorServices) - set(desiredDelegatedAdministratorServices)
+    for service in servicesToDeregister:
+      self.organizations.deregister_delegated_administrator(
+          AccountId=desired.Id,
+          ServicePrincipal=service
+      )
+
+    servicesToRegister = set(desiredDelegatedAdministratorServices) - set(currentDelegatedAdministratorServices)
+    for service in servicesToRegister:
+      self.organizations.register_delegated_administrator(
+          AccountId=desired.Id,
+          ServicePrincipal=service
+      )
 
     return self.get(desired)

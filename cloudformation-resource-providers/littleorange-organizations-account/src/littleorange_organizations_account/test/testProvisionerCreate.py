@@ -4,7 +4,7 @@ from moto import mock_organizations
 import mypy_boto3_organizations as Organizations
 from typing import Any, get_type_hints
 from unittest import TestCase
-from unittest.mock import Mock
+from unittest.mock import call, patch, Mock
 
 
 from ..models import ResourceModel
@@ -112,3 +112,36 @@ class TestProvisionerCreate(TestCase):
     assert account["Account"]["Id"] == model.Id
     assert account["Account"]["Name"] == model.Name
     assert parents["Parents"][0]["Id"] == model.ParentId
+
+  @mock_organizations
+  def testCreateWithDelegatedAdministratorServices(self):
+
+    organizations: Organizations.Client = boto3.client("organizations")
+
+    organizations.create_organization(FeatureSet="ALL")
+    root = organizations.list_roots()["Roots"][0]
+
+    desired = ResourceModel._deserialize({
+        "Email": "test@littleorange.com.au",
+        "Name": "Test",
+        "DelegatedAdministratorServices": [
+            "guardduty.amazonaws.com",
+            "ssm.amazonaws.com"
+        ]
+    })
+
+    provisioner = OrganizationsAccountProvisioner(self.logger, organizations)
+
+    with patch.object(organizations, 'register_delegated_administrator', wraps=organizations.register_delegated_administrator) as spy:
+      model = provisioner.create(desired)
+
+      assert spy.mock_calls == [
+          call(AccountId=model.Id, ServicePrincipal="guardduty.amazonaws.com"),
+          call(AccountId=model.Id, ServicePrincipal="ssm.amazonaws.com")
+      ]
+
+    assert model.DelegatedAdministratorServices == desired.DelegatedAdministratorServices
+
+    services = organizations.list_delegated_services_for_account(AccountId=model.Id)
+
+    assert [service["ServicePrincipal"] for service in services["DelegatedServices"]] == ["guardduty.amazonaws.com", "ssm.amazonaws.com"]

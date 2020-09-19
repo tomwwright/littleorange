@@ -40,6 +40,7 @@ class ResourceHandlerRequest(BaseResourceHandlerRequest):
 @dataclass
 class ResourceModel(BaseModel):
     Arn: Optional[str]
+    DelegatedAdministratorServices: Optional[Sequence[str]]
     Email: Optional[str]
     Id: Optional[str]
     Name: Optional[str]
@@ -57,6 +58,7 @@ class ResourceModel(BaseModel):
         recast_object(cls, json_data, dataclasses)
         return cls(
             Arn=json_data.get("Arn"),
+            DelegatedAdministratorServices=json_data.get("DelegatedAdministratorServices"),
             Email=json_data.get("Email"),
             Id=json_data.get("Id"),
             Name=json_data.get("Name"),

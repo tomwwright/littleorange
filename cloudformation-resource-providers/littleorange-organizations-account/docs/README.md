@@ -12,6 +12,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 {
     "Type" : "LittleOrange::Organizations::Account",
     "Properties" : {
+        "<a href="#delegatedadministratorservices" title="DelegatedAdministratorServices">DelegatedAdministratorServices</a>" : <i>[ String, ... ]</i>,
         "<a href="#email" title="Email">Email</a>" : <i>String</i>,
         "<a href="#name" title="Name">Name</a>" : <i>String</i>,
         "<a href="#parentid" title="ParentId">ParentId</a>" : <i>String</i>,
@@ -24,12 +25,24 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <pre>
 Type: LittleOrange::Organizations::Account
 Properties:
+    <a href="#delegatedadministratorservices" title="DelegatedAdministratorServices">DelegatedAdministratorServices</a>: <i>
+      - String</i>
     <a href="#email" title="Email">Email</a>: <i>String</i>
     <a href="#name" title="Name">Name</a>: <i>String</i>
     <a href="#parentid" title="ParentId">ParentId</a>: <i>String</i>
 </pre>
 
 ## Properties
+
+#### DelegatedAdministratorServices
+
+List of service principals for which this account should be registered as a delegated administrator
+
+_Required_: No
+
+_Type_: List of String
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
 #### Email
 

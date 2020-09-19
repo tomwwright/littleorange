@@ -8,6 +8,13 @@
       "description": "The ARN of this Organizational Unit (OU).",
       "type": "string"
     },
+    "DelegatedAdministratorServices": {
+      "description": "List of service principals for which this account should be registered as a delegated administrator",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
     "Email": {
       "description": "The email address associated with this Account",
       "type": "string"

@@ -4,7 +4,7 @@ from moto import mock_organizations
 import mypy_boto3_organizations as Organizations
 from typing import Any, get_type_hints
 from unittest import TestCase
-from unittest.mock import Mock
+from unittest.mock import patch, Mock
 
 
 from ..models import ResourceModel
@@ -79,3 +79,38 @@ class TestProvisionerUpdate(TestCase):
     parents = organizations.list_parents(ChildId=updated.Id)
 
     assert parents["Parents"][0]["Id"] == root["Id"]
+
+  @mock_organizations
+  def testUpdateDelegatedAdministratorServices(self):
+
+    organizations: Organizations.Client = boto3.client("organizations")
+
+    organizations.create_organization(FeatureSet="ALL")
+    root = organizations.list_roots()["Roots"][0]
+
+    desired = ResourceModel._deserialize({
+        "Email": "test@littleorange.com.au",
+        "Name": "Test",
+        "DelegatedAdministratorServices": [
+            "guardduty.amazonaws.com"
+        ]
+    })
+
+    provisioner = OrganizationsAccountProvisioner(self.logger, organizations)
+    created = provisioner.create(desired)
+
+    desiredUpdate = ResourceModel._deserialize({
+        **created._serialize(),
+        "DelegatedAdministratorServices": [
+            "ssm.amazonaws.com"
+        ]
+    })
+
+    with patch.object(organizations, 'deregister_delegated_administrator', wraps=organizations.deregister_delegated_administrator) as deregisterSpy:
+      with patch.object(organizations, 'register_delegated_administrator', wraps=organizations.register_delegated_administrator) as registerSpy:
+        updated = provisioner.update(created, desiredUpdate)
+
+        deregisterSpy.assert_called_with(AccountId=created.Id, ServicePrincipal="guardduty.amazonaws.com")
+        registerSpy.assert_called_with(AccountId=created.Id, ServicePrincipal="ssm.amazonaws.com")
+
+        assert updated.DelegatedAdministratorServices == ["ssm.amazonaws.com"]

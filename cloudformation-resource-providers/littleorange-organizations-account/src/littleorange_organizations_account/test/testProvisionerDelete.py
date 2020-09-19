@@ -71,3 +71,28 @@ class TestProvisionerCreate(TestCase):
     assert account["Account"]["Id"] == model.Id
     assert account["Account"]["Name"] == model.Name
     assert parents["Parents"][0]["Id"] == root["Id"]
+
+  @mock_organizations
+  def testDeleteWithDelegatedAdministratorServices(self):
+
+    organizations: Organizations.Client = boto3.client("organizations")
+
+    organizations.create_organization(FeatureSet="ALL")
+    root = organizations.list_roots()["Roots"][0]
+
+    desired = ResourceModel._deserialize({
+        "Email": "test@littleorange.com.au",
+        "Name": "Test",
+        "DelegatedAdministratorServices": [
+            "guardduty.amazonaws.com",
+            "ssm.amazonaws.com"
+        ]
+    })
+
+    provisioner = OrganizationsAccountProvisioner(self.logger, organizations)
+    model = provisioner.create(desired)
+
+    provisioner.delete(model)
+
+    with self.assertRaises(organizations.exceptions.AccountNotRegisteredException):
+      organizations.list_delegated_services_for_account(AccountId=model.Id)
