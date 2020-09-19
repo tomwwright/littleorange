@@ -20,7 +20,7 @@ class OrganizationsAccountProvisioner(object):
       if account["Name"] == name and account["Email"] == email:
         return account
       elif account["Name"] == name or account["Email"] == email:
-        raise Exception(f"Existing account with (name={account['Name']} email={account['Email']}) instead of ({name=} {email=})")
+        raise exceptions.ResourceConflict(f"Existing account with (name='{account['Name']}' email='{account['Email']}') instead of ({name=} {email=})")
 
     return None
 
@@ -30,7 +30,7 @@ class OrganizationsAccountProvisioner(object):
       return [service["ServicePrincipal"] for page in pages for service in page["DelegatedServices"]]
     except self.organizations.exceptions.AccountNotRegisteredException:
       return []
-      
+
   def findOrganizationRoot(self):
 
     pages = self.organizations.get_paginator('list_roots').paginate()
@@ -141,24 +141,24 @@ class OrganizationsAccountProvisioner(object):
       destinationParentId = organizationRootId
 
     if sourceParentId != destinationParentId:
-      self.organizations.move_account(AccountId=desired.Id, SourceParentId=sourceParentId,
+      self.organizations.move_account(AccountId=current.Id, SourceParentId=sourceParentId,
                                       DestinationParentId=destinationParentId)
 
-    currentDelegatedAdministratorServices = self.listDelegatedAdministratorServices(desired.Id)
+    currentDelegatedAdministratorServices = self.listDelegatedAdministratorServices(current.Id)
     desiredDelegatedAdministratorServices = desired.DelegatedAdministratorServices or []
 
     servicesToDeregister = set(currentDelegatedAdministratorServices) - set(desiredDelegatedAdministratorServices)
     for service in servicesToDeregister:
       self.organizations.deregister_delegated_administrator(
-          AccountId=desired.Id,
+          AccountId=current.Id,
           ServicePrincipal=service
       )
 
     servicesToRegister = set(desiredDelegatedAdministratorServices) - set(currentDelegatedAdministratorServices)
     for service in servicesToRegister:
       self.organizations.register_delegated_administrator(
-          AccountId=desired.Id,
+          AccountId=current.Id,
           ServicePrincipal=service
       )
 
-    return self.get(desired)
+    return self.get(current)

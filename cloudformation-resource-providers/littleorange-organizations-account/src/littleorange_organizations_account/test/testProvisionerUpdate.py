@@ -86,8 +86,7 @@ class TestProvisionerUpdate(TestCase):
     organizations: Organizations.Client = boto3.client("organizations")
 
     organizations.create_organization(FeatureSet="ALL")
-    root = organizations.list_roots()["Roots"][0]
-
+    
     desired = ResourceModel._deserialize({
         "Email": "test@littleorange.com.au",
         "Name": "Test",

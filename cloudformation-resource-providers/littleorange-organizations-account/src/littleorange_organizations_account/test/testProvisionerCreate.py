@@ -1,4 +1,5 @@
 import boto3
+from cloudformation_cli_python_lib import exceptions
 import logging
 from moto import mock_organizations
 import mypy_boto3_organizations as Organizations
@@ -119,7 +120,6 @@ class TestProvisionerCreate(TestCase):
     organizations: Organizations.Client = boto3.client("organizations")
 
     organizations.create_organization(FeatureSet="ALL")
-    root = organizations.list_roots()["Roots"][0]
 
     desired = ResourceModel._deserialize({
         "Email": "test@littleorange.com.au",
@@ -145,3 +145,61 @@ class TestProvisionerCreate(TestCase):
     services = organizations.list_delegated_services_for_account(AccountId=model.Id)
 
     assert [service["ServicePrincipal"] for service in services["DelegatedServices"]] == ["guardduty.amazonaws.com", "ssm.amazonaws.com"]
+
+  @mock_organizations
+  def testCreateAccountAlreadyExists(self):
+
+    organizations: Organizations.Client = boto3.client("organizations")
+
+    organizations.create_organization(FeatureSet="ALL")
+
+    desired = ResourceModel._deserialize({
+        "Email": "test@littleorange.com.au",
+        "Name": "Test",
+        "DelegatedAdministratorServices": [
+            "guardduty.amazonaws.com",
+            "ssm.amazonaws.com"
+        ]
+    })
+
+    provisioner = OrganizationsAccountProvisioner(self.logger, organizations)
+    provisioner.create(desired)
+
+    # modify delegated administrator services and attempt to recreate -- should silently adopt existing account but apply update where possible
+
+    desired.DelegatedAdministratorServices = [
+        "macie.amazonaws.com"
+    ]
+    model = provisioner.create(desired)
+
+    services = organizations.list_delegated_services_for_account(AccountId=model.Id)
+
+    assert model.DelegatedAdministratorServices == ["macie.amazonaws.com"]
+    assert len(services["DelegatedServices"]) == 1
+    assert services["DelegatedServices"][0]["ServicePrincipal"] == "macie.amazonaws.com"
+
+  @mock_organizations
+  def testCreateNonmatchingAccountExists(self):
+
+    organizations: Organizations.Client = boto3.client("organizations")
+
+    organizations.create_organization(FeatureSet="ALL")
+
+    desired = ResourceModel._deserialize({
+        "Email": "test@littleorange.com.au",
+        "Name": "Test"
+    })
+
+    provisioner = OrganizationsAccountProvisioner(self.logger, organizations)
+    provisioner.create(desired)
+
+    # modify name and attempt to create -- exception thrown because immutable property doesn't match
+
+    with self.assertRaises(exceptions.ResourceConflict):
+      desired.Name = "OtherTest"
+      provisioner.create(desired)
+
+    with self.assertRaises(exceptions.ResourceConflict):
+      desired.Name = "Test"
+      desired.Email = "otherTest@littleorange.com.au"
+      provisioner.create(desired)
