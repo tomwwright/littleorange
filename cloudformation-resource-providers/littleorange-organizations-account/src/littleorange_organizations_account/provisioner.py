@@ -20,7 +20,8 @@ class OrganizationsAccountProvisioner(object):
       if account["Name"] == name and account["Email"] == email:
         return account
       elif account["Name"] == name or account["Email"] == email:
-        raise exceptions.ResourceConflict(f"Existing account with (name='{account['Name']}' email='{account['Email']}') instead of ({name=} {email=})")
+        raise exceptions.ResourceConflict(
+            f"Existing account with (name='{account['Name']}' email='{account['Email']}') instead of (name='{name}' email='{email}')")
 
     return None
 

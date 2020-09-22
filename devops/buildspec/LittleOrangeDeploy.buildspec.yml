@@ -9,7 +9,7 @@ phases:
       - make pipenv
   build:
     commands:
-      - > 
+      - >
         pipenv run make \
           lint \
           deploy
