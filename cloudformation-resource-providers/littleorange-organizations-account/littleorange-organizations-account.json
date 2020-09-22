@@ -67,7 +67,7 @@
   "handlers": {
     "create": {
       "permissions": [
-        "organziations:CreateAccount",
+        "organizations:CreateAccount",
         "organizations:DescribeAccount",
         "organizations:ListAccounts",
         "organizations:ListParents",

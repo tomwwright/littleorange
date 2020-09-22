@@ -23,6 +23,7 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
+                - "organizations:CreateAccount"
                 - "organizations:DeregisterDelegatedAdministrator"
                 - "organizations:DescribeAccount"
                 - "organizations:ListAccounts"
@@ -31,7 +32,6 @@ Resources:
                 - "organizations:ListRoots"
                 - "organizations:MoveAccount"
                 - "organizations:RegisterDelegatedAdministrator"
-                - "organziations:CreateAccount"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:
