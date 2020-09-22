@@ -72,6 +72,13 @@ Resources:
       Description: Deny all services
       Name: Quarantine
 
+  SandboxAccount:
+    DependsOn: [Organization]
+    Type: LittleOrange::Organizations::Account
+    Properties:
+      Email: little.orange.aws+sandbox@gmail.com
+      Name: Sandbox
+
 Outputs:
   OrganizationId:
     Value: !Ref Organization
