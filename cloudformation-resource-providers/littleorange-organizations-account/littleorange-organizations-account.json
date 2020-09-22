@@ -69,6 +69,7 @@
       "permissions": [
         "organziations:CreateAccount",
         "organizations:DescribeAccount",
+        "organizations:ListAccounts",
         "organizations:ListParents",
         "organizations:ListRoots",
         "organizations:DeregisterDelegatedAdministrator",
