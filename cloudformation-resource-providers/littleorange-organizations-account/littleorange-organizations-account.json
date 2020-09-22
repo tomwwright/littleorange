@@ -69,6 +69,7 @@
       "permissions": [
         "organizations:CreateAccount",
         "organizations:DescribeAccount",
+        "organizations:DescribeCreateAccountStatus",
         "organizations:ListAccounts",
         "organizations:ListParents",
         "organizations:ListRoots",

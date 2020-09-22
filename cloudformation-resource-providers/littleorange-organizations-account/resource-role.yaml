@@ -26,6 +26,7 @@ Resources:
                 - "organizations:CreateAccount"
                 - "organizations:DeregisterDelegatedAdministrator"
                 - "organizations:DescribeAccount"
+                - "organizations:DescribeCreateAccountStatus"
                 - "organizations:ListAccounts"
                 - "organizations:ListDelegatedServicesForAccount"
                 - "organizations:ListParents"
