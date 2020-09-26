@@ -1,0 +1,41 @@
+
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange AWS SAM Deployment Resources
+Parameters:
+  OrganizationId:
+    Description: ID of the Little Orange Organization
+    Type: String
+Resources:
+
+  SAMDeploymentBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      AccessControl: Private
+      BucketName: littleorange-sam-deployment-resources
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+  
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Bucket: !Ref SAMDeploymentBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: OrganizationsAccess
+            Action:
+              - s3:GetObject
+              - s3:PutObject
+            Effect: Allow
+            Principal: "*"
+            Resource: !Sub ${SAMDeploymentBucket.Arn}/*
+            Condition:
+              StringEquals:
+                aws:PrincipalOrgID: !Ref OrganizationId

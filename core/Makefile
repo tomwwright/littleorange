@@ -9,3 +9,9 @@ deploy-core: ## Deploy 'Core' - Organizations configuration
 		--stack-name LittleOrangeCore \
 		--capabilities CAPABILITY_NAMED_IAM \
 		--no-fail-on-empty-changeset
+	aws cloudformation deploy \
+		--template-file core/SAMDeploymentResources.cfn.yml \
+		--stack-name LittleOrangeSAMDeploymentResources \
+		--no-fail-on-empty-changeset \
+		--parameter-overrides \
+			OrganizationId=`aws organizations describe-organization --query 'Organization.Id' --output text`
