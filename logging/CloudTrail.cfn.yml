@@ -81,9 +81,9 @@ Resources:
             Action:
               - kms:GenerateDataKey*
             Resource: "*"
-            # Condition:
-            #   StringLike:
-            #     kms:EncryptionContext:aws:cloudtrail:arn: !Sub arn:aws:cloudtrail:*:${AWS::AccountId}:trail/*
+            Condition:
+              StringLike:
+                kms:EncryptionContext:aws:cloudtrail:arn: !Sub arn:aws:cloudtrail:*:${AWS::AccountId}:trail/*
 
   KMSKeyAlias:
     Type: AWS::KMS::Alias
