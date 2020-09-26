@@ -5,6 +5,7 @@
 include cloudformation-resource-providers/Makefile
 include core/Makefile
 include devops/Makefile
+include logging/Makefile
 
 deploy: deploy-pipeline deploy-core ## Deploy Little Orange
 	
