@@ -1,0 +1,12 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange GuardDuty Main
+Resources:
+  GuardDutyDetector:
+    Type: AWS::GuardDuty::Detector
+    Properties:
+      DataSources:
+        S3Logs:
+          Enable: true
+      Enable: true
+      FindingPublishingFrequency: ONE_HOUR
