@@ -1,9 +1,8 @@
 ---
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: Little Orange CloudFormation Custom Resource for enabling IsOrganizationTrail on a CloudTrail trail
 Resources:
-
   CloudFormationCustomResourceFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -17,7 +16,7 @@ Resources:
 
   CloudFormationCustomResourcePermission:
     Type: AWS::Lambda::Permission
-    Properties: 
+    Properties:
       Action: lambda:InvokeFunction
       FunctionName: !GetAtt CloudFormationCustomResourceFunction.Arn
       Principal: cloudformation.amazonaws.com
