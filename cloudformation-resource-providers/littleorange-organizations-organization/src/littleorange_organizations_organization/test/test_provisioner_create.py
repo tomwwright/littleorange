@@ -48,12 +48,17 @@ class TestOrganizationsOrganizationProvisionerCreate(TestCase):
     assert {'Type': 'SERVICE_CONTROL_POLICY', 'Status': 'ENABLED'} in root['PolicyTypes']
     assert {'Type': 'TAG_POLICY', 'Status': 'ENABLED'} in root['PolicyTypes']
 
+    services = organizations.list_aws_service_access_for_organization()
+
+    assert [service["ServicePrincipal"] for service in services["EnabledServicePrincipals"]] == []
+
   @mock_organizations
-  def testCreateNoPolicyTypes(self):
+  def testCreateNoPolicyTypesNoServices(self):
 
     desired = ResourceModel._deserialize({
         'FeatureSet': 'ALL',
-        'EnabledPolicyTypes': []
+        'EnabledPolicyTypes': [],
+        'EnabledServices': []
     })
 
     provisioner = OrganizationsOrganizationProvisioner(self.logger, boto3)
@@ -71,3 +76,38 @@ class TestOrganizationsOrganizationProvisionerCreate(TestCase):
 
     assert root['Name'] == 'Root'
     assert len(root['PolicyTypes']) == 0
+
+    services = organizations.list_aws_service_access_for_organization()
+
+    assert [service["ServicePrincipal"] for service in services["EnabledServicePrincipals"]] == []
+
+  @mock_organizations
+  def testCreateWithServices(self):
+
+    desired = ResourceModel._deserialize({
+        'FeatureSet': 'ALL',
+        'EnabledServices': [
+          {'ServicePrincipal': 'cloudtrail.amazonaws.com'},
+          {'ServicePrincipal': 'guardduty.amazonaws.com'}
+        ]
+    })
+
+    provisioner = OrganizationsOrganizationProvisioner(self.logger, boto3)
+    model = provisioner.create(desired)
+
+    assert model.Id is not None
+
+    organizations: Organizations.Client = boto3.client('organizations')
+
+    organization = organizations.describe_organization()
+
+    assert organization['Organization']['FeatureSet'] == 'ALL'
+
+    root = provisioner.findRoot(organizations)
+
+    assert root['Name'] == 'Root'
+    assert len(root['PolicyTypes']) == 0
+
+    services = organizations.list_aws_service_access_for_organization()
+
+    assert set([service["ServicePrincipal"] for service in services["EnabledServicePrincipals"]]) == set(["cloudtrail.amazonaws.com", "guardduty.amazonaws.com"])

@@ -13,6 +13,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     "Type" : "LittleOrange::Organizations::Organization",
     "Properties" : {
         "<a href="#enabledpolicytypes" title="EnabledPolicyTypes">EnabledPolicyTypes</a>" : <i>[ <a href="enabledpolicytypes.md">EnabledPolicyTypes</a>, ... ]</i>,
+        "<a href="#enabledservices" title="EnabledServices">EnabledServices</a>" : <i>[ <a href="enabledservices.md">EnabledServices</a>, ... ]</i>,
         "<a href="#featureset" title="FeatureSet">FeatureSet</a>" : <i>String</i>
     }
 }
@@ -25,6 +26,8 @@ Type: LittleOrange::Organizations::Organization
 Properties:
     <a href="#enabledpolicytypes" title="EnabledPolicyTypes">EnabledPolicyTypes</a>: <i>
       - <a href="enabledpolicytypes.md">EnabledPolicyTypes</a></i>
+    <a href="#enabledservices" title="EnabledServices">EnabledServices</a>: <i>
+      - <a href="enabledservices.md">EnabledServices</a></i>
     <a href="#featureset" title="FeatureSet">FeatureSet</a>: <i>String</i>
 </pre>
 
@@ -37,6 +40,16 @@ The enabled policy types of the Organization root
 _Required_: No
 
 _Type_: List of <a href="enabledpolicytypes.md">EnabledPolicyTypes</a>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### EnabledServices
+
+AWS Service Principals enabled for integration with AWS Organizations
+
+_Required_: No
+
+_Type_: List of <a href="enabledservices.md">EnabledServices</a>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 

@@ -46,6 +46,7 @@ class ResourceModel(BaseModel):
     MasterAccountId: Optional[str]
     MasterAccountEmail: Optional[str]
     EnabledPolicyTypes: Optional[Sequence["_EnabledPolicyTypes"]]
+    EnabledServices: Optional[Sequence["_EnabledServices"]]
     FeatureSet: Optional[str]
 
     @classmethod
@@ -65,6 +66,7 @@ class ResourceModel(BaseModel):
             MasterAccountId=json_data.get("MasterAccountId"),
             MasterAccountEmail=json_data.get("MasterAccountEmail"),
             EnabledPolicyTypes=deserialize_list(json_data.get("EnabledPolicyTypes"), EnabledPolicyTypes),
+            EnabledServices=deserialize_list(json_data.get("EnabledServices"), EnabledServices),
             FeatureSet=json_data.get("FeatureSet"),
         )
 
@@ -91,5 +93,25 @@ class EnabledPolicyTypes(BaseModel):
 
 # work around possible type aliasing issues when variable has same name as a model
 _EnabledPolicyTypes = EnabledPolicyTypes
+
+
+@dataclass
+class EnabledServices(BaseModel):
+    ServicePrincipal: Optional[str]
+
+    @classmethod
+    def _deserialize(
+        cls: Type["_EnabledServices"],
+        json_data: Optional[Mapping[str, Any]],
+    ) -> Optional["_EnabledServices"]:
+        if not json_data:
+            return None
+        return cls(
+            ServicePrincipal=json_data.get("ServicePrincipal"),
+        )
+
+
+# work around possible type aliasing issues when variable has same name as a model
+_EnabledServices = EnabledServices
 
 

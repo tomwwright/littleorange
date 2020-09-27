@@ -29,6 +29,9 @@ class TestOrganizationsOrganizationProvisionerUpdate(TestCase):
         'EnabledPolicyTypes': [
             {'Type': 'SERVICE_CONTROL_POLICY'},
             {'Type': 'BACKUP_POLICY'}
+        ],
+        'EnabledServices': [
+            {'ServicePrincipal': 'guardduty.amazonaws.com'}
         ]
     })
 
@@ -37,6 +40,10 @@ class TestOrganizationsOrganizationProvisionerUpdate(TestCase):
         'EnabledPolicyTypes': [
             {'Type': 'SERVICE_CONTROL_POLICY'},
             {'Type': 'TAG_POLICY'}
+        ],
+        'EnabledServices': [
+            {'ServicePrincipal': 'cloudtrail.amazonaws.com'},
+            {'ServicePrincipal': 'config.amazonaws.com'}
         ]
     })
 
@@ -47,9 +54,12 @@ class TestOrganizationsOrganizationProvisionerUpdate(TestCase):
 
     organizations: Organizations.Client = boto3.client('organizations')
     root = provisioner.findRoot(organizations)
-
     assert root['Name'] == 'Root'
     assert len(root['PolicyTypes']) == 2
     assert {'Type': 'SERVICE_CONTROL_POLICY', 'Status': 'ENABLED'} in root['PolicyTypes']
     assert {'Type': 'TAG_POLICY', 'Status': 'ENABLED'} in root['PolicyTypes']
     assert {'Type': 'BACKUP_POLICY', 'Status': 'ENABLED'} not in root['PolicyTypes']
+
+    services = organizations.list_aws_service_access_for_organization()
+    assert set([service["ServicePrincipal"] for service in services["EnabledServicePrincipals"]]
+               ) == set(["cloudtrail.amazonaws.com", "config.amazonaws.com"])

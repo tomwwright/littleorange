@@ -47,6 +47,19 @@
         ]
       }
     },
+    "EnabledServices": {
+      "description": "AWS Service Principals enabled for integration with AWS Organizations",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ServicePrincipal": {
+            "description": "Service Principal for the service, e.g. cloudtrail.amazonaws.com",
+            "type": "string"
+          }
+        }
+      }
+    },
     "FeatureSet": {
       "description": "Specifies the feature set supported by the organization. Each feature set supports different levels of functionality.",
       "type": "string",
@@ -84,21 +97,27 @@
       "permissions": [
         "iam:CreateServiceLinkedRole",
         "organizations:CreateOrganization",
+        "organizations:DisableAWSServiceAccess",
         "organizations:DisablePolicyType",
+        "organizations:EnableAWSServiceAccess",
         "organizations:EnablePolicyType",
         "organizations:ListRoots"
       ]
     },
     "update": {
       "permissions": [
+        "organizations:DisableAWSServiceAccess",
         "organizations:DisablePolicyType",
+        "organizations:EnableAWSServiceAccess",
         "organizations:EnablePolicyType",
+        "organizations:ListAWSServiceAccessForOrganization",
         "organizations:ListRoots"
       ]
     },
     "read": {
       "permissions": [
         "organizations:DescribeOrganization",
+        "organizations:ListAWSServiceAccessForOrganization",
         "organizations:ListRoots"
       ]
     },
@@ -110,6 +129,7 @@
     "list": {
       "permissions": [
         "organizations:DescribeOrganization",
+        "organizations:ListAWSServiceAccessForOrganization",
         "organizations:ListRoots"
       ]
     }

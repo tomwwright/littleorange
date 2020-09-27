@@ -27,8 +27,11 @@ Resources:
                 - "organizations:CreateOrganization"
                 - "organizations:DeleteOrganization"
                 - "organizations:DescribeOrganization"
+                - "organizations:DisableAWSServiceAccess"
                 - "organizations:DisablePolicyType"
+                - "organizations:EnableAWSServiceAccess"
                 - "organizations:EnablePolicyType"
+                - "organizations:ListAWSServiceAccessForOrganization"
                 - "organizations:ListRoots"
                 Resource: "*"
 Outputs:

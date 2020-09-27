@@ -50,6 +50,21 @@ class OrganizationsOrganizationProvisioner(object):
 
     return root
 
+  def __handleEnabledAWSServices(self, organizations: Organizations.Client, desired: ResourceModel):
+    desiredServiceObjects = desired.EnabledServices or []
+    desiredServices = [service.ServicePrincipal for service in desiredServiceObjects]
+
+    services = self.__setEnabledAWSServices(organizations, desiredServices)
+    return services
+
+  def __listEnabledAWSServices(self, organizations: Organizations.Client):
+    pages = organizations.get_paginator("list_aws_service_access_for_organization").paginate()
+    services = [{
+        "ServicePrincipal": service["ServicePrincipal"]
+    } for page in pages for service in page["EnabledServicePrincipals"]]
+
+    return services
+
   def __setEnabledPolicyTypes(self, organizations: Organizations.Client, policyTypes: Sequence[Optional[str]]):
     root = self.findRoot(organizations)
 
@@ -72,6 +87,21 @@ class OrganizationsOrganizationProvisioner(object):
 
     # return refreshed to reflect policy changes
     return self.findRoot(organizations)
+  
+  def __setEnabledAWSServices(self, organizations, desiredServices: Sequence[Optional[str]]):
+    currentServices = [service["ServicePrincipal"] for service in self.__listEnabledAWSServices(organizations)]
+
+    servicesToDisable = [service for service in currentServices if service not in desiredServices]
+    servicesToEnable = [service for service in desiredServices if service not in currentServices]
+
+    for service in servicesToDisable:
+      organizations.disable_aws_service_access(ServicePrincipal=service)
+
+    for service in servicesToEnable:
+      organizations.enable_aws_service_access(ServicePrincipal=service)
+
+    return self.__listEnabledAWSServices(organizations)
+
 
   def create(self, desired: ResourceModel) -> ResourceModel:
 
@@ -82,11 +112,13 @@ class OrganizationsOrganizationProvisioner(object):
     )
 
     root = self.__handleEnabledPolicyTypes(organizations, desired)
+    services = self.__handleEnabledAWSServices(organizations, desired)
 
     modelData: Any = {
         **response['Organization'],
         'RootId': root['Id'],
-        'EnabledPolicyTypes': [{'Type': policy['Type']} for policy in root['PolicyTypes'] if policy['Status'] == 'ENABLED']
+        'EnabledPolicyTypes': [{'Type': policy['Type']} for policy in root['PolicyTypes'] if policy['Status'] == 'ENABLED'],
+        'EnabledServices': services
     }
 
     return safeDeserialise(ResourceModel, modelData)
@@ -107,40 +139,31 @@ class OrganizationsOrganizationProvisioner(object):
     try:
       organization = organizations.describe_organization()["Organization"]
       root = self.findRoot(organizations)
+      services = self.__listEnabledAWSServices(organizations)
     except organizations.exceptions.AWSOrganizationsNotInUseException:
       raise exceptions.NotFound(self.TYPE, desired.Id or 'NoID')
 
     modelData: Any = {
         **organization,
         'RootId': root['Id'],
-        'EnabledPolicyTypes': [{'Type': policy['Type']} for policy in root['PolicyTypes'] if policy['Status'] == 'ENABLED']
+        'EnabledPolicyTypes': [{'Type': policy['Type']} for policy in root['PolicyTypes'] if policy['Status'] == 'ENABLED'],
+        'EnabledServices': services
     }
 
     return safeDeserialise(ResourceModel, modelData)
 
   def listResources(self) -> Sequence[ResourceModel]:
 
-    organizations: Organizations.Client = self.boto3.client('organizations')
+    desired = ResourceModel._deserialize({})
 
-    try:
-      organization = organizations.describe_organization()["Organization"]
-      root = self.findRoot(organizations)
-    except organizations.exceptions.AWSOrganizationsNotInUseException:
-      raise exceptions.NotFound(self.TYPE, 'NoID')
-
-    modelData: Any = {
-        **organization,
-        'RootId': root['Id'],
-        'EnabledPolicyTypes': [{'Type': policy['Type']} for policy in root['PolicyTypes'] if policy['Status'] == 'ENABLED']
-    }
-
-    return [safeDeserialise(ResourceModel, modelData)]
+    return [self.get(desired)]
 
   def update(self, current: ResourceModel, desired: ResourceModel) -> ResourceModel:
 
     organizations: Organizations.Client = self.boto3.client('organizations')
 
     self.__handleEnabledPolicyTypes(organizations, desired)
+    self.__handleEnabledAWSServices(organizations, desired)
 
     modelData: Any = {
         **current._serialize(),
