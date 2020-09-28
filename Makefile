@@ -14,7 +14,7 @@ lint: lint-yaml lint-cloudformation ## Run all linting
 
 lint-cloudformation: ## Run CloudFormation linting with cfn-lint
 	$(info [+] Linting CloudFormation templates...)
-	cfn-lint '**/*.cfn.yml' 'cloudformation-resource-providers/**/template.yml' 'cloudformation-resource-providers/**/resource-role.yaml'
+	cfn-lint '**/*.cfn.yml' '**/*.sam.yml' 'cloudformation-resource-providers/**/template.yml' 'cloudformation-resource-providers/**/resource-role.yaml'
 
 lint-yaml:	## Run YAML linting with yamllint (see .yamllint.yml for config)
 	$(info [+] Linting YAML files...)
