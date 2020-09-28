@@ -28,6 +28,17 @@ DeployEnableIsOrganizationTrail:
 		--capabilities CAPABILITY_IAM \
 		--no-fail-on-empty-changeset
 
+DeployGuardDutyMain: GuardDutyOrganizationConfigurationServiceToken=`aws cloudformation describe-stacks --stack-name LittleOrangeGuardDutyOrganizationConfiguration --query 'Stacks[0].Outputs[?OutputKey==\`ServiceToken\`].OutputValue' --output text`
+DeployGuardDutyMain: DetectorId=`aws guardduty list-detectors --query 'DetectorIds[0]' --output text`
+DeployGuardDutyMain:
+	$(info [+] Deploying Little Orange GuardDuty Main)
+	aws cloudformation deploy \
+		--template-file logging/GuardDutyMain.cfn.yml \
+		--stack-name LittleOrangeGuardDuty \
+		--no-fail-on-empty-changeset \
+		--parameter-overrides \
+				DetectorId=${DetectorId} \
+				GuardDutyOrganizationConfigurationServiceToken=${GuardDutyOrganizationConfigurationServiceToken}
 
 DeployGuardDutyOrganizationConfiguration: BuildGuardDutyOrganizationConfiguration
 DeployGuardDutyOrganizationConfiguration:
