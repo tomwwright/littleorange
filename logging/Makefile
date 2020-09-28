@@ -3,6 +3,11 @@ BuildEnableIsOrganizationTrail:
 	sam build; \
 	sam package
 
+BuildGuardDutyOrganizationConfiguration:
+	cd logging/GuardDutyOrganizationConfiguration; \
+	sam build; \
+	sam package
+
 DeployCloudTrail: EnableIsOrganizationTrailServiceToken=`aws cloudformation describe-stacks --stack-name LittleOrangeEnableIsOrganizationTrail --query 'Stacks[0].Outputs[?OutputKey==\`ServiceToken\`].OutputValue' --output text`
 DeployCloudTrail:
 	$(info [+] Deploying Little Orange CloudTrail)
@@ -20,5 +25,15 @@ DeployEnableIsOrganizationTrail:
 	cd logging/EnableIsOrganizationTrail; \
 	sam deploy \
 		--stack-name LittleOrangeEnableIsOrganizationTrail \
+		--capabilities CAPABILITY_IAM \
+		--no-fail-on-empty-changeset
+
+
+DeployGuardDutyOrganizationConfiguration: BuildGuardDutyOrganizationConfiguration
+DeployGuardDutyOrganizationConfiguration:
+	$(info [+] Deploying GuardDutyOrganizationConfiguration CloudFormation Custom Resource)
+	cd logging/GuardDutyOrganizationConfiguration; \
+	sam deploy \
+		--stack-name LittleOrangeGuardDutyOrganizationConfiguration \
 		--capabilities CAPABILITY_IAM \
 		--no-fail-on-empty-changeset

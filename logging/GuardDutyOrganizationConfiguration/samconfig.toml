@@ -1,0 +1,10 @@
+version = 0.1
+[default.build.parameters]
+manifest = "requirements.txt"
+template_file = "GuardDutyOrganizationConfiguration.sam.yml"
+
+[default.package.parameters]
+s3_bucket = "littleorange-sam-deployment-resources"
+
+[default.deploy.parameters]
+s3_bucket = "littleorange-sam-deployment-resources"
