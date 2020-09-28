@@ -7,6 +7,10 @@ Metadata:
       ignore_checks:
         - E3001 # E3001: Invalid or unsupported Type -- user-defined types from CloudFormation Resource Types
         - E1010 # Invalid GetAtt -- user-defined types from CloudFormation Resource Types
+Parameters:
+  GuardDutyOrganizationAdminServiceToken:
+    Description: Service Token for CloudFormation Custom Resource
+    Type: String
 Resources:
   OrganizationsServiceLinkedRole:
     Type: AWS::IAM::ServiceLinkedRole
@@ -83,8 +87,25 @@ Resources:
       Email: little.orange.aws+sandbox@gmail.com
       Name: Sandbox
 
+  SecurityAccount:
+    DependsOn: [Organization]
+    Type: LittleOrange::Organizations::Account
+    Properties:
+      DelegatedAdministratorServices:
+        - guardduty.amazonaws.com
+      Email: little.orange.aws+security@gmail.com
+      Name: Security
+
+  GuardDutyOrganizationAdmin:
+    Type: Custom::GuardDutyOrganizationAdmin
+    Properties:
+      ServiceToken: !Ref GuardDutyOrganizationAdminServiceToken
+      AccountId: !Ref SecurityAccount
+
 Outputs:
   OrganizationId:
     Value: !Ref Organization
   RootId:
     Value: !GetAtt Organization.RootId
+  SecurityAccountId:
+    Value: !Ref SecurityAccount
