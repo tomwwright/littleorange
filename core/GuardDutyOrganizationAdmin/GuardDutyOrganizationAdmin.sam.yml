@@ -7,7 +7,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Description: CloudFormation Custom Resource that enables an GuardDuty Organization Admin account
-      CodeUri: ./src  
+      CodeUri: ./src
       Handler: app.handler
       MemorySize: 128
       Runtime: python3.8
