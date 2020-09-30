@@ -1,0 +1,51 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange GuardDuty in Delegated Admin account
+Parameters:
+  DetectorId:
+    Default: NONE
+    Description: ID of existing GuardDuty Detector auto-created by enabling Organization Admin account
+    Type: String
+  GuardDutyOrganizationConfigurationServiceToken:
+    Description: Service Token for CloudFormation Custom Resource
+    Type: String
+  MasterAccountId:
+    AllowedPattern: "[0-9]{12}"
+    Description: Account ID of the Organization Master
+    Type: String
+  MasterAccountEmail:
+    Description: Email address associated with the Organization Master
+    Type: String
+  SandboxAccountId:
+    AllowedPattern: "[0-9]{12}"
+    Description: Account ID of the Organization Sandbox account
+    Type: String
+  SandboxAccountEmail:
+    Description: Email address associated with the Organization Sandbox account
+    Type: String
+Resources:
+
+  GuardDutyOrganizationConfiguration:
+    Type: Custom::GuardDutyOrganizationConfiguration
+    Properties:
+      ServiceToken: !Ref GuardDutyOrganizationConfigurationServiceToken
+      OrganizationConfiguration:
+        DetectorId: !Ref DetectorId
+        AutoEnable: true
+        DataSources:
+          S3Logs:
+            AutoEnable: true
+  
+  MemberMaster:
+    Type: AWS::GuardDuty::Member
+    Properties:
+      DetectorId: !Ref DetectorId
+      Email: !Ref MasterAccountEmail
+      MemberId: !Ref MasterAccountId
+
+  MemberSandbox:
+    Type: AWS::GuardDuty::Member
+    Properties:
+      DetectorId: !Ref DetectorId
+      Email: !Ref SandboxAccountEmail
+      MemberId: !Ref SandboxAccountId

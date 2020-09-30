@@ -1,0 +1,25 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange GuardDuty in Organization Master
+Parameters:
+  GuardDutyOrganizationAdminServiceToken:
+    Description: Service Token for CloudFormation Custom Resource
+    Type: String
+  GuardDutyAdminAccountId:
+    AllowedPattern: "[0-9]{12}"
+    Description: Account ID for the account to enable as GuardDuty Organization Admin
+    Type: String
+Resources:
+  GuardDutyDetector:
+    Type: AWS::GuardDuty::Detector
+    Properties:
+      DataSources:
+        S3Logs:
+          Enable: true
+      Enable: true
+
+  GuardDutyOrganizationAdmin:
+    Type: Custom::GuardDutyOrganizationAdmin
+    Properties:
+      ServiceToken: !Ref GuardDutyOrganizationAdminServiceToken
+      AccountId: !Ref GuardDutyAdminAccountId
