@@ -21,9 +21,6 @@ class TestOrganizationsOrganizationProvisionerList(TestCase):
 
     organizations: Organizations.Client = boto3.client("organizations")
 
-    mockBoto3: Any = Mock()
-    mockBoto3.client.return_value = organizations
-
     with patch.object(organizations, 'describe_organization') as describeOrganizationMock:
       with patch.object(organizations, 'list_roots') as listRootsMock:
         with patch.object(organizations, 'list_aws_service_access_for_organization') as listServicesMock:
@@ -91,7 +88,7 @@ class TestOrganizationsOrganizationProvisionerList(TestCase):
               }
           ]
 
-          provisioner = OrganizationsOrganizationProvisioner(self.logger, mockBoto3)
+          provisioner = OrganizationsOrganizationProvisioner(self.logger, organizations)
           models = provisioner.listResources()
 
           assert len(models) == 1
@@ -103,4 +100,3 @@ class TestOrganizationsOrganizationProvisionerList(TestCase):
           assert models[0].EnabledPolicyTypes[1].Type == 'BACKUP_POLICY'
           assert models[0].EnabledServices[0].ServicePrincipal == "cloudtrail.amazonaws.com"
           assert models[0].EnabledServices[1].ServicePrincipal == "config.amazonaws.com"
-          

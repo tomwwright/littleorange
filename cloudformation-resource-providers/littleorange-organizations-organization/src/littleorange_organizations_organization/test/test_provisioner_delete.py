@@ -18,11 +18,9 @@ class TestProvisionerDelete(TestCase):
 
   def testDelete(self):
 
-    mockBoto3: Any = Mock()
     mockClient: Any = Mock()
-    mockBoto3.client.return_value = mockClient
 
-    provisioner = OrganizationsOrganizationProvisioner(self.logger, mockBoto3)
+    provisioner = OrganizationsOrganizationProvisioner(self.logger, mockClient)
 
     provisioner.delete()
 

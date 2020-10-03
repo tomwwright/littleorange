@@ -46,14 +46,15 @@ class TestOrganizationsOrganizationProvisionerUpdate(TestCase):
             {'ServicePrincipal': 'config.amazonaws.com'}
         ]
     })
+    
+    organizations: Organizations.Client = boto3.client('organizations')
 
-    provisioner = OrganizationsOrganizationProvisioner(self.logger, boto3)
+    provisioner = OrganizationsOrganizationProvisioner(self.logger, organizations)
     provisioner.create(current)
 
     provisioner.update(current, desired)
 
-    organizations: Organizations.Client = boto3.client('organizations')
-    root = provisioner.findRoot(organizations)
+    root = provisioner.findRoot()
     assert root['Name'] == 'Root'
     assert len(root['PolicyTypes']) == 2
     assert {'Type': 'SERVICE_CONTROL_POLICY', 'Status': 'ENABLED'} in root['PolicyTypes']

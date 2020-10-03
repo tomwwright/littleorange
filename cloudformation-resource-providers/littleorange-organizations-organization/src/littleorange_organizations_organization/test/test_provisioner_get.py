@@ -21,9 +21,6 @@ class TestOrganizationsOrganizationProvisionerGet(TestCase):
 
     organizations: Organizations.Client = boto3.client("organizations")
 
-    mockBoto3: Any = Mock()
-    mockBoto3.client.return_value = organizations
-
     with patch.object(organizations, 'describe_organization') as describeOrganizationMock:
       with patch.object(organizations, 'list_roots') as listRootsMock:
         with patch.object(organizations, 'list_aws_service_access_for_organization') as listServicesMock:
@@ -50,24 +47,24 @@ class TestOrganizationsOrganizationProvisionerGet(TestCase):
           }
 
           listRootsMock.return_value = {
-                  'Roots': [
-                      {
-                          'Id': 'r-1234',
-                          'Arn': 'arn:aws:organizations::111222333444:root/o-abcd123456/r-1234',
-                          'Name': 'Root',
-                          'PolicyTypes': [
+              'Roots': [
+                  {
+                      'Id': 'r-1234',
+                      'Arn': 'arn:aws:organizations::111222333444:root/o-abcd123456/r-1234',
+                      'Name': 'Root',
+                      'PolicyTypes': [
                               {
                                   'Type': 'SERVICE_CONTROL_POLICY',
                                   'Status': 'ENABLED'
                               },
-                              {
+                          {
                                   'Type': 'BACKUP_POLICY',
                                   'Status': 'ENABLED'
                               }
-                          ]
-                      }
-                  ]
-              }
+                      ]
+                  }
+              ]
+          }
 
           listServicesMock.side_effect = [
               {
@@ -98,7 +95,7 @@ class TestOrganizationsOrganizationProvisionerGet(TestCase):
               ]
           })
 
-          provisioner = OrganizationsOrganizationProvisioner(self.logger, mockBoto3)
+          provisioner = OrganizationsOrganizationProvisioner(self.logger, organizations)
           model = provisioner.get(desired)
 
           assert model.Id == 'o-abcd123456'

@@ -18,6 +18,8 @@ class TestOrganizationsOrganizationProvisionerCreate(TestCase):
   @mock_organizations
   def testCreate(self):
 
+    organizations: Organizations.Client = boto3.client('organizations')
+
     desired = ResourceModel._deserialize({
         'FeatureSet': 'CONSOLIDATED_BILLING',
         'EnabledPolicyTypes': [
@@ -26,7 +28,7 @@ class TestOrganizationsOrganizationProvisionerCreate(TestCase):
         ]
     })
 
-    provisioner = OrganizationsOrganizationProvisioner(self.logger, boto3)
+    provisioner = OrganizationsOrganizationProvisioner(self.logger, organizations)
     model = provisioner.create(desired)
 
     assert model.Id is not None
@@ -35,13 +37,11 @@ class TestOrganizationsOrganizationProvisionerCreate(TestCase):
     assert "SERVICE_CONTROL_POLICY" in modelEnabledPolicyTypes
     assert "TAG_POLICY" in modelEnabledPolicyTypes
 
-    organizations: Organizations.Client = boto3.client('organizations')
-
     organization = organizations.describe_organization()
 
     assert organization['Organization']['FeatureSet'] == 'CONSOLIDATED_BILLING'
 
-    root = provisioner.findRoot(organizations)
+    root = provisioner.findRoot()
 
     assert root['Name'] == 'Root'
     assert len(root['PolicyTypes']) == 2
@@ -55,24 +55,25 @@ class TestOrganizationsOrganizationProvisionerCreate(TestCase):
   @mock_organizations
   def testCreateNoPolicyTypesNoServices(self):
 
+    organizations: Organizations.Client = boto3.client('organizations')
+
     desired = ResourceModel._deserialize({
         'FeatureSet': 'ALL',
         'EnabledPolicyTypes': [],
         'EnabledServices': []
     })
 
-    provisioner = OrganizationsOrganizationProvisioner(self.logger, boto3)
+    provisioner = OrganizationsOrganizationProvisioner(self.logger, organizations)
     model = provisioner.create(desired)
 
     assert model.Id is not None
 
-    organizations: Organizations.Client = boto3.client('organizations')
 
     organization = organizations.describe_organization()
 
     assert organization['Organization']['FeatureSet'] == 'ALL'
 
-    root = provisioner.findRoot(organizations)
+    root = provisioner.findRoot()
 
     assert root['Name'] == 'Root'
     assert len(root['PolicyTypes']) == 0
@@ -84,30 +85,31 @@ class TestOrganizationsOrganizationProvisionerCreate(TestCase):
   @mock_organizations
   def testCreateWithServices(self):
 
+    organizations: Organizations.Client = boto3.client('organizations')
+
     desired = ResourceModel._deserialize({
         'FeatureSet': 'ALL',
         'EnabledServices': [
-          {'ServicePrincipal': 'cloudtrail.amazonaws.com'},
-          {'ServicePrincipal': 'guardduty.amazonaws.com'}
+            {'ServicePrincipal': 'cloudtrail.amazonaws.com'},
+            {'ServicePrincipal': 'guardduty.amazonaws.com'}
         ]
     })
 
-    provisioner = OrganizationsOrganizationProvisioner(self.logger, boto3)
+    provisioner = OrganizationsOrganizationProvisioner(self.logger, organizations)
     model = provisioner.create(desired)
 
     assert model.Id is not None
-
-    organizations: Organizations.Client = boto3.client('organizations')
 
     organization = organizations.describe_organization()
 
     assert organization['Organization']['FeatureSet'] == 'ALL'
 
-    root = provisioner.findRoot(organizations)
+    root = provisioner.findRoot()
 
     assert root['Name'] == 'Root'
     assert len(root['PolicyTypes']) == 0
 
     services = organizations.list_aws_service_access_for_organization()
 
-    assert set([service["ServicePrincipal"] for service in services["EnabledServicePrincipals"]]) == set(["cloudtrail.amazonaws.com", "guardduty.amazonaws.com"])
+    assert set([service["ServicePrincipal"] for service in services["EnabledServicePrincipals"]]
+               ) == set(["cloudtrail.amazonaws.com", "guardduty.amazonaws.com"])
