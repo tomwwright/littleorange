@@ -4,6 +4,7 @@ from moto import mock_organizations
 import mypy_boto3_organizations as Organizations
 from typing import Any, get_type_hints
 from unittest import TestCase
+from unittest.mock import patch
 
 from ..models import ResourceModel
 from ..provisioner import OrganizationsOrganizationProvisioner
@@ -51,6 +52,24 @@ class TestOrganizationsOrganizationProvisionerCreate(TestCase):
     services = organizations.list_aws_service_access_for_organization()
 
     assert [service["ServicePrincipal"] for service in services["EnabledServicePrincipals"]] == []
+
+  @mock_organizations
+  def testExistingCreate(self):
+
+    organizations = boto3.client("organizations")
+    response = organizations.create_organization(FeatureSet="ALL")
+
+    desired = ResourceModel._deserialize({
+        'FeatureSet': "ALL"
+    })
+
+    with patch.object(organizations, 'create_organization') as mock:
+      mock.side_effect = organizations.exceptions.AlreadyInOrganizationException({"Error": {"Code": "AlreadyInOrganizationException"}}, "CreateOrganization")
+      
+      provisioner = OrganizationsOrganizationProvisioner(self.logger, organizations)
+      model = provisioner.create(desired)
+
+    assert model.Id == response["Organization"]["Id"]
 
   @mock_organizations
   def testCreateNoPolicyTypesNoServices(self):

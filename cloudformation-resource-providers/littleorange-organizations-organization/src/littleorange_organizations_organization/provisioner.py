@@ -105,14 +105,18 @@ class OrganizationsOrganizationProvisioner(object):
 
   def create(self, desired: ResourceModel) -> ResourceModel:
 
-    organizations: Organizations.Client = self.boto3.client('organizations')
+    try:
+      response = self.organizations.create_organization(
+          FeatureSet=cast(Any, desired.FeatureSet)  # generated model doesn't represent type of enums correctly
+      )
+    except self.organizations.exceptions.AlreadyInOrganizationException:
+      response = self.organizations.describe_organization()
+      if desired.FeatureSet != None and response["Organization"]["FeatureSet"] != desired.FeatureSet:
+        self.logger.error(f"Existing Organization has FeatureSet={response['Organization']['FeatureSet']}, expected {desired.FeatureSet}")
+        raise
 
-    response = organizations.create_organization(
-        FeatureSet=cast(Any, desired.FeatureSet)  # generated model doesn't represent type of enums correctly
-    )
-
-    root = self.__handleEnabledPolicyTypes(organizations, desired)
-    services = self.__handleEnabledAWSServices(organizations, desired)
+    root = self.__handleEnabledPolicyTypes(desired)
+    services = self.__handleEnabledAWSServices(desired)
 
     modelData: Any = {
         **response['Organization'],
