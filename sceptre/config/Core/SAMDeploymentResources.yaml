@@ -1,0 +1,4 @@
+---
+template_path: Core/SAMDeploymentResources.cfn.yaml
+parameters:
+  OrganizationId: !stack_output Core/Organization.yaml::OrganizationId
