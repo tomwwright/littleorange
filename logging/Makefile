@@ -1,8 +1,3 @@
-BuildEnableIsOrganizationTrail:
-	cd logging/EnableIsOrganizationTrail; \
-	sam build; \
-	sam package
-
 BuildGuardDutyOrganizationAdmin:
 	cd logging/GuardDutyOrganizationAdmin; \
 	sam build; \
