@@ -1,0 +1,4 @@
+---
+template_path: Core/CloudTrail.cfn.yaml
+parameters:
+  EnableIsOrganizationTrailServiceToken: !stack_output Core/EnableIsOrganizationTrail.yaml::ServiceToken

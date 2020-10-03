@@ -8,26 +8,6 @@ BuildGuardDutyOrganizationConfiguration:
 	sam build; \
 	sam package
 
-DeployCloudTrail: EnableIsOrganizationTrailServiceToken=`aws cloudformation describe-stacks --stack-name LittleOrangeEnableIsOrganizationTrail --query 'Stacks[0].Outputs[?OutputKey==\`ServiceToken\`].OutputValue' --output text`
-DeployCloudTrail:
-	$(info [+] Deploying Little Orange CloudTrail)
-	aws cloudformation deploy \
-		--template-file logging/CloudTrail.cfn.yml \
-		--stack-name LittleOrangeCloudTrail \
-		--capabilities CAPABILITY_IAM \
-		--no-fail-on-empty-changeset \
-		--parameter-overrides \
-				EnableIsOrganizationTrailServiceToken=${EnableIsOrganizationTrailServiceToken}
-
-DeployEnableIsOrganizationTrail: BuildEnableIsOrganizationTrail
-DeployEnableIsOrganizationTrail:
-	$(info [+] Deploying EnableIsOrganizationTrail CloudFormation Custom Resource)
-	cd logging/EnableIsOrganizationTrail; \
-	sam deploy \
-		--stack-name LittleOrangeEnableIsOrganizationTrail \
-		--capabilities CAPABILITY_IAM \
-		--no-fail-on-empty-changeset
-
 DeployGuardDutyDelegated: DetectorId=`aws guardduty list-detectors --query 'DetectorIds[0]' --output text`
 DeployGuardDutyDelegated: GuardDutyOrganizationConfigurationServiceToken=`aws cloudformation describe-stacks --stack-name LittleOrangeGuardDutyOrganizationConfiguration --query 'Stacks[0].Outputs[?OutputKey==\`ServiceToken\`].OutputValue' --output text`
 DeployGuardDutyDelegated: MasterAccountEmail=`aws organizations list-accounts --query 'Accounts[?Name==\`Thomas Wright\`].Email' --output text`
