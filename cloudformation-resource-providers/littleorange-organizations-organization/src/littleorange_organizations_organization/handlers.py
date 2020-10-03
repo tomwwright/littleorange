@@ -38,8 +38,9 @@ def create_handler(
   if not request.desiredResourceState:
     raise exceptions.InternalFailure("Desired resource state unavailable")
 
-  provisioner = OrganizationsOrganizationProvisioner(LOG, session)
+  organizations = session.client("organizations")
 
+  provisioner = OrganizationsOrganizationProvisioner(LOG, organizations)
   organization = provisioner.create(request.desiredResourceState)
 
   return ProgressEvent(
@@ -66,8 +67,9 @@ def update_handler(
   if not request.desiredResourceState:
     raise exceptions.InternalFailure("Desired resource state unavailable")
 
-  provisioner = OrganizationsOrganizationProvisioner(LOG, session)
+  organizations = session.client("organizations")
 
+  provisioner = OrganizationsOrganizationProvisioner(LOG, organizations)
   organization = provisioner.update(request.previousResourceState, request.desiredResourceState)
 
   return ProgressEvent(
@@ -88,7 +90,9 @@ def delete_handler(
   if not session:
     raise exceptions.InternalFailure(f"boto3 session unavailable")
 
-  provisioner = OrganizationsOrganizationProvisioner(LOG, session)
+  organizations = session.client("organizations")
+
+  provisioner = OrganizationsOrganizationProvisioner(LOG, organizations)
   provisioner.delete()
 
   return ProgressEvent(
@@ -110,8 +114,8 @@ def read_handler(
   if not session:
     raise exceptions.InternalFailure(f"boto3 session unavailable")
 
-  provisioner = OrganizationsOrganizationProvisioner(LOG, session)
-
+  organizations = session.client("organizations")
+  provisioner = OrganizationsOrganizationProvisioner(LOG, organizations)
   organization = provisioner.get(request.desiredResourceState)
 
   return ProgressEvent(
@@ -130,10 +134,12 @@ def list_handler(
   if not session:
     raise exceptions.InternalFailure(f"boto3 session unavailable")
 
-  provisioner = OrganizationsOrganizationProvisioner(LOG, session)
-  organizations = provisioner.listResources()
+  organizations = session.client("organizations")
+
+  provisioner = OrganizationsOrganizationProvisioner(LOG, organizations)
+  organizationList = provisioner.listResources()
 
   return ProgressEvent(
       status=OperationStatus.SUCCESS,
-      resourceModels=organizations,
+      resourceModels=organizationList,
   )
