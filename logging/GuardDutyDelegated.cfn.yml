@@ -24,7 +24,6 @@ Parameters:
     Description: Email address associated with the Organization Sandbox account
     Type: String
 Resources:
-
   GuardDutyOrganizationConfiguration:
     Type: Custom::GuardDutyOrganizationConfiguration
     Properties:
@@ -35,7 +34,7 @@ Resources:
         DataSources:
           S3Logs:
             AutoEnable: true
-  
+
   MemberMaster:
     Type: AWS::GuardDuty::Member
     Properties:
