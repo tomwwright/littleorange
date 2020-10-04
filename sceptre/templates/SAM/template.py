@@ -4,8 +4,12 @@ import subprocess
 
 def sceptre_handler(sceptre_user_data):
 
-  logging.basicConfig(format='[%(asctime)s] AWS SAM Template [%(levelname)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.INFO)
+  formatter = logging.Formatter("[%(asctime)s] AWS SAM Template [%(levelname)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+  handler = logging.StreamHandler()
+  handler.setFormatter(formatter)
   logger = logging.getLogger(__name__)
+  logger.handlers = [handler]
+  logger.setLevel(logging.INFO)
 
   logger.info(f"Building AWS SAM Project...")
 
