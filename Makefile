@@ -8,7 +8,8 @@ include logging/Makefile
 include sceptre/Makefile
 
 deploy: deploy-pipeline deploy-core ## Deploy Little Orange
-	
+
+install: pipenv SceptreInstallResolvers
 
 lint: lint-yaml lint-cloudformation ## Run all linting
 

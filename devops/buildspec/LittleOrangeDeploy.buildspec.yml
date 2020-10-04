@@ -6,7 +6,7 @@ phases:
     runtime-versions:
       python: 3.8
     commands:
-      - make pipenv
+      - make install
   build:
     commands:
       - >
