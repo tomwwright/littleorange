@@ -6,7 +6,7 @@ phases:
     runtime-versions:
       python: 3.8
     commands:
-      - make Install
+      - make Install DockerBuildCfnLint
       - mkdir -p "${HOME}/.aws"
       - make GenerateAWSProfiles | tee "${HOME}/.aws/config"
   build:

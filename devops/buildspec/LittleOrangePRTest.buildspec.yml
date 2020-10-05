@@ -6,7 +6,7 @@ phases:
     runtime-versions:
       python: 3.8
     commands:
-      - make Install
+      - make Install DockerBuildCfnLint
   build:
     commands:
       - pipenv run make Lint SceptreValidateCore SceptreValidateTest
