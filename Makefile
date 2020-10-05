@@ -9,16 +9,16 @@ include */Makefile
 Deploy: DeployPipeline SceptreCore SceptreSecurity ## Deploy Little Orange
 
 DockerLintCloudFormation: CfnLint=docker run --rm -v ${PWD}:/path --name cfn-lint cfn-lint:latest
-DockerLintCloudFormation: LintCloudformation
+DockerLintCloudFormation: LintCloudFormation
 
 GenerateAWSProfiles:
 	@ python3 bin/generate_aws_profiles.py
 
 Install: Pipenv SceptreInstallResolvers
 
-Lint: LintYaml DockerLintCloudformation ## Run all linting
+Lint: LintYaml DockerLintCloudFormation ## Run all linting
 
-LintCloudformation: ## Run CloudFormation linting with cfn-lint
+LintCloudFormation: ## Run CloudFormation linting with cfn-lint
 	$(info [+] Linting CloudFormation templates...)
 	${CfnLint} '**/*.cfn.yml' '**/*.sam.yml' 'cloudformation-resource-providers/**/template.yml' 'cloudformation-resource-providers/**/resource-role.yaml'
 
