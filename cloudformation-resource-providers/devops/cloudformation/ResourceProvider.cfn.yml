@@ -17,6 +17,7 @@ Resources:
   DeployProject:
     Type: AWS::CodeBuild::Project
     Properties:
+      Name: !Sub LittleOrange${ResourceProvider}Deploy
       ServiceRole: !GetAtt Role.Arn
       Artifacts:
         Type: NO_ARTIFACTS
@@ -45,6 +46,7 @@ Resources:
   PRTestProject:
     Type: AWS::CodeBuild::Project
     Properties:
+      Name: !Sub LittleOrange${ResourceProvider}Test
       ServiceRole: !GetAtt Role.Arn
       Artifacts:
         Type: NO_ARTIFACTS
