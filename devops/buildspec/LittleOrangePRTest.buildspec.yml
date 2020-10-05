@@ -9,4 +9,4 @@ phases:
       - make install
   build:
     commands:
-      - pipenv run make lint
+      - pipenv run make lint SceptreValidateCore SceptreValidateTest

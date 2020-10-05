@@ -3,11 +3,11 @@ Sceptre%: ## Run 'sceptre launch' with PATH as %
 	$(info )
 	$(info [+] Sceptre launch on '$*')
 	$(info )
-	sceptre --dir sceptre launch $*
+	sceptre --dir sceptre launch -y $*
 
 SceptreInstallResolvers: ## Install Sceptre Custom Resolvers
 	pip install sceptre/resolvers/*
-	
+
 SceptreValidate%: ## Run 'sceptre validate' with PATH as %
 	$(info )
 	$(info [+] Sceptre validate on '$*')
