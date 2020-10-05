@@ -1,0 +1,5 @@
+---
+template_path: Core/GuardDuty.cfn.yaml
+parameters:
+  GuardDutyAdminAccountId: !stack_output Core/Organization.yaml::SecurityAccountId
+  GuardDutyOrganizationAdminServiceToken: !stack_output Core/GuardDutyOrganizationAdmin.yaml::ServiceToken

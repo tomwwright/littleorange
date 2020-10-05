@@ -1,7 +1,3 @@
-BuildGuardDutyOrganizationAdmin:
-	cd logging/GuardDutyOrganizationAdmin; \
-	sam build; \
-	sam package
 
 BuildGuardDutyOrganizationConfiguration:
 	cd logging/GuardDutyOrganizationConfiguration; \
@@ -27,27 +23,6 @@ DeployGuardDutyDelegated:
 				MasterAccountId=${MasterAccountId} \
 				SandboxAccountEmail=${SandboxAccountEmail} \
 				SandboxAccountId=${SandboxAccountId}
-
-DeployGuardDutyMaster: GuardDutyAdminAccountId=`aws organizations list-accounts --query 'Accounts[?Name==\`Security\`].Id' --output text`
-DeployGuardDutyMaster: GuardDutyOrganizationAdminServiceToken=`aws cloudformation describe-stacks --stack-name LittleOrangeGuardDutyOrganizationAdmin --query 'Stacks[0].Outputs[?OutputKey==\`ServiceToken\`].OutputValue' --output text`
-DeployGuardDutyMaster:
-	$(info [+] Deploying Little Orange GuardDuty for Organization Master)
-	aws cloudformation deploy \
-		--template-file logging/GuardDutyMaster.cfn.yml \
-		--stack-name LittleOrangeGuardDuty \
-		--no-fail-on-empty-changeset \
-		--parameter-overrides \
-				GuardDutyAdminAccountId=${GuardDutyAdminAccountId} \
-				GuardDutyOrganizationAdminServiceToken=${GuardDutyOrganizationAdminServiceToken}
-
-DeployGuardDutyOrganizationAdmin: BuildGuardDutyOrganizationAdmin
-DeployGuardDutyOrganizationAdmin:
-	$(info [+] Deploying GuardDutyOrganizationAdmin CloudFormation Custom Resource)
-	cd logging/GuardDutyOrganizationAdmin; \
-	sam deploy \
-		--stack-name LittleOrangeGuardDutyOrganizationAdmin \
-		--capabilities CAPABILITY_IAM \
-		--no-fail-on-empty-changeset
 
 DeployGuardDutyOrganizationConfiguration: BuildGuardDutyOrganizationConfiguration
 DeployGuardDutyOrganizationConfiguration:
