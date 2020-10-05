@@ -5,6 +5,7 @@ verify_ssl = true
 
 [dev-packages]
 autopep8 = "*"
+boto3-stubs = {extras = ["organizations"],version = "*"}
 cloudformation-cli = "*"
 cloudformation-cli-python-plugin = "*"
 mypy = "*"
@@ -12,10 +13,10 @@ moto = "*"
 
 [packages]
 boto3 = "*"
-boto3-stubs = {extras = ["organizations"],version = "*"}
-cfn-lint = "*"
+# cfn-lint = "*" # disabled and replaced with Docker https://github.com/tomwwright/littleorange/issues/13
 yamllint = "*"
 crhelper = "*"
+sceptre = "*"
 
 [requires]
 python_version = "3.8"

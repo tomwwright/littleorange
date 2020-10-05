@@ -2,19 +2,22 @@
 #	Makefile
 #
 
-include cloudformation-resource-providers/Makefile
-include devops/Makefile
-include sceptre/Makefile
+include */Makefile
 
 deploy: deploy-pipeline deploy-core ## Deploy Little Orange
 
+docker-lint-cloudformation: CfnLint=docker run --rm -v ${PWD}:/path --name cfn-lint cfn-lint:latest
+docker-lint-cloudformation: lint-cloudformation
+
 install: pipenv SceptreInstallResolvers
 
-lint: lint-yaml lint-cloudformation ## Run all linting
+lint: lint-yaml docker-lint-cloudformation ## Run all linting
+
+CfnLint ?= cfn-lint
 
 lint-cloudformation: ## Run CloudFormation linting with cfn-lint
 	$(info [+] Linting CloudFormation templates...)
-	cfn-lint '**/*.cfn.yml' '**/*.sam.yml' 'cloudformation-resource-providers/**/template.yml' 'cloudformation-resource-providers/**/resource-role.yaml'
+	${CfnLint} '**/*.cfn.yml' '**/*.sam.yml' 'cloudformation-resource-providers/**/template.yml' 'cloudformation-resource-providers/**/resource-role.yaml'
 
 lint-yaml:	## Run YAML linting with yamllint (see .yamllint.yml for config)
 	$(info [+] Linting YAML files...)
