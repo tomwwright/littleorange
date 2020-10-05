@@ -2,7 +2,7 @@
 # DevOps Makefile
 # 
 
-deploy-github-credentials: ## Deploy stack to store GitHub credentials in Secrets Manager and create CodeBuild credentials
+DeployGitHubCredentials: ## Deploy stack to store GitHub credentials in Secrets Manager and create CodeBuild credentials
 	$(info [+] Deploying GitHub credentials...)
 	aws cloudformation deploy \
 		--template-file devops/cloudformation/GithubCredentials.cfn.yml \
@@ -12,7 +12,7 @@ deploy-github-credentials: ## Deploy stack to store GitHub credentials in Secret
 			$(call CloudFormationParam,GitHubToken) \
 			$(call CloudFormationParam,GitHubUsername)
 
-deploy-pipeline: ## Deploy CodeBuild projects with webhook to run tests on GitHub pull requests and deploy on merge
+DeployPipeline: ## Deploy CodeBuild projects with webhook to run tests on GitHub pull requests and deploy on merge
 	$(info [+] Deploying GitHub Pull Request tests)
 	aws cloudformation deploy \
 		--template-file devops/cloudformation/LittleOrangePipeline.cfn.yml \

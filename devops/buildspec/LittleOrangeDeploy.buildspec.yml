@@ -6,11 +6,11 @@ phases:
     runtime-versions:
       python: 3.8
     commands:
-      - make install
+      - make Install
       - make GenerateAWSProfiles | tee "${HOME}/.aws/config"
   build:
     commands:
       - >
         pipenv run make \
-          lint \
-          deploy
+          Lint \
+          Deploy

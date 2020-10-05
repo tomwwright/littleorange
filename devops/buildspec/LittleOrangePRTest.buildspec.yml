@@ -6,7 +6,7 @@ phases:
     runtime-versions:
       python: 3.8
     commands:
-      - make install
+      - make Install
   build:
     commands:
-      - pipenv run make lint SceptreValidateCore SceptreValidateTest
+      - pipenv run make Lint SceptreValidateCore SceptreValidateTest
