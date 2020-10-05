@@ -22,5 +22,4 @@ ${SAMBuildProjects}: ## AWS SAM CLI build and package, e.g. BuildEnableIsOrganiz
 	$(info [+] SAM Build + Package on '$(subst Build,,$@)')
 	$(info )
 	cd sceptre/templates/SAM/$(subst Build,,$@); \
-	sam build; \
-	sam package
+	sam build && sam package
