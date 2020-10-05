@@ -9,6 +9,9 @@ deploy: deploy-pipeline SceptreCore SceptreSecurity ## Deploy Little Orange
 docker-lint-cloudformation: CfnLint=docker run --rm -v ${PWD}:/path --name cfn-lint cfn-lint:latest
 docker-lint-cloudformation: lint-cloudformation
 
+GenerateAWSProfiles:
+	@ python3 bin/generate_aws_profiles.py
+
 install: pipenv SceptreInstallResolvers
 
 lint: lint-yaml docker-lint-cloudformation ## Run all linting
