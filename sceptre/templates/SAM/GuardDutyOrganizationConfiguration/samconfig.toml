@@ -5,6 +5,7 @@ template_file = "GuardDutyOrganizationConfiguration.sam.yml"
 
 [default.package.parameters]
 s3_bucket = "littleorange-sam-deployment-resources"
+output_template_file = "template.cfn.yaml"
 
 [default.deploy.parameters]
 s3_bucket = "littleorange-sam-deployment-resources"

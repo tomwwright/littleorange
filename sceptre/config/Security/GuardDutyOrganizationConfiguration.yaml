@@ -1,0 +1,4 @@
+---
+template_path: SAM/template.py
+sceptre_user_data:
+  SAMProject: GuardDutyOrganizationConfiguration

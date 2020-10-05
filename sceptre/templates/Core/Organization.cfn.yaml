@@ -7,6 +7,11 @@ Metadata:
       ignore_checks:
         - E3001 # E3001: Invalid or unsupported Type -- user-defined types from CloudFormation Resource Types
         - E1010 # Invalid GetAtt -- user-defined types from CloudFormation Resource Types
+Mappings:
+  Configuration:
+    AccountEmails:
+      Sandbox: little.orange.aws+sandbox@gmail.com
+      Security: little.orange.aws+security@gmail.com
 Resources:
   OrganizationsServiceLinkedRole:
     Type: AWS::IAM::ServiceLinkedRole
@@ -82,7 +87,7 @@ Resources:
     DependsOn: [Organization]
     Type: LittleOrange::Organizations::Account
     Properties:
-      Email: little.orange.aws+sandbox@gmail.com
+      Email: !FindInMap [Configuration, AccountEmails, Sandbox]
       Name: Sandbox
 
   SecurityAccount:
@@ -91,7 +96,7 @@ Resources:
     Properties:
       DelegatedAdministratorServices:
         - guardduty.amazonaws.com
-      Email: little.orange.aws+security@gmail.com
+      Email: !FindInMap [Configuration, AccountEmails, Security]
       Name: Security
 
 Outputs:
@@ -99,5 +104,15 @@ Outputs:
     Value: !Ref Organization
   RootId:
     Value: !GetAtt Organization.RootId
+  MasterAccountEmail:
+    Value: !GetAtt Organization.MasterAccountEmail
+  MasterAccountId:
+    Value: !GetAtt Organization.MasterAccountId
+  SandboxAccountEmail:
+    Value: !FindInMap [Configuration, AccountEmails, Sandbox]
+  SandboxAccountId:
+    Value: !Ref SandboxAccount
+  SecurityAccountEmail:
+    Value: !FindInMap [Configuration, AccountEmails, Security]
   SecurityAccountId:
     Value: !Ref SecurityAccount
