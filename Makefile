@@ -14,7 +14,7 @@ DockerLintCloudFormation: LintCloudFormation
 GenerateAWSProfiles:
 	@ python3 bin/generate_aws_profiles.py
 
-Install: Pipenv SceptreInstallResolvers
+Install: DockerBuildCfnLint SceptreInstallResolvers
 
 Lint: LintYaml DockerLintCloudFormation ## Run all linting
 
