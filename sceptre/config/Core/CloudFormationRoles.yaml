@@ -1,0 +1,5 @@
+---
+template_path: Core/CloudFormationRoles.cfn.yaml
+parameters:
+  MasterAccountId: !stack_output Core/Organization.yaml::MasterAccountId
+  SecurityAccountId: !stack_output Core/Organization.yaml::SecurityAccountId

@@ -1,0 +1,7 @@
+---
+template_path: Core/CloudFormationRolesStackSet.cfn.yaml
+parameters:
+  MasterAccountId: !stack_output Core/Organization.yaml::MasterAccountId
+  OrganizationRootId: !stack_output Core/Organization.yaml::RootId
+  SecurityAccountId: !stack_output Core/Organization.yaml::SecurityAccountId
+  StackTemplate: !file_contents "{{ project_path }}/templates/Core/CloudFormationRoles.cfn.yaml"

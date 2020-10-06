@@ -1,0 +1,55 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange CloudFormation StackSet Roles https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacksets-prereqs-self-managed.html
+Parameters:
+  MasterAccountId:
+    AllowedPattern: "[0-9]{12}"
+    Description: Account ID for the Organization Master account that will be configured in execution role trust
+    Type: String
+  SecurityAccountId:
+    AllowedPattern: "[0-9]{12}"
+    Description: Account ID for the Security account that will be configured in execution role trust
+    Type: String
+Conditions:
+  CreateAdministrationRole: !Or
+    - !Equals [!Ref "AWS::AccountId", !Ref MasterAccountId]
+    - !Equals [!Ref "AWS::AccountId", !Ref SecurityAccountId]
+Resources:
+  AdministrationRole:
+    Condition: CreateAdministrationRole
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: cloudformation.amazonaws.com
+      Path: /LittleOrange/
+      Policies:
+        - PolicyName: AssumeExecutionRoles
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action: sts:AssumeRole
+                Resource: arn:aws:iam::*:role/AWSCloudFormationStackSetExecutionRole
+                Effect: Allow
+      RoleName: AWSCloudFormationStackSetAdministrationRole
+
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              AWS:
+                - !Sub arn:aws:iam::${MasterAccountId}:root
+                - !Sub arn:aws:iam::${SecurityAccountId}:root
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+      Path: /LittleOrange/
+      RoleName: AWSCloudFormationStackSetExecutionRole

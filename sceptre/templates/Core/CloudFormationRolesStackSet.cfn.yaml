@@ -1,0 +1,40 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange CloudFormation StackSet Roles https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacksets-prereqs-self-managed.html
+Parameters:
+  MasterAccountId:
+    AllowedPattern: "[0-9]{12}"
+    Description: Account ID for the Organization Master account that will be configured in execution role trust
+    Type: String
+  SecurityAccountId:
+    AllowedPattern: "[0-9]{12}"
+    Description: Account ID for the Security account that will be configured in execution role trust
+    Type: String
+  OrganizationRootId:
+    Description: Root ID of the Organization to apply as deployment target
+    Type: String
+  StackTemplate:
+    Description: Stack template to deploy in set
+    Type: String
+Resources:
+  StackSet:
+    Type: AWS::CloudFormation::StackSet
+    Properties:
+      AutoDeployment:
+        Enabled: true
+        RetainStacksOnAccountRemoval: true
+      Capabilities:
+        - CAPABILITY_NAMED_IAM
+      Description: Self-managed Cloudformation StackSet roles across Organization
+      Parameters:
+        - ParameterKey: MasterAccountId
+          ParameterValue: !Ref MasterAccountId
+        - ParameterKey: SecurityAccountId
+          ParameterValue: !Ref SecurityAccountId
+      PermissionModel: SERVICE_MANAGED
+      StackInstancesGroup:
+        - DeploymentTargets:
+            OrganizationalUnitIds: [!Ref OrganizationRootId]
+          Regions: [!Ref "AWS::Region"]
+      StackSetName: !Sub "${AWS::StackName}"
+      TemplateBody: !Ref StackTemplate

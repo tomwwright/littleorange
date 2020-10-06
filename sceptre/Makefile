@@ -3,7 +3,7 @@ Sceptre%: ## Run 'sceptre launch' with PATH as %
 	$(info )
 	$(info [+] Sceptre launch on '$*')
 	$(info )
-	sceptre --dir sceptre launch -y $*
+	sceptre --dir "./sceptre" launch -y $*
 
 SceptreInstallResolvers: ## Install Sceptre Custom Resolvers
 	pip install sceptre/resolvers/*
@@ -12,7 +12,7 @@ SceptreValidate%: ## Run 'sceptre validate' with PATH as %
 	$(info )
 	$(info [+] Sceptre validate on '$*')
 	$(info )
-	sceptre --dir sceptre validate $*
+	sceptre --dir "./sceptre" validate $*
 
 SAMProjects := $(notdir $(wildcard sceptre/templates/SAM/*))
 SAMBuildProjects := $(addprefix Build, ${SAMProjects})
