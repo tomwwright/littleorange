@@ -6,6 +6,7 @@ verify_ssl = true
 [dev-packages]
 autopep8 = "*"
 boto3-stubs = {extras = ["organizations"],version = "*"}
+cfn-response = "*"
 cloudformation-cli = "*"
 cloudformation-cli-python-plugin = "*"
 mypy = "*"
@@ -17,6 +18,7 @@ boto3 = "*"
 yamllint = "*"
 crhelper = "*"
 sceptre = "*"
+aws-sam-translator = "*"
 
 [requires]
 python_version = "3.8"
