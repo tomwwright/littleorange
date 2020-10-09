@@ -1,0 +1,48 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange GuardDuty deploy in all regions
+Parameters:
+  GuardDutyOrganizationServiceToken:
+    Description: Service Token for CloudFormation Custom Resource
+    Type: String
+  GuardDutyAdminAccountId:
+    AllowedPattern: "[0-9]{12}"
+    Description: Account ID for the account to enable as GuardDuty Organization Admin
+    Type: String
+  StackTemplate:
+    Description: Stack template to deploy in set
+    Type: String
+Resources:
+  GuardDutyStackSet:
+    Type: AWS::CloudFormation::StackSet
+    Properties:
+      Description: Deploy GuardDuty in all regions
+      Parameters:
+        - ParameterKey: GuardDutyOrganizationServiceToken
+          ParameterValue: !Ref GuardDutyOrganizationServiceToken
+        - ParameterKey: GuardDutyAdminAccountId
+          ParameterValue: !Ref GuardDutyAdminAccountId
+      PermissionModel: SELF_MANAGED
+      StackInstancesGroup:
+        - DeploymentTargets:
+            Accounts:
+              - !Ref "AWS::AccountId"
+          Regions:
+            - ap-northeast-1
+            - ap-south-1
+            - ap-northeast-2
+            - ap-southeast-1
+            - ap-southeast-2
+            - ca-central-1
+            - eu-central-1
+            - eu-north-1
+            - eu-west-1
+            - eu-west-2
+            - eu-west-3
+            - sa-east-1
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+      StackSetName: !Sub "${AWS::StackName}"
+      TemplateBody: !Ref StackTemplate

@@ -2,7 +2,7 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: Little Orange GuardDuty in Organization Master
 Parameters:
-  GuardDutyOrganizationAdminServiceToken:
+  GuardDutyOrganizationServiceToken:
     Description: Service Token for CloudFormation Custom Resource
     Type: String
   GuardDutyAdminAccountId:
@@ -18,8 +18,16 @@ Resources:
           Enable: true
       Enable: true
 
-  GuardDutyOrganizationAdmin:
-    Type: Custom::GuardDutyOrganizationAdmin
+  GuardDutyOrganization:
+    Type: Custom::GuardDutyOrganization
     Properties:
-      ServiceToken: !Ref GuardDutyOrganizationAdminServiceToken
-      AccountId: !Ref GuardDutyAdminAccountId
+      ServiceToken: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CustomResourceProxy"
+      CustomResourceProperties:
+        ServiceToken: !Ref GuardDutyOrganizationServiceToken
+        AccountId: !Ref GuardDutyAdminAccountId
+        OrganizationConfiguration:
+          AutoEnable: true
+          DataSources:
+            S3Logs:
+              AutoEnable: true
+        Region: !Ref "AWS::Region"
