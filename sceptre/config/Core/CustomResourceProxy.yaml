@@ -1,0 +1,4 @@
+---
+template_path: Core/CustomResourceProxyStackSet.cfn.yaml
+parameters:
+  StackTemplate: !Command python sceptre/templates/SAM/CustomResourceProxy/CustomResourceProxy.py
