@@ -14,7 +14,10 @@ DockerLintCloudFormation: LintCloudFormation
 GenerateAWSProfiles:
 	@ python3 bin/generate_aws_profiles.py
 
-Install: DockerBuildCfnLint SceptreInstallResolvers
+Install: DockerBuildCfnLint InstallLib
+
+InstallLib: ## Install project Python libraries using pip
+	pip install lib/*
 
 Lint: LintYaml DockerLintCloudFormation ## Run all linting
 
@@ -48,7 +51,7 @@ Help: ## Help documentation
 	@ echo ""
 	@ echo "Available targets:"
 	@ echo ""
-	@ cat $(MAKEFILE_LIST) | grep '##' | sort | awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-%]+:.*?## / {printf "\033[36m%-30s\033[0m%s\n", $$1, $$2}'
+	@ cat $(MAKEFILE_LIST) | grep '##' | sort | awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_\-%]+:.*?## / {printf "\033[36m%-30s\033[0m%s\n", $$1, $$2}'
 
 # Helper function that prints variable out in format MyParameter=${MyParameter} if set, otherwise prints nothing
 CloudFormationParam = $(if $(value $(1)), $(1)=$(value $(1)),)
