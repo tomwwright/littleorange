@@ -41,16 +41,17 @@ def create(event, context):
 
   accountId = event["ResourceProperties"]["AccountId"]
   configuration = event["ResourceProperties"]["OrganizationConfiguration"]
+  region = event["ResourceProperties"]["Region"]
   parse_boolean_values(configuration)
 
-  guardduty = boto3.client("guardduty")
+  guardduty = boto3.client("guardduty", region_name=region)
   response = guardduty.enable_organization_admin_account(AdminAccountId=accountId)
 
   logger.info(f"GuardDuty EnableOrganizationAdminAccount Response: {response}")
 
   assumed = assume_role(accountId)
 
-  assumedGuardDuty = assumed.client("guardduty")
+  assumedGuardDuty = assumed.client("guardduty", region_name=region)
   response = assumedGuardDuty.list_detectors()
 
   logger.debug(f"GuardDuty [ASSUMED] ListDetectors Response: {response}")
@@ -60,11 +61,11 @@ def create(event, context):
 
   logger.info(f"GuardDuty [ASSUMED] UpdateOrganizationConfiguration Response: {response}")
 
-  assumedSsm = assumed.client("ssm")
+  assumedSsm = assumed.client("ssm", region_name=region)
   response = assumedSsm.put_parameter(
       Name="/LittleOrange/GuardDuty/DetectorId",
       Description="GuardDuty DetectorId configured when account enabled as Organization admin account",
-      Value=detectorId,
+      Value=configuration["DetectorId"],
       Type="String",
       Overwrite=True
   )
@@ -77,19 +78,23 @@ def delete(event, context):
   logger.info("Performing DELETE")
 
   accountId = event["ResourceProperties"]["AccountId"]
-  guardduty = boto3.client('guardduty')
+  region = event["ResourceProperties"]["Region"]
+
+  guardduty = boto3.client('guardduty', region_name=region)
   response = guardduty.disable_organization_admin_account(AdminAccountId=accountId)
 
   logger.info(f"GuardDuty DisableOrganizationAdminAccount Response: {response}")
 
   assumed = assume_role(accountId)
 
-  assumedSsm = assumed.client("ssm")
-  response = assumedSsm.delete_parameter(
-      Name="/LittleOrange/GuardDuty/DetectorId"
-  )
-
-  logger.info(f"SSM [ASSUMED] DeleteParameter Response: {response}")
+  assumedSsm = assumed.client("ssm", region_name=region)
+  try:
+    response = assumedSsm.delete_parameter(
+        Name="/LittleOrange/GuardDuty/DetectorId"
+    )
+    logger.info(f"SSM [ASSUMED] DeleteParameter Response: {response}")
+  except assumedSsm.exceptions.ParameterNotFoundException:
+    logger.warn(f"ParameterNotFoundException removing SSM Parameter. Continuing...")
 
 
 def handler(event, context):

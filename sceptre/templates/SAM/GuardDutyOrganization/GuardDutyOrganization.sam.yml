@@ -42,7 +42,6 @@ Resources:
                 Action:
                   - guardduty:DisableOrganizationAdminAccount
                   - guardduty:EnableOrganizationAdminAccount
-                  - iam:AssumeRole
                   - iam:GetRole
                   - iam:CreateServiceLinkedRole
                   - organizations:DescribeOrganization
@@ -50,6 +49,10 @@ Resources:
                   - organizations:ListDelegatedAdministrators
                   - organizations:ListDelegatedServicesForAccount
                 Resource: "*"
+              - Sid: AccessOrganizationAccounts
+                Effect: Allow
+                Action: sts:AssumeRole
+                Resource: arn:aws:iam::*:role/OrganizationAccountAccessRole
         - PolicyName: CloudWatchLogs
           PolicyDocument:
             Statement:
