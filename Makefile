@@ -36,6 +36,10 @@ Pipenv:	## Install Pipenv and use it to create virtual environment of Python dep
 	pipenv --venv
 	pipenv run python --version
 
+TestPython: ## Run pytest tests
+	$(info [+] Running Python tests with pytest...)
+	pipenv run pytest
+
 #
 # Utils
 #
