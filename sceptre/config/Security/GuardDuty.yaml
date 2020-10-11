@@ -1,9 +1,8 @@
 ---
-template_path: Security/GuardDuty.cfn.yaml
+template_path: Security/GuardDutyStackSet.cfn.yaml
 parameters:
-  DetectorId: !Command aws guardduty list-detectors --query 'DetectorIds[0]' --output text
-  GuardDutyOrganizationConfigurationServiceToken: !stack_output Security/GuardDutyOrganizationConfiguration.yaml::ServiceToken
   MasterAccountEmail: !stack_output Core/Organization.yaml::MasterAccountEmail
   MasterAccountId: !stack_output Core/Organization.yaml::MasterAccountId
   SandboxAccountEmail: !stack_output Core/Organization.yaml::SandboxAccountEmail
   SandboxAccountId: !stack_output Core/Organization.yaml::SandboxAccountId
+  StackTemplate: !file_contents "{{ project_path }}/templates/Security/GuardDuty.cfn.yaml"
