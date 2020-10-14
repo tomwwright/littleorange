@@ -2,8 +2,14 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: Little Orange Custom Resource Proxy Stack Set
 Parameters:
-  StackTemplate:
-    Description: Stack template to deploy in set
+  AllowedRoleName:
+    Description: Role name to allow to publish to the SNS topic of the Custom Resource Proxy to enable cross-account use
+    Type: String
+  OrganizationId:
+    Description: Organization ID to use to allow access to the SNS topic of the Custom Resource Proxy
+    Type: String
+  StackTemplateURL:
+    Description: S3 URL of uploaded CloudFormation template to deploy in set
     Type: String
 Resources:
   StackSet:
@@ -12,6 +18,11 @@ Resources:
       Capabilities:
         - CAPABILITY_IAM
       Description: CloudFormation Custom Resource Proxy
+      Parameters:
+        - ParameterKey: AllowedRoleName
+          ParameterValue: !Ref AllowedRoleName
+        - ParameterKey: OrganizationId
+          ParameterValue: !Ref OrganizationId
       PermissionModel: SELF_MANAGED
       StackInstancesGroup:
         - DeploymentTargets:
@@ -35,4 +46,4 @@ Resources:
             - us-west-1
             - us-west-2
       StackSetName: !Sub "${AWS::StackName}"
-      TemplateBody: !Ref StackTemplate
+      TemplateURL: !Ref StackTemplateURL

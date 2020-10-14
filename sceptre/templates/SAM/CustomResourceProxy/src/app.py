@@ -21,6 +21,19 @@ def constructProxiedEvent(event):
   }
 
 
+def unwrapSnsMessage(event):
+  """
+  Unwrap and parse an SNS message event, or return as-is if not an SNS event
+  """
+
+  try:
+    unwrappedEvent = json.loads(event["Records"][0]["Sns"]["Message"])
+    return unwrappedEvent
+  except KeyError:
+    logger.warning(f"Unable to parse as SNS payload -- treating as native Lambda event")
+    return event
+
+
 def handle(event, context):
   """
   Invoke the nested ServiceToken with a rebuilt event. Does not communicate any 
@@ -51,9 +64,10 @@ def handle(event, context):
 
 def handler(event, context):
   """
-  Communicate any failure back to CloudFormation to avoid hangs
+  Communicates any failure back to CloudFormation to avoid hangs and handles unwrapping of potential SNS event
   """
   try:
+    event = unwrapSnsMessage(event)
     handle(event, context)
   except Exception as e:
     logger.exception(e)

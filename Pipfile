@@ -24,6 +24,7 @@ aws-cdk-core = "*"
 aws-cdk-aws-lambda = "*"
 aws-cdk-aws-iam = "*"
 aws-cdk-aws-ssm = "*"
+aws-cdk-aws-sns = "*"
 
 [requires]
 python_version = "3.8"

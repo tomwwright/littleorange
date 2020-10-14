@@ -2,12 +2,20 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: Little Orange CloudFormation Custom Resource for proxying requests cross-region to another Custom Resource
+Parameters:
+  AllowedRoleName:
+    Description: Role name to allow to publish to the SNS topic of the Custom Resource Proxy to enable cross-account use
+    Type: String
+  OrganizationId:
+    Description: Organization ID to use to allow access to the SNS topic of the Custom Resource Proxy
+    Type: String
 Resources:
   CloudFormationCustomResourceFunction:
     Type: AWS::Serverless::Function
     Properties:
       Description: CloudFormation Custom Resource for proxying requests cross-region to another Custom Resource
       CodeUri: ./src
+      FunctionName: LittleOrangeCustomResourceProxy
       Handler: app.handler
       MemorySize: 128
       Runtime: python3.8
@@ -20,6 +28,42 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !GetAtt CloudFormationCustomResourceFunction.Arn
       Principal: cloudformation.amazonaws.com
+
+  SNSCustomResourcePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt CloudFormationCustomResourceFunction.Arn
+      Principal: sns.amazonaws.com
+      SourceArn: !Ref Topic
+
+  Topic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: LittleOrangeCustomResourceProxy
+      Subscription:
+        - Endpoint: !GetAtt CloudFormationCustomResourceFunction.Arn
+          Protocol: lambda
+
+  TopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowCrossAccountCloudFormationPublish
+            Action: sns:Publish
+            Condition:
+              StringEquals:
+                aws:PrincipalOrgID: !Ref OrganizationId
+              StringLike:
+                aws:PrincipalArn: !Sub "arn:aws:iam::*:role/${AllowedRoleName}"
+            Effect: Allow
+            Principal:
+              AWS: "*"
+            Resource: "*"
+      Topics:
+        - !Ref Topic
 
   Role:
     Type: AWS::IAM::Role
@@ -53,3 +97,5 @@ Resources:
 Outputs:
   ServiceToken:
     Value: !GetAtt CloudFormationCustomResourceFunction.Arn
+  SNSServiceToken:
+    Value: !Ref Topic

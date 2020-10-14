@@ -1,4 +1,9 @@
 ---
 template_path: Core/CustomResourceProxyStackSet.cfn.yaml
 parameters:
-  StackTemplate: !Command python sceptre/templates/SAM/CustomResourceProxy/CustomResourceProxy.py
+  AllowedRoleName: stacksets-exec-* # see https://github.com/tomwwright/littleorange/issues/19
+  OrganizationId: !stack_output Core/Organization.yaml::OrganizationId
+  StackTemplateURL: !UploadS3
+    Bucket: littleorange-sam-deployment-resources
+    Content: !Command python sceptre/templates/SAM/CustomResourceProxy/CustomResourceProxy.py
+    Key: Sceptre/CustomResourceProxy
