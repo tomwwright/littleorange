@@ -20,8 +20,9 @@ Resources:
 
   GuardDutyOrganization:
     Type: Custom::GuardDutyOrganization
+    DependsOn: [GuardDutyDetector]
     Properties:
-      ServiceToken: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CustomResourceProxy"
+      ServiceToken: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:LittleOrangeCustomResourceProxy"
       CustomResourceProperties:
         ServiceToken: !Ref GuardDutyOrganizationServiceToken
         AccountId: !Ref GuardDutyAdminAccountId
