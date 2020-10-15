@@ -1,6 +1,24 @@
-# littleorange
+![Little Orange](docs/LittleOrange.svg)
 
-Stay tuned
+# Little Orange AWS
+
+LittleOrange is a minimalist multi-account blueprint for AWS. It attempts to deliver patterns and services following best-practice in a clean, maintainable and decoupled implementation.
+
+## Principles
+
+## Tools and Implementation
+
+- Make
+- Python
+- CloudFormation
+- CloudFormation Stack Sets
+- CloudFormation Resource Providers - https://docs.amazonaws.cn/en_us/cloudformation-cli/latest/userguide/what-is-cloudformation-cli.html
+- CloudFormation Custom Resources
+- Sceptre
+
+## Features
+
+[Features](./docs/Features.md)
 
 ## Roadmap
 
@@ -9,24 +27,24 @@ Stay tuned
 | DevOps        | Pipeline                 | CodePipeline, CodeBuild            |
 | Organisations | Org, OUs, SCPs, Accounts | CloudFormation Resource Providders |
 
-| Category        | Feature                                            | Implementation                                        | Progress         |
-| --------------- | -------------------------------------------------- | ----------------------------------------------------- | ---------------- |
-| Core            | CI/CD DevOps Pipeline                              | GitHub, CodeBuild                                     | `[==>       ]  0%` |
-| Core            | Organizations                                      | CloudFormation Resource Providers                     | `[======>   ] 60%` |
-| Core            | Account Creation and Onboarding                    | CloudFormation Resource Providers + Step Function     | `[          ]  0%` |
-| Core            | Cost and Usage Reports                             | `???`                                                 | `[          ]  0%` |
-| IAM             | Federated Login                                    | AWS SSO                                               | `[          ]  0%` |
-| IAM             | Delegated IAM                                      | IAM Permissions Boundary                              | `[          ]  0%` |
-| Logging + Audit | CloudTrail                                         | Cfn Stack + Custom Resource (for IsOrganizationTrail) | `[======>   ] 60%` |
-| Logging + Audit | Config                                             | Cfn Stack + StackSet                                  | `[          ]  0%` |
-| Logging + Audit | GuardDuty                                          | Cfn Stack + StackSet                                  | `[=====>    ] 50%` |
-| Networking      | VPC Factory                                        | CloudFormation Macro, Service Catalogue               | `[          ]  0%` |
-| Networking      | Route 53 Hosted Zone (integrated with VPC Factory) | `???`                                                 | `[          ]  0%` |
-| Networking      | Route 53 Resolvers                                 | `???`                                                 | `[          ]  0%` |
-| Networking      | Transit Gateway                                    | `???`                                                 | `[          ]  0%` |
-| Networking      | Centralised VPC Endpoints                          | `???`                                                 | `[          ]  0%` |
-| Networking      | Centralised Egress                                 | Squid in Fargate                                      | `[          ]  0%` |
-| Cost Management | Instance Scheduling                                | `???`                                                 | `[          ]  0%` |
+| Category        | Feature                                            | Implementation                                        | Progress            |
+| --------------- | -------------------------------------------------- | ----------------------------------------------------- | ------------------- |
+| Core            | CI/CD DevOps Pipeline                              | GitHub, CodeBuild                                     | `[==> ] 0%`         |
+| Core            | Organizations                                      | CloudFormation Resource Providers                     | `[======> ] 60%`    |
+| Core            | Account Creation and Onboarding                    | CloudFormation Resource Providers + Step Function     | `[ ] 0%`            |
+| Core            | Cost and Usage Reports                             | `???`                                                 | `[ ] 0%`            |
+| IAM             | Federated Login                                    | AWS SSO                                               | `[ ] 0%`            |
+| IAM             | Delegated IAM                                      | IAM Permissions Boundary                              | `[ ] 0%`            |
+| Logging + Audit | CloudTrail                                         | Cfn Stack + Custom Resource (for IsOrganizationTrail) | `[========> ] 80%`  |
+| Logging + Audit | Config                                             | Cfn Stack + StackSet                                  | `[ ] 0%`            |
+| Logging + Audit | GuardDuty                                          | Cfn Stack + StackSet                                  | `[=========> ] 90%` |
+| Networking      | VPC Factory                                        | CloudFormation Macro, Service Catalogue               | `[ ] 0%`            |
+| Networking      | Route 53 Hosted Zone (integrated with VPC Factory) | `???`                                                 | `[ ] 0%`            |
+| Networking      | Route 53 Resolvers                                 | `???`                                                 | `[ ] 0%`            |
+| Networking      | Transit Gateway                                    | `???`                                                 | `[ ] 0%`            |
+| Networking      | Centralised VPC Endpoints                          | `???`                                                 | `[ ] 0%`            |
+| Networking      | Centralised Egress                                 | Squid in Fargate                                      | `[ ] 0%`            |
+| Cost Management | Instance Scheduling                                | `???`                                                 | `[ ] 0%`            |
 
 - Automated account creation and onboarding
 - GuardDuty
@@ -54,13 +72,6 @@ Stay tuned
 - Assign SCPs to OUs
 - Create accounts
 - Assign accounts to OUs
-
-## Tools and Implementation
-
-- Make
-- CloudFormation
-- Python
-- CloudFormation Resource Providers - https://docs.amazonaws.cn/en_us/cloudformation-cli/latest/userguide/what-is-cloudformation-cli.html
 
 ### Python Unit Testing
 
