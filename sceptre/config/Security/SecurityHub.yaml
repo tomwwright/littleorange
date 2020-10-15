@@ -1,0 +1,9 @@
+---
+template_path: Security/SecurityHubStackSet.cfn.yaml
+dependencies:
+  - Core/CloudFormationRolesStackSet.yaml
+parameters:
+  OrganizationMasterAccountId: !stack_output Core/Organization.yaml::MasterAccountId
+  SecurityHubMasterAccountId: !stack_output Core/Organization.yaml::SecurityAccountId
+  SecurityHubOnboardingServiceToken: !stack_output Core/SecurityHubOnboarding.yaml::ServiceToken
+  StackTemplate: !file_contents "{{ project_path }}/templates/Security/SecurityHub.cfn.yaml"

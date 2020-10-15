@@ -1,0 +1,56 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange Security Hub for individual account delivered via Stack Set
+Parameters:
+  OrganizationMasterAccountId:
+    AllowedPattern: "[0-9]{12}"
+    Description: Account ID for the Organization master account to invoke Custom Resource Proxy
+    Type: String
+  SecurityHubMasterAccountId:
+    AllowedPattern: "[0-9]{12}"
+    Description: Account ID for the account designated as master Security Hub account
+    Type: String
+  SecurityHubOnboardingServiceToken:
+    Description: Service Token for CloudFormation Custom Resource to onboard accounts to master Security Hub
+    Type: String
+  StackTemplate:
+    Description: CloudFormation Stack template to deploy in Stack Set
+    Type: String
+Resources:
+  StackSet:
+    Type: AWS::CloudFormation::StackSet
+    Properties:
+      Description: Security Hub for Security Hub master account
+      Parameters:
+        - ParameterKey: DeploySecurityHubMasterResources
+          ParameterValue: "TRUE"
+        - ParameterKey: OrganizationMasterAccountId
+          ParameterValue: !Ref OrganizationMasterAccountId
+        - ParameterKey: SecurityHubMasterAccountId
+          ParameterValue: !Ref SecurityHubMasterAccountId
+        - ParameterKey: SecurityHubOnboardingServiceToken
+          ParameterValue: !Ref SecurityHubOnboardingServiceToken
+      PermissionModel: SELF_MANAGED
+      StackInstancesGroup:
+        - DeploymentTargets:
+            Accounts:
+              - !Ref "AWS::AccountId"
+          Regions:
+            - ap-northeast-1
+            - ap-northeast-2
+            - ap-south-1
+            - ap-southeast-1
+            - ap-southeast-2
+            # - ca-central-1
+            # - eu-central-1
+            # - eu-north-1
+            # - eu-west-1
+            # - eu-west-2
+            # - eu-west-3
+            # - sa-east-1
+            # - us-east-1
+            # - us-east-2
+            # - us-west-1
+            # - us-west-2
+      StackSetName: !Sub "${AWS::StackName}"
+      TemplateBody: !Ref StackTemplate
