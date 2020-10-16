@@ -1,0 +1,6 @@
+template_path: Security/ConfigStackSets.cfn.yaml
+parameters:
+  ConfigAggregatorAccountId: !stack_output Core/Organization.yaml::MasterAccountId
+  ConfigS3BucketName: !stack_output Core/ConfigAggregator.yaml::ConfigS3BucketName
+  OrganizationRootId: !stack_output Core/Organization.yaml::RootId
+  StackTemplate: !file_contents "{{ project_path }}/templates/Security/Config.cfn.yaml"

@@ -28,6 +28,8 @@ Resources:
         - Type: SERVICE_CONTROL_POLICY
         - Type: TAG_POLICY
       EnabledServices:
+        - ServicePrincipal: config.amazonaws.com # Config
+        - ServicePrincipal: config-multiaccountsetup.amazonaws.com # Config Rules
         - ServicePrincipal: cloudtrail.amazonaws.com # CloudTrail
         - ServicePrincipal: guardduty.amazonaws.com # GuardDuty
         - ServicePrincipal: member.org.stacksets.cloudformation.amazonaws.com # CloudFormation StackSets
@@ -95,6 +97,7 @@ Resources:
     Type: LittleOrange::Organizations::Account
     Properties:
       DelegatedAdministratorServices:
+        - config-multiaccountsetup.amazonaws.com
         - guardduty.amazonaws.com
       Email: !FindInMap [Configuration, AccountEmails, Security]
       Name: Security

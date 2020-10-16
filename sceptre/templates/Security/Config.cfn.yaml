@@ -1,0 +1,51 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange Config
+Parameters:
+  ConfigAggregatorAccountId:
+    AllowedPattern: "[0-9]{12}"
+    Description: Account ID of the Config Aggregator
+    Type: String
+  ConfigS3BucketName:
+    Description: S3 Bucket to deliver Config snapshots to
+    Type: String
+  MainRegion:
+    Description: Main region designated for Little Orange
+    Type: String
+Conditions:
+  IsMainRegion: !Equals [!Ref "AWS::Region", !Ref MainRegion]
+Resources:
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: config.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /LittleOrange/
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSConfigRole
+
+  ConfigurationRecorder:
+    Type: AWS::Config::ConfigurationRecorder
+    Properties:
+      RecordingGroup:
+        AllSupported: true
+        IncludeGlobalResourceTypes: !If [IsMainRegion, true, false]
+      RoleARN: !GetAtt Role.Arn
+
+  DeliveryChannel:
+    Type: AWS::Config::DeliveryChannel
+    Properties:
+      ConfigSnapshotDeliveryProperties:
+        DeliveryFrequency: TwentyFour_Hours
+      S3BucketName: !Ref ConfigS3BucketName
+
+  AggregationAuthorization:
+    Type: AWS::Config::AggregationAuthorization
+    Properties:
+      AuthorizedAccountId: !Ref ConfigAggregatorAccountId
+      AuthorizedAwsRegion: !Ref MainRegion
