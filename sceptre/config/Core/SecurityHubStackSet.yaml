@@ -1,3 +1,4 @@
+---
 template_path: Core/SecurityHubStackSet.cfn.yaml
 dependencies:
   - Core/CloudFormationRolesStackSet.yaml

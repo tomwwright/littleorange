@@ -1,3 +1,4 @@
+---
 template_path: Security/ConfigStackSets.cfn.yaml
 parameters:
   ConfigAggregatorAccountId: !stack_output Core/Organization.yaml::MasterAccountId

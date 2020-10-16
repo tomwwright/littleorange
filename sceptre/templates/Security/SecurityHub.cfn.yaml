@@ -28,11 +28,11 @@ Resources:
     Type: AWS::SecurityHub::Hub
     Properties: {}
 
-  Onboarding:
+  Onboarding: # invoke onboarding Custom Resource via proxy
     Condition: OnboardSecurityHub
     Type: Custom::SecurityHubOnboarding
     Properties:
-      ServiceToken: !Sub "arn:aws:sns:${AWS::Region}:${OrganizationMasterAccountId}:LittleOrangeCustomResourceProxy" # invoke onboarding Custom Resource via proxy
+      ServiceToken: !Sub "arn:aws:sns:${AWS::Region}:${OrganizationMasterAccountId}:LittleOrangeCustomResourceProxy"
       CustomResourceProperties:
         ServiceToken: !Ref SecurityHubOnboardingServiceToken
         AccountId: !Ref "AWS::AccountId"
