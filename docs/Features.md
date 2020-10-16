@@ -6,6 +6,12 @@
 
 ## AWS CloudTrail
 
+## AWS Config
+
+![Config Architecture](./Config.png)
+
+![Config Stacks](./ConfigStacks.png)
+
 ## AWS Organizations
 
 ## AWS GuardDuty
