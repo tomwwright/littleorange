@@ -13,6 +13,12 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
+      LifecycleConfiguration:
+        Rules:
+          - Status: Enabled
+            ExpirationInDays: 2556
+      VersioningConfiguration:
+        Status: Enabled
 
   ConfigBucketPolicy:
     Type: AWS::S3::BucketPolicy
