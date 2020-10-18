@@ -1,0 +1,65 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange Billing Reporting
+Parameters:
+  CostUsageReportDefinitionServiceToken:
+    Description: Service Token for CloudFormation Custom Resource
+    Type: String
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      AccessControl: BucketOwnerFullControl
+      BucketName: littleorange-billing
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      LifecycleConfiguration:
+        Rules:
+          - Status: Enabled
+            ExpirationInDays: 2556
+      VersioningConfiguration:
+        Status: Enabled
+
+  BucketPolicy: # policy document from https://docs.aws.amazon.com/cur/latest/userguide/cur-s3.html
+    Type: AWS::S3::BucketPolicy
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: billingreports.amazonaws.com
+            Action:
+              - s3:GetBucketAcl
+              - s3:GetBucketPolicy
+            Resource: !GetAtt S3Bucket.Arn
+          - Effect: Allow
+            Principal:
+              Service: billingreports.amazonaws.com
+            Action: s3:PutObject
+            Resource: !Sub "${S3Bucket.Arn}/*"
+
+  CostUsageReport:
+    Type: Custom::CostUsageReportDefinition
+    DependsOn: [BucketPolicy]
+    Properties:
+      ServiceToken: !Ref CostUsageReportDefinitionServiceToken
+      ReportName: LittleOrangeCostUsageReport
+      ReportDefinition:
+        TimeUnit: DAILY
+        Format: Parquet
+        Compression: Parquet
+        AdditionalSchemaElements: [RESOURCES]
+        S3Bucket: !Ref S3Bucket
+        S3Prefix: LittleOrange
+        S3Region: !Ref "AWS::Region"
+        AdditionalArtifacts: [ATHENA]
+        RefreshClosedReports: true
+        ReportVersioning: OVERWRITE_REPORT

@@ -1,0 +1,4 @@
+---
+template_path: Core/Billing.cfn.yaml
+parameters:
+  CostUsageReportDefinitionServiceToken: !stack_output Core/CostUsageReportDefinition.yaml::ServiceToken
