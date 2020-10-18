@@ -1,0 +1,3 @@
+.aws-sam
+*.log
+template.cfn.yaml
