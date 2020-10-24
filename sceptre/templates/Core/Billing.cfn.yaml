@@ -5,6 +5,9 @@ Parameters:
   CostUsageReportDefinitionServiceToken:
     Description: Service Token for CloudFormation Custom Resource
     Type: String
+  BudgetNotificationsEmail:
+    Description: Email address to subscribe to for Budgets notifications
+    Type: String
 Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
@@ -63,3 +66,29 @@ Resources:
         AdditionalArtifacts: [ATHENA]
         RefreshClosedReports: true
         ReportVersioning: OVERWRITE_REPORT
+
+  Budget:
+    Type: AWS::Budgets::Budget
+    Properties:
+      Budget:
+        BudgetName: LittleOrangeBasicBudget
+        BudgetLimit:
+          Amount: 50
+          Unit: USD
+        TimeUnit: MONTHLY
+        BudgetType: COST
+      NotificationsWithSubscribers:
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: 50
+          Subscribers:
+            - SubscriptionType: EMAIL
+              Address: !Ref BudgetNotificationsEmail
+        - Notification:
+            NotificationType: FORECASTED
+            ComparisonOperator: GREATER_THAN
+            Threshold: 100
+          Subscribers:
+            - SubscriptionType: EMAIL
+              Address: !Ref BudgetNotificationsEmail

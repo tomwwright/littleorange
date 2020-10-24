@@ -1,4 +1,5 @@
 ---
 template_path: Core/Billing.cfn.yaml
 parameters:
+  BudgetNotificationsEmail: !stack_output Core/Organization.yaml::MasterAccountEmail
   CostUsageReportDefinitionServiceToken: !stack_output Core/CostUsageReportDefinition.yaml::ServiceToken
