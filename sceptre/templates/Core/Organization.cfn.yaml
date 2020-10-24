@@ -35,6 +35,11 @@ Resources:
         - ServicePrincipal: member.org.stacksets.cloudformation.amazonaws.com # CloudFormation StackSets
       FeatureSet: ALL
 
+  #
+  # Quarantine OU
+  # Provides secure quarantine location for compromised accounts -- no access to AWS services
+  #
+
   QuarantineOU:
     Type: LittleOrange::Organizations::OrganizationalUnit
     Properties:
@@ -42,30 +47,6 @@ Resources:
       ParentId: !GetAtt Organization.RootId
       PolicyIds:
         - !Ref QuarantineSCP
-
-  ServerlessSCP:
-    DependsOn: [Organization]
-    Type: LittleOrange::Organizations::ServiceControlPolicy
-    Properties:
-      Content: |
-        {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Action": [
-                "dynamodb:*",
-                "iam:*",
-                "lambda:*",
-                "sns:*",
-                "sqs:*"
-              ],
-              "Effect": "Allow",
-              "Resource": "*"
-            }
-          ]
-        }
-      Description: Access to common serverless services
-      Name: Serverless
 
   QuarantineSCP:
     DependsOn: [Organization]
@@ -85,12 +66,71 @@ Resources:
       Description: Deny all services
       Name: Quarantine
 
+  #
+  # Main OU
+  # Top-level OU for organization accounts -- some security guardrails applied via SCP
+  #
+
+  MainOU:
+    Type: LittleOrange::Organizations::OrganizationalUnit
+    Properties:
+      Name: Main
+      ParentId: !GetAtt Organization.RootId
+      PolicyIds:
+        - !Ref SecurityGuardrailsSCP
+
+  SecurityGuardrailsSCP:
+    DependsOn: [Organization]
+    Type: LittleOrange::Organizations::ServiceControlPolicy
+    Properties:
+      Content: |
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "SecureCloudformationStackSetsRoles",
+              "Action": [
+                "iam:AddRoleToInstanceProfile",
+                "iam:AttachRolePolicy",
+                "iam:CreateRole",
+                "iam:DeleteRole",
+                "iam:DeleteRolePermissionsBoundary",
+                "iam:DeleteRolePolicy",
+                "iam:DetachRolePolicy",
+                "iam:PassRole",
+                "iam:PutRolePermissionsBoundary",
+                "iam:PutRolePolicy",
+                "iam:RemoveRoleFromInstanceProfile",
+                "iam:TagRole",
+                "iam:UntagRole",
+                "iam:UpdateAssumeRolePolicy",
+                "iam:UpdateRole",
+                "iam:UpdateRoleDescription"
+              ],
+              "Effect": "Deny",
+              "Resource": "arn:aws:iam::*:role/stacksets-exec-*",
+              "Condition": {
+                "StringNotLike": {
+                    "aws:PrincipalArn": "arn:aws:iam::*:role/aws-service-role/member.org.stacksets.cloudformation.amazonaws.com/AWSServiceRoleForCloudFormationStackSetsOrgMember"
+                }
+              }
+            }
+          ]
+        }
+      Description: Enforce security guardrails
+      Name: SecurityGuardrails
+
+  #
+  # Core Accounts
+  #
+
   SandboxAccount:
     DependsOn: [Organization]
     Type: LittleOrange::Organizations::Account
     Properties:
       Email: !FindInMap [Configuration, AccountEmails, Sandbox]
       Name: Sandbox
+      ParentId: !Ref MainOU
 
   SecurityAccount:
     DependsOn: [Organization]
@@ -101,6 +141,7 @@ Resources:
         - guardduty.amazonaws.com
       Email: !FindInMap [Configuration, AccountEmails, Security]
       Name: Security
+      ParentId: !Ref MainOU
 
 Outputs:
   OrganizationId:
