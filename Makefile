@@ -45,7 +45,7 @@ TestPython: ## Run pytest tests
 # Utils
 #
 
-needs-%: ## Helper target that errors if % isn't set -- i.e. check-TOKEN ensures TOKEN is set
+Needs%: ## Helper target that errors if % isn't set -- i.e. check-TOKEN ensures TOKEN is set
 	@: $(if $(value $*),,$(error $* is a required parameter!))
 
 Help: ## Help documentation
