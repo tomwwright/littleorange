@@ -20,8 +20,6 @@
 
 ![Config Architecture](./Config.png)
 
-![Config Stacks](./ConfigStacks.png)
-
 ## AWS Organizations
 
 - Declarative Organizations resource state in CloudFormation stack in `Core` account
