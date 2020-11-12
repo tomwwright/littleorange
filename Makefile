@@ -8,6 +8,7 @@ include */Makefile
 
 Deploy: DeployPipeline SceptreCore SceptreSecurity ## Deploy Little Orange
 
+DockerLintCloudFormation: ## Run LintCloudFormation target but within Docker image for cfn-lint
 DockerLintCloudFormation: CfnLint=docker run --rm -v ${PWD}:/path --name cfn-lint cfn-lint:latest
 DockerLintCloudFormation: LintCloudFormation
 

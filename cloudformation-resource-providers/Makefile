@@ -17,3 +17,16 @@ DeployResourceProviderDevOps: needs-ResourceProvider ## Deploy CodeBuild project
 		--no-fail-on-empty-changeset \
 		--parameter-overrides \
 			$(call CloudFormationParam,ResourceProvider)
+
+DeployResourceProviders: ## Deploys DevOps automation for all Resource Providers
+	@ $(MAKE) DeployResourceProviderDevOps ResourceProvider=OrganizationsAccount
+	@ $(MAKE) DeployResourceProviderDevOps ResourceProvider=OrganizationsOrganization
+	@ $(MAKE) DeployResourceProviderDevOps ResourceProvider=OrganizationsOrganizationalUnit
+	@ $(MAKE) DeployResourceProviderDevOps ResourceProvider=OrganizationsServiceControlPolicy
+
+# CloudFormation CLI deploys a CloudFormation stack for uploading resources when deploying resource providers
+# This target attaches an alias to the KMS Key that is deployed so it is identifiable. Run this target after at least one resource provider has been deployed
+CreateKMSKeyAliasForCloudFormationCLI: KmsKeyId=$(shell aws cloudformation describe-stack-resources --stack-name CloudFormationManagedUploadInfrastructure --logical-resource-id EncryptionKey --query 'StackResources[0].PhysicalResourceId' --output text)
+CreateKMSKeyAliasForCloudFormationCLI:
+	$(info [+] Creating KMS Key Alias for CloudFormationManagedUploadInfrastructure (${KmsKeyId}))
+	aws kms create-alias --alias-name alias/CloudFormationManagedUploadInfrastructure --target-key-id ${KmsKeyId}

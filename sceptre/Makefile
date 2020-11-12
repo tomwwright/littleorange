@@ -1,16 +1,19 @@
 
+SceptreCommand := sceptre --dir "./sceptre"
+
 Sceptre%: ## Run 'sceptre launch' with PATH as %
 	$(info )
 	$(info [+] Sceptre launch on '$*')
 	$(info )
-	sceptre --dir "./sceptre" launch -y $*
+	${SceptreCommand} launch -y $*
 
 SceptreValidate%: ## Run 'sceptre validate' with PATH as %
 	$(info )
 	$(info [+] Sceptre validate on '$*')
 	$(info )
-	sceptre --dir "./sceptre" validate $*
+	${SceptreCommand} validate $*
 
+# Dynamically generates BuildXYZ targets from listing the SAM project directory
 SAMProjects := $(notdir $(wildcard sceptre/templates/SAM/*))
 SAMBuildProjects := $(addprefix Build, ${SAMProjects})
 
