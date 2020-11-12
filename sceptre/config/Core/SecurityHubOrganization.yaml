@@ -1,5 +1,5 @@
 ---
-template_path: Core/SecurityHubStackSet.cfn.yaml
+template_path: Security/SecurityHubOrganizationStackSet.cfn.yaml
 dependencies:
   - Core/CloudFormationRolesStackSet.yaml
   - Core/CustomResourceProxy.yaml
@@ -7,6 +7,7 @@ dependencies:
 parameters:
   OrganizationMasterAccountId: !stack_output Core/Organization.yaml::MasterAccountId
   OrganizationRootId: !stack_output Core/Organization.yaml::RootId
+  Regions: "{{ var.enabled_regions | join(',') }}"
   SecurityHubMasterAccountId: !stack_output Core/Organization.yaml::SecurityAccountId
   SecurityHubOnboardingServiceToken: !stack_output Core/SecurityHubOnboarding.yaml::ServiceToken
   StackTemplate: !file_contents "{{ project_path }}/templates/Security/SecurityHub.cfn.yaml"

@@ -5,6 +5,7 @@ dependencies:
   - Security/SecurityHub.yaml
 parameters:
   OrganizationMasterAccountId: !stack_output Core/Organization.yaml::MasterAccountId
+  Regions: "{{ var.enabled_regions | join(',') }}"
   SecurityHubMasterAccountId: !stack_output Core/Organization.yaml::SecurityAccountId
   SecurityHubOnboardingServiceToken: !stack_output Core/SecurityHubOnboarding.yaml::ServiceToken
   StackTemplate: !file_contents "{{ project_path }}/templates/Security/SecurityHub.cfn.yaml"

@@ -1,5 +1,5 @@
 
-SceptreCommand := sceptre --dir "./sceptre"
+SceptreCommand := sceptre --dir "./sceptre" --var-file=./sceptre/littleorange.yaml
 
 Sceptre%: ## Run 'sceptre launch' with PATH as %
 	$(info )

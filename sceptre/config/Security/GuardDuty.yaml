@@ -3,6 +3,7 @@ template_path: Security/GuardDutyStackSet.cfn.yaml
 parameters:
   MasterAccountEmail: !stack_output Core/Organization.yaml::MasterAccountEmail
   MasterAccountId: !stack_output Core/Organization.yaml::MasterAccountId
+  Regions: "{{ var.enabled_regions | join(',') }}"
   SandboxAccountEmail: !stack_output Core/Organization.yaml::SandboxAccountEmail
   SandboxAccountId: !stack_output Core/Organization.yaml::SandboxAccountId
   StackTemplate: !file_contents "{{ project_path }}/templates/Security/GuardDuty.cfn.yaml"

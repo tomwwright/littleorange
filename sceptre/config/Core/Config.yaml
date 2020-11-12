@@ -4,4 +4,5 @@ parameters:
   ConfigAggregatorAccountId: !stack_output Core/Organization.yaml::MasterAccountId
   ConfigS3BucketName: !stack_output Core/ConfigAggregator.yaml::ConfigS3BucketName
   OrganizationRootId: !stack_output Core/Organization.yaml::RootId
+  Regions: "{{ var.enabled_regions | join(',') }}"
   StackTemplate: !file_contents "{{ project_path }}/templates/Security/Config.cfn.yaml"

@@ -12,29 +12,12 @@ Parameters:
   OrganizationRootId:
     Description: Root ID of the Organization to apply as deployment target
     Type: String
+  Regions:
+    Description: AWS Regions to deploy Stack Set to
+    Type: CommaDelimitedList
   StackTemplate:
     Description: Stack template to deploy in set
     Type: String
-Mappings:
-  Configuration:
-    StackSets:
-      Regions:
-        # - ap-northeast-1
-        # - ap-northeast-2
-        # - ap-south-1
-        # - ap-southeast-1
-        - ap-southeast-2
-        # - ca-central-1
-        # - eu-central-1
-        # - eu-north-1
-        # - eu-west-1
-        # - eu-west-2
-        # - eu-west-3
-        # - sa-east-1
-        # - us-east-1
-        # - us-east-2
-        # - us-west-1
-        # - us-west-2
 Resources:
   StackSet:
     Type: AWS::CloudFormation::StackSet
@@ -53,7 +36,7 @@ Resources:
       StackInstancesGroup:
         - DeploymentTargets:
             Accounts: [!Ref "AWS::AccountId"]
-          Regions: !FindInMap [Configuration, StackSets, Regions]
+          Regions: !Ref Regions
       StackSetName: !Sub "${AWS::StackName}"
       TemplateBody: !Ref StackTemplate
 
@@ -77,6 +60,6 @@ Resources:
       StackInstancesGroup:
         - DeploymentTargets:
             OrganizationalUnitIds: [!Ref OrganizationRootId]
-          Regions: !FindInMap [Configuration, StackSets, Regions]
+          Regions: !Ref Regions
       StackSetName: !Sub "${AWS::StackName}Organization"
       TemplateBody: !Ref StackTemplate
