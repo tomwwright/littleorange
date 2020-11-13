@@ -1,0 +1,42 @@
+---
+# [4.1 IAM] Federated Identity with AWS SSO and Azure AD
+# Note: this template is not used or deployed as part of Little Orange due to difficulties in ability to automate configuration for AWS SSO
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange AWS SSO Permission Sets
+Parameters:
+  SSOInstanceArn:
+    Description: Instance ARN of AWS SSO in Organization master account
+    Type: String
+Conditions:
+  AlwaysFalse: !Equals ["true", "false"]
+Resources:
+  AdministratorPermissionSet:
+    Type: AWS::SSO::PermissionSet
+    Properties:
+      Description: Administrator access using AWS-provided managed policy
+      InstanceArn: !Ref SSOInstanceArn
+      ManagedPolicies:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+      Name: LittleOrangeAdministrator
+  ReadOnlyPermissionSet:
+    Type: AWS::SSO::PermissionSet
+    Properties:
+      Description: Read-only access using AWS-provided managed policy
+      InstanceArn: !Ref SSOInstanceArn
+      ManagedPolicies:
+        - arn:aws:iam::aws:policy/job-function/ViewOnlyAccess
+      Name: LittleOrangeReadOnly
+
+  # Example Assignment only
+  # Illustrates how Permission Set is combined with User/Group and Account as part of an Assignment
+  # An IAM Role would be provisioned to Account 000011112222 with permissions matching ReadOnlyPermissionSet and a trust policy that specficies the AWS SSO identity provider
+  ExampleAssignment:
+    Condition: AlwaysFalse
+    Type: AWS::SSO::Assignment
+    Properties:
+      InstanceArn: !Ref SSOInstanceArn
+      TargetId: "000011112222"
+      TargetType: ACCOUNT
+      PermissionSetArn: !Ref ReadOnlyPermissionSet
+      PrincipalType: USER
+      PrincipalId: "EXAMPLE-USER-GUID"
