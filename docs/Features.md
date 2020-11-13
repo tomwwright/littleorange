@@ -47,3 +47,15 @@
 ![SecurityHub Architecture](./SecurityHub.png)
 
 ![SecurityHub Stacks](./SecurityHubStacks.png)
+
+## Federated Identify with AWS SSO
+
+The below architecture is not implemented as part of Little Orange due to gaps in ability to automate configuration of AWS SSO. Currently, AWS SSO can only be configured via the AWS Console. The following guide presents a good ClickOps walk-through of configurating AWS SSO for federated identity with Azure Active Directory:
+
+https://aws.amazon.com/blogs/aws/the-next-evolution-in-aws-single-sign-on/
+
+![AWS SSO Federated Identity with Azure AD](./FederatedIdentityWithAWSSSO.png)
+
+## Federated Identity with IAM SAML Identity Provider
+
+![Federated Identity with Azure AD](./FederatedIdentity.png)
