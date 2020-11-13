@@ -1,0 +1,327 @@
+---
+# [4.2 IAM] Federated Identity with IAM SAML Identity Provider and Azure AD
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange Federated Identity and Roles using IAM SAML Identity Provider
+Parameters:
+  IAMSAMLProviderServiceToken:
+    Description: Service Token for CloudFormation Custom Resource
+    Type: String
+  OrganizationMasterAccountId:
+    AllowedPattern: "[0-9]{12}"
+    Description: Account ID for the Organization master account to invoke Custom Resource Proxy
+    Type: String
+  SAMLIdentityProviderMetadataUrl:
+    Description: Valid URL to retrieve application federation metadata XML from
+    Type: String
+Resources:
+  IdentityProvider:
+    Type: Custom::IAMSAMLProvider
+    Properties:
+      ServiceToken: !Sub "arn:aws:sns:${AWS::Region}:${OrganizationMasterAccountId}:LittleOrangeCustomResourceProxy"
+      CustomResourceProperties:
+        ServiceToken: !Ref IAMSAMLProviderServiceToken
+        AccountId: !Ref "AWS::AccountId"
+        Region: !Ref "AWS::Region"
+        SamlProvider:
+          MetadataUrl: !Ref SAMLIdentityProviderMetadataUrl
+          Name: LittleOrangeSAMLProvider
+
+  ReadOnlyRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Ref IdentityProvider
+            Action: sts:AssumeRoleWithSAML
+            Condition:
+              StringEquals:
+                SAML:aud: https://signin.aws.amazon.com/saml
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/job-function/ViewOnlyAccess
+      Path: /LittleOrange/
+      RoleName: LittleOrangeReadOnly
+      MaxSessionDuration: 28800
+
+  AdministratorRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Ref IdentityProvider
+            Action: sts:AssumeRoleWithSAML
+            Condition:
+              StringEquals:
+                SAML:aud: https://signin.aws.amazon.com/saml
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+      Path: /LittleOrange/
+      RoleName: LittleOrangeAdministrator
+      MaxSessionDuration: 28800
+
+  WorkloadAdministratorRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Ref IdentityProvider
+            Action: sts:AssumeRoleWithSAML
+            Condition:
+              StringEquals:
+                SAML:aud: https://signin.aws.amazon.com/saml
+      ManagedPolicyArns:
+        - !Ref WorkloadAdministratorPolicy
+      Path: /LittleOrange/
+      PermissionsBoundary: !Ref WorkloadAdministratorPolicy
+      RoleName: LittleOrangeWorkloadAdministrator
+      MaxSessionDuration: 28800
+
+  WorkloadAdministratorPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: LittleOrangeWorkloadAccess
+      Description: Maximum access policy for workload account administration
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowServices
+            Effect: Allow
+            Action:
+              - access-analyzer:*
+              - acm:*
+              - application-autoscaling:*
+              - appstream:*
+              - appsync:*
+              - athena:*
+              - autoscaling:*
+              - autoscaling-plans:*
+              - aws-portal:*
+              - aws-portal:ViewBilling
+              - batch:*
+              - budgets:*
+              - ce:*
+              - chatbot:*
+              - cloud9:*
+              - cloudformation:*
+              - cloudtrail:*
+              - cloudwatch:*
+              - codebuild:*
+              - codecommit:*
+              - codedeploy:*
+              - codepipeline:*
+              - cognito:*
+              - cognito-identity:*
+              - cognito-idp:*
+              - cognito-sync:*
+              - comprehend:*
+              - compute-optimizer:*
+              - config:*
+              - cur:*
+              - datapipeline:*
+              - datasync:*
+              - dax:*
+              - devicefarm:*
+              - dynamodb:*
+              - ec2:*
+              - ec2messages:*
+              - ecr:*
+              - ecs:*
+              - elasticache:*
+              - elasticfilesystem:*
+              - elasticloadbalancing:*
+              - elasticmapreduce:*
+              - es:*
+              - events:*
+              - firehose:*
+              - fsx:*
+              - glacier:*
+              - glue:*
+              - greengrass:*
+              - groundtruthlabeling:*
+              - guardduty:*
+              - health:*
+              - iamadmin:*
+              - iot:*
+              - iotanalytics:*
+              - iotevents:*
+              - iotsitewise:*
+              - kendra:*
+              - kinesis:*
+              - kinesisanalytics:*
+              - kinesisvideo:*
+              - kms:*
+              - lambda:*
+              - lex:*
+              - logs:*
+              - mq:*
+              - networkmanager:*
+              - personalize:*
+              - polly:*
+              - quicksight:*
+              - ram:*
+              - rds:*
+              - redshift:*
+              - rekognition:*
+              - resource-groups:*
+              - robomaker:*
+              - route53:*
+              - route53resolver:*
+              - s3:*
+              - sagemaker:*
+              - secretsmanager:*
+              - securityhub:*
+              - serverlessrepo:*
+              - servicecatalog:*
+              - servicequotas:*
+              - ses:*
+              - sns:*
+              - sqs:*
+              - ssm:*
+              - ssmmessages:*
+              - states:*
+              - storagegateway:*
+              - sts:*
+              - support:*
+              - tag:*
+              - textract:*
+              - transcribe:*
+              - translate:*
+              - trustedadvisor:*
+              - vpc:*
+              - waf:*
+              - waf-regional:*
+              - wellarchitected:*
+              - xray:*
+            Resource: "*"
+          - Sid: AllowSpecificActions
+            Effect: Allow
+            Action:
+              - iam:CreateServiceLinkedRole
+              - iam:DeleteServiceLinkedRole
+              - iam:GetPolicy
+              - iam:GetPolicyVersion
+              - iam:GetRole
+              - iam:ListAttachedRolePolicies
+              - iam:ListEntitiesForPolicy
+              - iam:ListInstanceProfilesForRole
+              - iam:ListPolicies
+              - iam:ListPolicyVersions
+              - iam:ListGroups
+              - iam:ListGroupsForUser
+              - iam:ListRolePolicies
+              - iam:ListRoles
+              - organizations:DescribeOrganization
+              - account:ListRegions
+            Resource: "*"
+          - Sid: DenySpecificActions
+            Effect: Deny
+            Action:
+              - iam:AddUserToGroup
+              - iam:AttachUserPolicy
+              - iam:ChangePassword
+              - iam:CreateAccessKey
+              - iam:CreateAccountAlias
+              - iam:CreateGroup
+              - iam:CreateOpenIDConnectProvider
+              - iam:CreateSAMLProvider
+              - iam:CreateUser
+              - iam:DeactivateMFADevice
+              - iam:DeleteAccessKey
+              - iam:DeleteAccountAlias
+              - iam:DeleteAccountPasswordPolicy
+              - iam:DeleteGroup
+              - iam:DeleteLoginProfile
+              - iam:DeleteOpenIDConnectProvider
+              - iam:DeleteRolePermissionsBoundary
+              - iam:DeleteSAMLProvider
+              - iam:DeleteUser
+              - iam:DeleteUserPermissionsBoundary
+              - iam:DeleteUserPolicy
+              - iam:DeleteVirtualMFADevice
+              - iam:DetachUserPolicy
+              - iam:PutRolePermissionsBoundary
+              - iam:PutUserPermissionsBoundary
+              - iam:PutUserPolicy
+              - iam:RemoveUserFromGroup
+              - iam:SetSecurityTokenServicePreferences
+              - iam:UpdateAccessKey
+              - iam:UpdateAccountPasswordPolicy
+              - iam:UpdateGroup
+              - iam:UpdateSAMLProvider
+              - iam:UpdateUser
+              - account:DisableRegion
+              - account:EnableRegion
+              - organization:AttachPolicy
+              - organization:CreateAccount
+              - organization:CreateGovCloudAccount
+              - organization:CreateOrganization
+              - organization:CreateOrganizationalUnit
+              - organization:CreatePolicy
+              - organization:DeleteOrganization
+              - organization:DeleteOrganizationalUnit
+              - organization:DeletePolicy
+              - organization:DeregisterDelegatedAdministrator
+              - organization:DetachPolicy
+              - organization:DisableAWSServiceAccess
+              - organization:DisablePolicyType
+              - organization:EnableAllFeatures
+              - organization:EnableAWSServiceAccess
+              - organization:EnablePolicyType
+              - organization:InviteAccountToOrganization
+              - organization:LeaveOrganization
+              - organization:MoveAccount
+              - organization:RegisterDelegatedAdministrator
+              - organization:RemoveAccountFromOrganization
+              - organization:UpdateOrganizationalUnit
+              - organization:UpdatePolicy
+            Resource: "*"
+          - Sid: DenyEC2LaunchCommunityAmi # Deny launching AMIs not owned by this account
+            Effect: Deny
+            Action:
+              - ec2:RunInstances
+              - ec2:RunScheduledInstances
+            Resource: arn:aws:ec2:*::image/*
+            Condition:
+              StringNotEquals:
+                ec2:Owner: !Ref "AWS::AccountId"
+          - Sid: AllowWorkloadRoles
+            Action:
+              - iam:DeleteRole
+              - iam:PassRole
+              - iam:UpdateAssumeRolePolicy
+              - iam:UpdateRole
+              - iam:UpdateRoleDescription
+            Resource:
+              - !Sub arn:aws:iam::${AWS::AccountId}:role/LittleOrangeWorkload/*
+            Effect: Allow
+          - Sid: AllowWorkloadRolesWithPermissionsBoundary
+            Effect: Allow
+            Action:
+              - iam:AttachRolePolicy
+              - iam:CreateRole
+              - iam:DeleteRolePolicy
+              - iam:DetachRolePolicy
+              - iam:PutRolePolicy
+            Resource:
+              - !Sub arn:aws:iam::${AWS::AccountId}:role/LittleOrangeWorkload/*
+            Condition:
+              StringEquals:
+                iam:PermissionsBoundary: !Sub arn:aws:iam::${AWS::AccountId}:policy/LittleOrangeWorkloadAccess
+          - Sid: AllowWorkloadPolicies
+            Effect: Allow
+            Action:
+              - iam:CreatePolicy
+              - iam:CreatePolicyVersion
+              - iam:DeletePolicy
+              - iam:DeletePolicyVersion
+              - iam:SetDefaultPolicyVersion
+            Resource:
+              - !Sub arn:aws:iam::${AWS::AccountId}:policy/LittleOrangeWorkload/*

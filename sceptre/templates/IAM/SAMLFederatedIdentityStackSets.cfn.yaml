@@ -1,0 +1,49 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange Federated Identity Stack Sets
+Parameters:
+  IAMSAMLProviderServiceToken:
+    Description: Service Token for CloudFormation Custom Resource
+    Type: String
+  OrganizationRootId:
+    Description: Root ID of the Organization to apply as deployment target
+    Type: String
+  SAMLIdentityProviderMetadataUrl:
+    Description: Valid URL to retrieve application federation metadata XML from
+    Type: String
+  StackTemplateUrl:
+    Description: S3 URL for stack template to deploy in set
+    Type: String
+Resources:
+  ManagementAccountStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        IAMSAMLProviderServiceToken: !Ref IAMSAMLProviderServiceToken
+        OrganizationMasterAccountId: !Ref "AWS::AccountId"
+        SAMLIdentityProviderMetadataUrl: !Ref SAMLIdentityProviderMetadataUrl
+      TemplateURL: !Ref StackTemplateUrl
+
+  OrganizationStackSet:
+    Type: AWS::CloudFormation::StackSet
+    Properties:
+      AutoDeployment:
+        Enabled: true
+        RetainStacksOnAccountRemoval: true
+      Capabilities:
+        - CAPABILITY_NAMED_IAM
+      Description: Federated Identity deployed across Organization
+      Parameters:
+        - ParameterKey: IAMSAMLProviderServiceToken
+          ParameterValue: !Ref IAMSAMLProviderServiceToken
+        - ParameterKey: OrganizationMasterAccountId
+          ParameterValue: !Ref "AWS::AccountId"
+        - ParameterKey: SAMLIdentityProviderMetadataUrl
+          ParameterValue: !Ref SAMLIdentityProviderMetadataUrl
+      PermissionModel: SERVICE_MANAGED
+      StackInstancesGroup:
+        - DeploymentTargets:
+            OrganizationalUnitIds: [!Ref OrganizationRootId]
+          Regions: [!Ref "AWS::Region"]
+      StackSetName: !Sub "${AWS::StackName}Organization"
+      TemplateURL: !Ref StackTemplateUrl
