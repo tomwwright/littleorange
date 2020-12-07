@@ -73,8 +73,8 @@ class NetworkingVPCMacro(object):
         }
     }
 
-  def buildNATGateways(self, vpcName, availabilityZones):
-    for i in range(availabilityZones):
+  def buildNATGateways(self, vpcName, availabilityZoneCount):
+    for i in range(availabilityZoneCount):
       label = self.availabilityZoneLabels[i]
       publicSubnetResourceName = "{}Public{}".format(vpcName, label)
       natGatewayResourceName = "{}NAT{}".format(vpcName, label)
@@ -165,6 +165,23 @@ class NetworkingVPCMacro(object):
         (naclEntryResourceName, naclEntryResource) = buildNACLEntry(naclResourceName, nacl)
         self.template["Resources"][naclEntryResourceName] = naclEntryResource
 
+  def buildTransitGatewayAttachment(self, vpcName, availabilityZoneCount, transitGatewayId):
+
+    networkingSubnetIds = [
+        {"Ref": "{}Networking{}".format(vpcName, self.availabilityZoneLabels[i])}
+        for i in range(availabilityZoneCount)
+    ]
+    transitGatewayAttachmentResourceName = "{}TGWAttachment".format(vpcName)
+
+    self.template["Resources"][transitGatewayAttachmentResourceName] = {
+        "Type": "AWS::EC2::TransitGatewayAttachment",
+        "Properties": {
+            "SubnetIds": networkingSubnetIds,
+            "TransitGatewayId": transitGatewayId,
+            "VpcId": {"Ref": vpcName}
+        }
+    }
+
   def buildVPC(self, name, resource):
     cidr = self.resolveParameter(resource["Properties"]["CIDR"])
     if not isValidIPv4CIDR(cidr):
@@ -174,6 +191,7 @@ class NetworkingVPCMacro(object):
     useInternetGateway = self.resolveParameter(resource["Properties"].get("InternetGateway", True))
     useNATGateways = self.resolveParameter(resource["Properties"].get("NATGateways", False))
     internetGatewayRouteCIDR = self.resolveParameter(resource["Properties"].get("InternetGatewayRouteCIDR", "0.0.0.0/0"))
+    transitGatewayId = self.resolveParameter(resource["Properties"].get("TransitGatewayId", None))
 
     vpc = VPC(
         CIDR=cidr,
@@ -202,6 +220,9 @@ class NetworkingVPCMacro(object):
 
     if useNATGateways:
       self.buildNATGateways(name, availabilityZones)
+
+    if transitGatewayId:
+      self.buildTransitGatewayAttachment(name, availabilityZones, transitGatewayId)
 
   def resolveParameter(self, value):
     if not isinstance(value, dict):

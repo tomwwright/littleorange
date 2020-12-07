@@ -880,6 +880,26 @@
           "Ref": "VPCPublicC"
         }
       }
+    },
+    "VPCTGWAttachment": {
+      "Type": "AWS::EC2::TransitGatewayAttachment",
+      "Properties": {
+        "SubnetIds": [
+          {
+            "Ref": "VPCNetworkingA"
+          },
+          {
+            "Ref": "VPCNetworkingB"
+          },
+          {
+            "Ref": "VPCNetworkingC"
+          }
+        ],
+        "TransitGatewayId": "tgw-xxxxxx",
+        "VpcId": {
+          "Ref": "VPC"
+        }
+      }
     }
   },
   "Outputs": {

@@ -60,7 +60,8 @@
           "Ref": "VPCCIDR"
         },
         "InternetGateway": true,
-        "NATGateways": true
+        "NATGateways": true,
+        "TransitGatewayId": "tgw-xxxxxx"
       }
     }
   },
