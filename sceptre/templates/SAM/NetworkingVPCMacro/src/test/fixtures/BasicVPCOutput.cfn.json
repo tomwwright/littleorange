@@ -61,6 +61,21 @@
         "InstanceTenancy": "default"
       }
     },
+    "VPCIGW": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {}
+    },
+    "VPCIGWAttachment": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "InternetGatewayId": {
+          "Ref": "VPCIGW"
+        },
+        "VpcId": {
+          "Ref": "VPC"
+        }
+      }
+    },
     "VPCPublicNACL": {
       "Type": "AWS::EC2::NetworkAcl",
       "Properties": {

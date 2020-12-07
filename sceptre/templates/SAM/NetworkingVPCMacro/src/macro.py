@@ -59,6 +59,20 @@ class NetworkingVPCMacro(object):
 
   availabilityZoneLabels = ["A", "B", "C", "D", "E", "F"]
 
+  def buildInternetGateway(self, vpcName):
+    self.template["Resources"][f"{vpcName}IGW"] = {
+        "Type": "AWS::EC2::InternetGateway",
+        "Properties": {}
+    }
+
+    self.template["Resources"][f"{vpcName}IGWAttachment"] = {
+        "Type": "AWS::EC2::VPCGatewayAttachment",
+        "Properties": {
+            "InternetGatewayId": {"Ref": f"{vpcName}IGW"},
+            "VpcId": {"Ref": vpcName},
+        }
+    }
+
   def buildSubnets(self, vpc):
     for subnet in vpc.subnets:
       self.template["Resources"][subnet["ResourceName"]] = {
@@ -137,6 +151,10 @@ class NetworkingVPCMacro(object):
             "InstanceTenancy": "default"
         }
     }
+
+    attachInternetGateway = self.resolveParameter(resource["Properties"].get("InternetGateway", True))
+    if attachInternetGateway:
+      self.buildInternetGateway(name)
 
     self.buildTiers(vpc)
     self.buildSubnets(vpc)
