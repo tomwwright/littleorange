@@ -57,6 +57,10 @@ class NetworkingVPCMacro(object):
   template: Dict[str, Dict] = {}
   parameters: Dict[str, Dict] = {}
 
+  useInternetGateway = False
+  useNATGateways = False
+  internetGatewayRouteCIDR = None
+
   availabilityZoneLabels = ["A", "B", "C", "D", "E", "F"]
 
   def buildInternetGateway(self, vpcName):
@@ -72,6 +76,28 @@ class NetworkingVPCMacro(object):
             "VpcId": {"Ref": vpcName},
         }
     }
+
+  def buildNATGateways(self, vpcName, availabilityZones):
+    for i in range(availabilityZones):
+      label = self.availabilityZoneLabels[i]
+      publicSubnetResourceName = "{}Public{}".format(vpcName, label)
+      natGatewayResourceName = "{}NAT{}".format(vpcName, label)
+      natGatewayIPResourceName = "{}NATIP{}".format(vpcName, label)
+
+      self.template["Resources"][natGatewayIPResourceName] = {
+          "Type": "AWS::EC2::EIP",
+          "Properties": {
+              "Domain": "vpc"
+          }
+      }
+
+      self.template["Resources"][natGatewayResourceName] = {
+          "Type": "AWS::EC2::NatGateway",
+          "Properties": {
+              "AllocationId": {"Fn::GetAtt": f"{natGatewayIPResourceName}.AllocationId"},
+              "SubnetId": {"Ref": publicSubnetResourceName}
+          }
+      }
 
   def buildSubnets(self, vpc):
     for subnet in vpc.subnets:
@@ -107,6 +133,18 @@ class NetworkingVPCMacro(object):
           }
       }
 
+      for route in subnet["Routes"]:
+        (name, cidr, parameters) = route
+        routeResourceName = "{}Route{}".format(subnet["ResourceName"], name)
+        self.template["Resources"][routeResourceName] = {
+            "Type": "AWS::EC2::Route",
+            "Properties": {
+                "DestinationCidrBlock": cidr,
+                "RouteTableId": {"Ref": subnet["ResourceName"] + "RouteTable"},
+                **parameters
+            }
+        }
+
   def buildTiers(self, vpc):
     for tier in vpc.tiers:
       name = tier["Name"]
@@ -136,10 +174,18 @@ class NetworkingVPCMacro(object):
     if not isValidIPv4CIDR(cidr):
       raise Exception(f"Invalid IPv4 VPC CIDR: {cidr}")
 
+    availabilityZones = self.resolveParameter(resource["Properties"]["AvailabilityZones"])
+    self.useInternetGateway = self.resolveParameter(resource["Properties"].get("InternetGateway", True))
+    self.useNATGateways = self.resolveParameter(resource["Properties"].get("NATGateways", False))
+    self.internetGatewayRouteCIDR = self.resolveParameter(resource["Properties"].get("InternetGatewayRouteCIDR", "0.0.0.0/0"))
+
     vpc = VPC(
         CIDR=cidr,
         Name=name,
-        AvailabilityZoneCount=self.resolveParameter(resource["Properties"]["AvailabilityZones"])
+        AvailabilityZoneCount=availabilityZones,
+        InternetGateway=self.useInternetGateway,
+        InternetGatewayRouteCIDR=self.internetGatewayRouteCIDR,
+        NATGateways=self.useNATGateways,
     )
 
     self.template["Resources"][name] = {
@@ -152,12 +198,14 @@ class NetworkingVPCMacro(object):
         }
     }
 
-    attachInternetGateway = self.resolveParameter(resource["Properties"].get("InternetGateway", True))
-    if attachInternetGateway:
+    if self.useInternetGateway:
       self.buildInternetGateway(name)
 
     self.buildTiers(vpc)
     self.buildSubnets(vpc)
+
+    if self.useNATGateways:
+      self.buildNATGateways(name, availabilityZones)
 
   def resolveParameter(self, value):
     if not isinstance(value, dict):

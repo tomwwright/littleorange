@@ -241,6 +241,18 @@
         }
       }
     },
+    "VPCPublicARouteIGW": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "RouteTableId": {
+          "Ref": "VPCPublicARouteTable"
+        },
+        "GatewayId": {
+          "Ref": "VPCIGW"
+        }
+      }
+    },
     "VPCPublicB": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
@@ -285,6 +297,18 @@
         },
         "SubnetId": {
           "Ref": "VPCPublicB"
+        }
+      }
+    },
+    "VPCPublicBRouteIGW": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "RouteTableId": {
+          "Ref": "VPCPublicBRouteTable"
+        },
+        "GatewayId": {
+          "Ref": "VPCIGW"
         }
       }
     },
@@ -335,6 +359,18 @@
         }
       }
     },
+    "VPCPublicCRouteIGW": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "RouteTableId": {
+          "Ref": "VPCPublicCRouteTable"
+        },
+        "GatewayId": {
+          "Ref": "VPCIGW"
+        }
+      }
+    },
     "VPCPrivateA": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
@@ -379,6 +415,18 @@
         },
         "SubnetId": {
           "Ref": "VPCPrivateA"
+        }
+      }
+    },
+    "VPCPrivateARouteNAT": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "RouteTableId": {
+          "Ref": "VPCPrivateARouteTable"
+        },
+        "NatGatewayId": {
+          "Ref": "VPCNATA"
         }
       }
     },
@@ -429,6 +477,18 @@
         }
       }
     },
+    "VPCPrivateBRouteNAT": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "RouteTableId": {
+          "Ref": "VPCPrivateBRouteTable"
+        },
+        "NatGatewayId": {
+          "Ref": "VPCNATB"
+        }
+      }
+    },
     "VPCPrivateC": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
@@ -473,6 +533,18 @@
         },
         "SubnetId": {
           "Ref": "VPCPrivateC"
+        }
+      }
+    },
+    "VPCPrivateCRouteNAT": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "RouteTableId": {
+          "Ref": "VPCPrivateCRouteTable"
+        },
+        "NatGatewayId": {
+          "Ref": "VPCNATC"
         }
       }
     },
@@ -755,6 +827,57 @@
         },
         "SubnetId": {
           "Ref": "VPCNetworkingC"
+        }
+      }
+    },
+    "VPCNATIPA": {
+      "Type": "AWS::EC2::EIP",
+      "Properties": {
+        "Domain": "vpc"
+      }
+    },
+    "VPCNATA": {
+      "Type": "AWS::EC2::NatGateway",
+      "Properties": {
+        "AllocationId": {
+          "Fn::GetAtt": "VPCNATIPA.AllocationId"
+        },
+        "SubnetId": {
+          "Ref": "VPCPublicA"
+        }
+      }
+    },
+    "VPCNATIPB": {
+      "Type": "AWS::EC2::EIP",
+      "Properties": {
+        "Domain": "vpc"
+      }
+    },
+    "VPCNATB": {
+      "Type": "AWS::EC2::NatGateway",
+      "Properties": {
+        "AllocationId": {
+          "Fn::GetAtt": "VPCNATIPB.AllocationId"
+        },
+        "SubnetId": {
+          "Ref": "VPCPublicB"
+        }
+      }
+    },
+    "VPCNATIPC": {
+      "Type": "AWS::EC2::EIP",
+      "Properties": {
+        "Domain": "vpc"
+      }
+    },
+    "VPCNATC": {
+      "Type": "AWS::EC2::NatGateway",
+      "Properties": {
+        "AllocationId": {
+          "Fn::GetAtt": "VPCNATIPC.AllocationId"
+        },
+        "SubnetId": {
+          "Ref": "VPCPublicC"
         }
       }
     }

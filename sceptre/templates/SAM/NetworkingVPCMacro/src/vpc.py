@@ -43,12 +43,16 @@ class VPC(object):
     self.cidr = ipaddress.IPv4Network(kwargs["CIDR"])
     self.name = kwargs["Name"]
     self.availabilityZoneCount = kwargs["AvailabilityZoneCount"]
+    self.internetGatewayRouteCIDR = kwargs.get("InternetGatewayRouteCIDR", None)
+    self.useInternetGateway = kwargs.get("InternetGateway", None)
+    self.useNatGateways = kwargs.get("NATGateways", None)
     self.tierSettings = kwargs.get("Tiers", [])
 
     self.tiers = []
     self.subnets = []
     self.calculateTiers()
     self.calculateNACLs()
+    self.calculateRoutes()
 
   def calculateNACLs(self):
     publicTier = [tier for tier in self.tiers if tier["Name"] == "Public"][0]
@@ -73,6 +77,22 @@ class VPC(object):
     networkingTier["NACLs"] = [
         (100, "ALLOW", "ALL", 0, 0, str(self.cidr))
     ]
+
+  def calculateRoutes(self):
+    publicTier = [tier for tier in self.tiers if tier["Name"] == "Public"][0]
+    privateTier = [tier for tier in self.tiers if tier["Name"] == "Private"][0]
+    restrictedTier = [tier for tier in self.tiers if tier["Name"] == "Restricted"][0]
+    networkingTier = [tier for tier in self.tiers if tier["Name"] == "Networking"][0]
+
+    for subnet in publicTier["Subnets"]:
+      if self.useInternetGateway:
+        internetGatewayResourceName = self.name + "IGW"
+        subnet["Routes"].append(("IGW", self.internetGatewayRouteCIDR, {"GatewayId": {"Ref": f"{self.name}IGW"}}))
+
+    for subnet in privateTier["Subnets"]:
+      if self.useInternetGateway and self.useNatGateways:
+        natGatewayResourceName = "{}NAT{}".format(self.name, subnet["Name"])
+        subnet["Routes"].append(("NAT", self.internetGatewayRouteCIDR, {"NatGatewayId": {"Ref": natGatewayResourceName}}))
 
   def calculateTiers(self):
 
@@ -147,11 +167,12 @@ class VPC(object):
     for i in range(self.availabilityZoneCount):
       label = AVAILABILITY_ZONE_LABELS[i]
       subnet = {
+          "AvailabilityZoneIndex": i,
+          "CIDR": subnets[i],
           "Name": label,
           "ResourceName": tier["ResourceName"] + label,
-          "AvailabilityZoneIndex": i,
+          "Routes": [],
           "Tier": tier,
-          "CIDR": subnets[i]
       }
 
       tier["Subnets"].append(subnet)

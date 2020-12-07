@@ -58,7 +58,9 @@
         "AvailabilityZones": 3,
         "CIDR": {
           "Ref": "VPCCIDR"
-        }
+        },
+        "InternetGateway": true,
+        "NATGateways": true
       }
     }
   },
