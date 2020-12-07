@@ -57,10 +57,6 @@ class NetworkingVPCMacro(object):
   template: Dict[str, Dict] = {}
   parameters: Dict[str, Dict] = {}
 
-  useInternetGateway = False
-  useNATGateways = False
-  internetGatewayRouteCIDR = None
-
   availabilityZoneLabels = ["A", "B", "C", "D", "E", "F"]
 
   def buildInternetGateway(self, vpcName):
@@ -175,17 +171,17 @@ class NetworkingVPCMacro(object):
       raise Exception(f"Invalid IPv4 VPC CIDR: {cidr}")
 
     availabilityZones = self.resolveParameter(resource["Properties"]["AvailabilityZones"])
-    self.useInternetGateway = self.resolveParameter(resource["Properties"].get("InternetGateway", True))
-    self.useNATGateways = self.resolveParameter(resource["Properties"].get("NATGateways", False))
-    self.internetGatewayRouteCIDR = self.resolveParameter(resource["Properties"].get("InternetGatewayRouteCIDR", "0.0.0.0/0"))
+    useInternetGateway = self.resolveParameter(resource["Properties"].get("InternetGateway", True))
+    useNATGateways = self.resolveParameter(resource["Properties"].get("NATGateways", False))
+    internetGatewayRouteCIDR = self.resolveParameter(resource["Properties"].get("InternetGatewayRouteCIDR", "0.0.0.0/0"))
 
     vpc = VPC(
         CIDR=cidr,
         Name=name,
         AvailabilityZoneCount=availabilityZones,
-        InternetGateway=self.useInternetGateway,
-        InternetGatewayRouteCIDR=self.internetGatewayRouteCIDR,
-        NATGateways=self.useNATGateways,
+        InternetGateway=useInternetGateway,
+        InternetGatewayRouteCIDR=internetGatewayRouteCIDR,
+        NATGateways=useNATGateways,
     )
 
     self.template["Resources"][name] = {
@@ -198,13 +194,13 @@ class NetworkingVPCMacro(object):
         }
     }
 
-    if self.useInternetGateway:
+    if useInternetGateway:
       self.buildInternetGateway(name)
 
     self.buildTiers(vpc)
     self.buildSubnets(vpc)
 
-    if self.useNATGateways:
+    if useNATGateways:
       self.buildNATGateways(name, availabilityZones)
 
   def resolveParameter(self, value):
