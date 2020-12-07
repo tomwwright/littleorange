@@ -61,7 +61,8 @@
         },
         "InternetGateway": true,
         "NATGateways": true,
-        "TransitGatewayId": "tgw-xxxxxx"
+        "TransitGatewayId": "tgw-xxxxxx",
+        "TransitGatewayRouteCIDR": "10.16.0.0/24"
       }
     }
   },

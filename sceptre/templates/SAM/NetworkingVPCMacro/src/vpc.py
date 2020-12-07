@@ -47,6 +47,8 @@ class VPC(object):
     self.useInternetGateway = kwargs.get("InternetGateway", None)
     self.useNatGateways = kwargs.get("NATGateways", None)
     self.tierSettings = kwargs.get("Tiers", [])
+    self.transitGatewayId = kwargs.get("TransitGatewayId", None)
+    self.transitGatewayRouteCIDR = kwargs.get("TransitGatewayRouteCIDR", None)
 
     self.tiers = []
     self.subnets = []
@@ -82,17 +84,20 @@ class VPC(object):
     publicTier = [tier for tier in self.tiers if tier["Name"] == "Public"][0]
     privateTier = [tier for tier in self.tiers if tier["Name"] == "Private"][0]
     restrictedTier = [tier for tier in self.tiers if tier["Name"] == "Restricted"][0]
-    networkingTier = [tier for tier in self.tiers if tier["Name"] == "Networking"][0]
 
     for subnet in publicTier["Subnets"]:
       if self.useInternetGateway:
         internetGatewayResourceName = self.name + "IGW"
         subnet["Routes"].append(("IGW", self.internetGatewayRouteCIDR, {"GatewayId": {"Ref": f"{self.name}IGW"}}))
+      if self.transitGatewayId:
+        subnet["Routes"].append(("TGW", self.transitGatewayRouteCIDR, {"TransitGatewayId": self.transitGatewayId}))
 
     for subnet in privateTier["Subnets"]:
       if self.useInternetGateway and self.useNatGateways:
         natGatewayResourceName = "{}NAT{}".format(self.name, subnet["Name"])
         subnet["Routes"].append(("NAT", self.internetGatewayRouteCIDR, {"NatGatewayId": {"Ref": natGatewayResourceName}}))
+      if self.transitGatewayId:
+        subnet["Routes"].append(("TGW", self.transitGatewayRouteCIDR, {"TransitGatewayId": self.transitGatewayId}))
 
   def calculateTiers(self):
 

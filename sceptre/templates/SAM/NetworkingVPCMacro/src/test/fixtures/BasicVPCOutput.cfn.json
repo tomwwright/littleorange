@@ -253,6 +253,16 @@
         }
       }
     },
+    "VPCPublicARouteTGW": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "10.16.0.0/24",
+        "RouteTableId": {
+          "Ref": "VPCPublicARouteTable"
+        },
+        "TransitGatewayId": "tgw-xxxxxx"
+      }
+    },
     "VPCPublicB": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
@@ -310,6 +320,16 @@
         "GatewayId": {
           "Ref": "VPCIGW"
         }
+      }
+    },
+    "VPCPublicBRouteTGW": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "10.16.0.0/24",
+        "RouteTableId": {
+          "Ref": "VPCPublicBRouteTable"
+        },
+        "TransitGatewayId": "tgw-xxxxxx"
       }
     },
     "VPCPublicC": {
@@ -371,6 +391,16 @@
         }
       }
     },
+    "VPCPublicCRouteTGW": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "10.16.0.0/24",
+        "RouteTableId": {
+          "Ref": "VPCPublicCRouteTable"
+        },
+        "TransitGatewayId": "tgw-xxxxxx"
+      }
+    },
     "VPCPrivateA": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
@@ -428,6 +458,16 @@
         "NatGatewayId": {
           "Ref": "VPCNATA"
         }
+      }
+    },
+    "VPCPrivateARouteTGW": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "10.16.0.0/24",
+        "RouteTableId": {
+          "Ref": "VPCPrivateARouteTable"
+        },
+        "TransitGatewayId": "tgw-xxxxxx"
       }
     },
     "VPCPrivateB": {
@@ -489,6 +529,16 @@
         }
       }
     },
+    "VPCPrivateBRouteTGW": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "10.16.0.0/24",
+        "RouteTableId": {
+          "Ref": "VPCPrivateBRouteTable"
+        },
+        "TransitGatewayId": "tgw-xxxxxx"
+      }
+    },
     "VPCPrivateC": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
@@ -546,6 +596,16 @@
         "NatGatewayId": {
           "Ref": "VPCNATC"
         }
+      }
+    },
+    "VPCPrivateCRouteTGW": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "10.16.0.0/24",
+        "RouteTableId": {
+          "Ref": "VPCPrivateCRouteTable"
+        },
+        "TransitGatewayId": "tgw-xxxxxx"
       }
     },
     "VPCRestrictedA": {
