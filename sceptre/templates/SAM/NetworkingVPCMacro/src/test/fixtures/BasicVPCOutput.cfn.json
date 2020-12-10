@@ -115,11 +115,11 @@
         "Egress": false,
         "Protocol": 6,
         "RuleAction": "allow",
-        "RuleNumber": 100
-      },
-      "PortRange": {
-        "To": 65535,
-        "From": 1024
+        "RuleNumber": 100,
+        "PortRange": {
+          "To": 65535,
+          "From": 1024
+        }
       }
     },
     "VPCPrivateNACLIngress200": {
@@ -132,11 +132,11 @@
         "Egress": false,
         "Protocol": 17,
         "RuleAction": "allow",
-        "RuleNumber": 200
-      },
-      "PortRange": {
-        "To": 65535,
-        "From": 1024
+        "RuleNumber": 200,
+        "PortRange": {
+          "To": 65535,
+          "From": 1024
+        }
       }
     },
     "VPCPrivateNACLIngress300": {

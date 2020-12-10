@@ -36,12 +36,12 @@ def buildNACLEntry(naclResourceName, nacl):
       }
   }
   if protocol in ["TCP", "UDP"]:
-    resource["PortRange"] = {
+    resource["Properties"]["PortRange"] = {
         "To": toPortOrIcmpType,
         "From": fromPortOrIcmpCode
     }
   elif protocol == "ICMP":
-    resource["Icmp"] = {
+    resource["Properties"]["Icmp"] = {
         "Code": fromPortOrIcmpCode,
         "Type": toPortOrIcmpType
     }
