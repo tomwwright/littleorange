@@ -120,3 +120,29 @@ class Test(TestCase):
     assert response["status"] == "success"
     assert response["requestId"] == event["requestId"]
     assert response["fragment"] == outputTemplate
+
+  def testMinimalVPC(self):
+
+    with open(os.path.join(os.path.dirname(__file__), "fixtures/MinimalVPCInput.cfn.json"), 'r') as f:
+      inputTemplate = json.load(f)
+    with open(os.path.join(os.path.dirname(__file__), "fixtures/MinimalVPCOutput.cfn.json"), 'r') as f:
+      outputTemplate = json.load(f)
+
+    event = {
+        "region": "us-east-1",
+        "accountId": "000011112222",
+        "fragment": inputTemplate,
+        "transformId": "LittleOrange::Networking::VPC",
+        "params": {},
+        "requestId": "REQUEST_ID_0002",
+        "templateParameterValues": {
+            "VPCCIDR": "10.0.0.0/22"
+        }
+    }
+    context = {}
+
+    response = app.handler(event, context)
+
+    assert response["status"] == "success"
+    assert response["requestId"] == event["requestId"]
+    assert response["fragment"] == outputTemplate
