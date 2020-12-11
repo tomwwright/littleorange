@@ -3,7 +3,7 @@ import json
 import os
 from unittest import TestCase
 
-from .. import app
+from ..macro import app
 
 
 class Test(TestCase):
