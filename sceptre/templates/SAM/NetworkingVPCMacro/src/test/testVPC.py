@@ -25,7 +25,7 @@ class Test(TestCase):
         for tier in vpc.tiers
     } == {
         "Public":     {"Name": "Public",     "ResourceName": "TestVPCPublic",     "Size": 0.25, "PrefixLength": 25, "CIDR": ipaddress.IPv4Network("10.1.2.0/25"), "Subnets": 2, "NACLs": [(100, "ALLOW", "ALL", 0, 0, "0.0.0.0/0")]},
-        "Private":    {"Name": "Private",    "ResourceName": "TestVPCPrivate",    "Size": 0.25, "PrefixLength": 25, "CIDR": ipaddress.IPv4Network("10.1.2.128/25"), "Subnets": 2, "NACLs": [(100, "ALLOW", "TCP", 1024, 65535, "0.0.0.0/0"), (200, "ALLOW", "UDP", 1024, 65535, "0.0.0.0/0"), (300, "ALLOW", "ALL", 0, 0, "10.1.2.0/23")]},
+        "Private":    {"Name": "Private",    "ResourceName": "TestVPCPrivate",    "Size": 0.25, "PrefixLength": 25, "CIDR": ipaddress.IPv4Network("10.1.2.128/25"), "Subnets": 2, "NACLs": [(100, "ALLOW", "TCP", 1024, 65535, "0.0.0.0/0"), (200, "ALLOW", "UDP", 1024, 65535, "0.0.0.0/0"), (300, "ALLOW", "ALL", 0, 0, "10.1.2.0/23"), (400, "ALLOW", "ALL", 0, 0, "10.0.0.0/8")]},
         "Restricted": {"Name": "Restricted", "ResourceName": "TestVPCRestricted", "Size": 0.25, "PrefixLength": 25, "CIDR": ipaddress.IPv4Network("10.1.3.0/25"), "Subnets": 2, "NACLs": [(100, "ALLOW", "ALL", 0, 0, "10.1.2.128/25")]},
         "Networking": {"Name": "Networking", "ResourceName": "TestVPCNetworking", "Size": 0.25, "PrefixLength": 25, "CIDR": ipaddress.IPv4Network("10.1.3.128/25"), "Subnets": 2, "NACLs": [(100, "ALLOW", "ALL", 0, 0, "10.1.2.0/23")]}
     }

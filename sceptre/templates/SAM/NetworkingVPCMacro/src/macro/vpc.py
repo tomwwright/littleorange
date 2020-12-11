@@ -72,6 +72,8 @@ class VPC(object):
         (200, "ALLOW", "UDP", 1024, 65535, "0.0.0.0/0"),
         (300, "ALLOW", "ALL", 0, 0, str(self.cidr))
     ]
+    if self.transitGatewayId:
+      privateTier["NACLs"].append((400, "ALLOW", "ALL", 0, 0, str(self.transitGatewayRouteCIDR)))
 
     restrictedTier["NACLs"] = [
         (100, "ALLOW", "ALL", 0, 0, str(privateTier["CIDR"]))
