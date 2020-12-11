@@ -976,6 +976,12 @@
         "Ref": "VPCCIDR"
       }
     },
+    "VPCId": {
+      "Description": "VPC ID of VPC",
+      "Value": {
+        "Ref": "VPC"
+      }
+    },
     "VPCPublicTierCIDR": {
       "Description": "IPv4 CIDR of the Public Tier of VPC",
       "Value": "10.0.0.0/24"

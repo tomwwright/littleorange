@@ -219,6 +219,11 @@ class NetworkingVPCMacro(object):
         }
     }
 
+    self.template["Outputs"][name + "Id"] = {
+        "Description": f"VPC ID of {vpc.name}",
+        "Value": {"Ref": name}
+    }
+
     if useInternetGateway:
       self.buildInternetGateway(name)
 
