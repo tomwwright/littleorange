@@ -1,7 +1,7 @@
 import ipaddress
 from unittest import TestCase
 
-from ..vpc import allocateSubnets, VPC
+from ..macro.vpc import allocateSubnets, VPC
 
 
 class Test(TestCase):
@@ -11,7 +11,12 @@ class Test(TestCase):
     vpc = VPC(
         CIDR="10.1.2.0/23",
         Name="TestVPC",
-        AvailabilityZoneCount=2
+        AvailabilityZoneCount=2,
+        InternetGateway=True,
+        InternetGatewayRouteCIDR="0.0.0.0/0",
+        NATGateways=True,
+        TransitGatewayId="tgw-xxxx",
+        TransitGatewayRouteCIDR="10.0.0.0/8"
     )
 
     assert vpc.name == "TestVPC"
@@ -29,14 +34,14 @@ class Test(TestCase):
         f"{subnet['Tier']['Name']}{subnet['Name']}": {**subnet, "Tier": subnet["Tier"]["Name"]}
         for subnet in vpc.subnets
     } == {
-        "PublicA": {"Name": "A", "ResourceName": "TestVPCPublicA", "AvailabilityZoneIndex": 0, "Tier": "Public", "CIDR": ipaddress.IPv4Network("10.1.2.0/26")},
-        "PublicB": {"Name": "B", "ResourceName": "TestVPCPublicB", "AvailabilityZoneIndex": 1, "Tier": "Public", "CIDR": ipaddress.IPv4Network("10.1.2.64/26")},
-        "PrivateA": {"Name": "A", "ResourceName": "TestVPCPrivateA", "AvailabilityZoneIndex": 0, "Tier": "Private", "CIDR": ipaddress.IPv4Network("10.1.2.128/26")},
-        "PrivateB": {"Name": "B", "ResourceName": "TestVPCPrivateB", "AvailabilityZoneIndex": 1, "Tier": "Private", "CIDR": ipaddress.IPv4Network("10.1.2.192/26")},
-        "RestrictedA": {"Name": "A", "ResourceName": "TestVPCRestrictedA", "AvailabilityZoneIndex": 0, "Tier": "Restricted", "CIDR": ipaddress.IPv4Network("10.1.3.0/26")},
-        "RestrictedB": {"Name": "B", "ResourceName": "TestVPCRestrictedB", "AvailabilityZoneIndex": 1, "Tier": "Restricted", "CIDR": ipaddress.IPv4Network("10.1.3.64/26")},
-        "NetworkingA": {"Name": "A", "ResourceName": "TestVPCNetworkingA", "AvailabilityZoneIndex": 0, "Tier": "Networking", "CIDR": ipaddress.IPv4Network("10.1.3.128/26")},
-        "NetworkingB": {"Name": "B", "ResourceName": "TestVPCNetworkingB", "AvailabilityZoneIndex": 1, "Tier": "Networking", "CIDR": ipaddress.IPv4Network("10.1.3.192/26")}
+        "PublicA": {"Name": "A", "ResourceName": "TestVPCPublicA", "AvailabilityZoneIndex": 0, "Tier": "Public", "Routes": [("IGW", "0.0.0.0/0", {"GatewayId": {"Ref": "TestVPCIGW"}}), ("TGW", "10.0.0.0/8", {"TransitGatewayId": "tgw-xxxx"})], "CIDR": ipaddress.IPv4Network("10.1.2.0/26")},
+        "PublicB": {"Name": "B", "ResourceName": "TestVPCPublicB", "AvailabilityZoneIndex": 1, "Tier": "Public", "Routes": [("IGW", "0.0.0.0/0", {"GatewayId": {"Ref": "TestVPCIGW"}}), ("TGW", "10.0.0.0/8", {"TransitGatewayId": "tgw-xxxx"})], "CIDR": ipaddress.IPv4Network("10.1.2.64/26")},
+        "PrivateA": {"Name": "A", "ResourceName": "TestVPCPrivateA", "AvailabilityZoneIndex": 0, "Tier": "Private", "Routes": [("NAT", "0.0.0.0/0", {"NatGatewayId": {"Ref": "TestVPCNATA"}}), ("TGW", "10.0.0.0/8", {"TransitGatewayId": "tgw-xxxx"})], "CIDR": ipaddress.IPv4Network("10.1.2.128/26")},
+        "PrivateB": {"Name": "B", "ResourceName": "TestVPCPrivateB", "AvailabilityZoneIndex": 1, "Tier": "Private", "Routes": [("NAT", "0.0.0.0/0", {"NatGatewayId": {"Ref": "TestVPCNATB"}}), ("TGW", "10.0.0.0/8", {"TransitGatewayId": "tgw-xxxx"})], "CIDR": ipaddress.IPv4Network("10.1.2.192/26")},
+        "RestrictedA": {"Name": "A", "ResourceName": "TestVPCRestrictedA", "AvailabilityZoneIndex": 0, "Tier": "Restricted", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.3.0/26")},
+        "RestrictedB": {"Name": "B", "ResourceName": "TestVPCRestrictedB", "AvailabilityZoneIndex": 1, "Tier": "Restricted", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.3.64/26")},
+        "NetworkingA": {"Name": "A", "ResourceName": "TestVPCNetworkingA", "AvailabilityZoneIndex": 0, "Tier": "Networking", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.3.128/26")},
+        "NetworkingB": {"Name": "B", "ResourceName": "TestVPCNetworkingB", "AvailabilityZoneIndex": 1, "Tier": "Networking", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.3.192/26")}
     }
 
   def testVPCSubnets3AZ(self):
@@ -44,7 +49,10 @@ class Test(TestCase):
     vpc = VPC(
         CIDR="10.1.2.0/23",
         Name="TestVPC",
-        AvailabilityZoneCount=3
+        AvailabilityZoneCount=3,
+        InternetGateway=True,
+        InternetGatewayRouteCIDR="0.0.0.0/0",
+        NATGateways=False
     )
 
     assert vpc.name == "TestVPC"
@@ -62,18 +70,18 @@ class Test(TestCase):
         f"{subnet['Tier']['Name']}{subnet['Name']}": {**subnet, "Tier": subnet["Tier"]["Name"]}
         for subnet in vpc.subnets
     } == {
-        "PublicA": {"Name": "A", "ResourceName": "TestVPCPublicA", "AvailabilityZoneIndex": 0, "Tier": "Public", "CIDR": ipaddress.IPv4Network("10.1.2.0/27")},
-        "PublicB": {"Name": "B", "ResourceName": "TestVPCPublicB", "AvailabilityZoneIndex": 1, "Tier": "Public", "CIDR": ipaddress.IPv4Network("10.1.2.32/27")},
-        "PublicC": {"Name": "C", "ResourceName": "TestVPCPublicC", "AvailabilityZoneIndex": 2, "Tier": "Public", "CIDR": ipaddress.IPv4Network("10.1.2.64/27")},
-        "PrivateA": {"Name": "A", "ResourceName": "TestVPCPrivateA", "AvailabilityZoneIndex": 0, "Tier": "Private", "CIDR": ipaddress.IPv4Network("10.1.2.128/27")},
-        "PrivateB": {"Name": "B", "ResourceName": "TestVPCPrivateB", "AvailabilityZoneIndex": 1, "Tier": "Private", "CIDR": ipaddress.IPv4Network("10.1.2.160/27")},
-        "PrivateC": {"Name": "C", "ResourceName": "TestVPCPrivateC", "AvailabilityZoneIndex": 2, "Tier": "Private", "CIDR": ipaddress.IPv4Network("10.1.2.192/27")},
-        "RestrictedA": {"Name": "A", "ResourceName": "TestVPCRestrictedA", "AvailabilityZoneIndex": 0, "Tier": "Restricted", "CIDR": ipaddress.IPv4Network("10.1.3.0/27")},
-        "RestrictedB": {"Name": "B", "ResourceName": "TestVPCRestrictedB", "AvailabilityZoneIndex": 1, "Tier": "Restricted", "CIDR": ipaddress.IPv4Network("10.1.3.32/27")},
-        "RestrictedC": {"Name": "C", "ResourceName": "TestVPCRestrictedC", "AvailabilityZoneIndex": 2, "Tier": "Restricted", "CIDR": ipaddress.IPv4Network("10.1.3.64/27")},
-        "NetworkingA": {"Name": "A", "ResourceName": "TestVPCNetworkingA", "AvailabilityZoneIndex": 0, "Tier": "Networking", "CIDR": ipaddress.IPv4Network("10.1.3.128/27")},
-        "NetworkingB": {"Name": "B", "ResourceName": "TestVPCNetworkingB", "AvailabilityZoneIndex": 1, "Tier": "Networking", "CIDR": ipaddress.IPv4Network("10.1.3.160/27")},
-        "NetworkingC": {"Name": "C", "ResourceName": "TestVPCNetworkingC", "AvailabilityZoneIndex": 2, "Tier": "Networking", "CIDR": ipaddress.IPv4Network("10.1.3.192/27")}
+        "PublicA": {"Name": "A", "ResourceName": "TestVPCPublicA", "AvailabilityZoneIndex": 0, "Tier": "Public", "Routes": [("IGW", "0.0.0.0/0", {"GatewayId": {"Ref": "TestVPCIGW"}})], "CIDR": ipaddress.IPv4Network("10.1.2.0/27")},
+        "PublicB": {"Name": "B", "ResourceName": "TestVPCPublicB", "AvailabilityZoneIndex": 1, "Tier": "Public", "Routes": [("IGW", "0.0.0.0/0", {"GatewayId": {"Ref": "TestVPCIGW"}})], "CIDR": ipaddress.IPv4Network("10.1.2.32/27")},
+        "PublicC": {"Name": "C", "ResourceName": "TestVPCPublicC", "AvailabilityZoneIndex": 2, "Tier": "Public", "Routes": [("IGW", "0.0.0.0/0", {"GatewayId": {"Ref": "TestVPCIGW"}})], "CIDR": ipaddress.IPv4Network("10.1.2.64/27")},
+        "PrivateA": {"Name": "A", "ResourceName": "TestVPCPrivateA", "AvailabilityZoneIndex": 0, "Tier": "Private", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.2.128/27")},
+        "PrivateB": {"Name": "B", "ResourceName": "TestVPCPrivateB", "AvailabilityZoneIndex": 1, "Tier": "Private", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.2.160/27")},
+        "PrivateC": {"Name": "C", "ResourceName": "TestVPCPrivateC", "AvailabilityZoneIndex": 2, "Tier": "Private", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.2.192/27")},
+        "RestrictedA": {"Name": "A", "ResourceName": "TestVPCRestrictedA", "AvailabilityZoneIndex": 0, "Tier": "Restricted", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.3.0/27")},
+        "RestrictedB": {"Name": "B", "ResourceName": "TestVPCRestrictedB", "AvailabilityZoneIndex": 1, "Tier": "Restricted", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.3.32/27")},
+        "RestrictedC": {"Name": "C", "ResourceName": "TestVPCRestrictedC", "AvailabilityZoneIndex": 2, "Tier": "Restricted", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.3.64/27")},
+        "NetworkingA": {"Name": "A", "ResourceName": "TestVPCNetworkingA", "AvailabilityZoneIndex": 0, "Tier": "Networking", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.3.128/27")},
+        "NetworkingB": {"Name": "B", "ResourceName": "TestVPCNetworkingB", "AvailabilityZoneIndex": 1, "Tier": "Networking", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.3.160/27")},
+        "NetworkingC": {"Name": "C", "ResourceName": "TestVPCNetworkingC", "AvailabilityZoneIndex": 2, "Tier": "Networking", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.3.192/27")}
     }
 
   def testVPCSubnets4AZ(self):
@@ -99,22 +107,22 @@ class Test(TestCase):
         f"{subnet['Tier']['Name']}{subnet['Name']}": {**subnet, "Tier": subnet["Tier"]["Name"]}
         for subnet in vpc.subnets
     } == {
-        "PublicA": {"Name": "A", "ResourceName": "TestVPCPublicA", "AvailabilityZoneIndex": 0, "Tier": "Public", "CIDR": ipaddress.IPv4Network("10.1.2.0/27")},
-        "PublicB": {"Name": "B", "ResourceName": "TestVPCPublicB", "AvailabilityZoneIndex": 1, "Tier": "Public", "CIDR": ipaddress.IPv4Network("10.1.2.32/27")},
-        "PublicC": {"Name": "C", "ResourceName": "TestVPCPublicC", "AvailabilityZoneIndex": 2, "Tier": "Public", "CIDR": ipaddress.IPv4Network("10.1.2.64/27")},
-        "PublicD": {"Name": "D", "ResourceName": "TestVPCPublicD", "AvailabilityZoneIndex": 3, "Tier": "Public", "CIDR": ipaddress.IPv4Network("10.1.2.96/27")},
-        "PrivateA": {"Name": "A", "ResourceName": "TestVPCPrivateA", "AvailabilityZoneIndex": 0, "Tier": "Private", "CIDR": ipaddress.IPv4Network("10.1.2.128/27")},
-        "PrivateB": {"Name": "B", "ResourceName": "TestVPCPrivateB", "AvailabilityZoneIndex": 1, "Tier": "Private", "CIDR": ipaddress.IPv4Network("10.1.2.160/27")},
-        "PrivateC": {"Name": "C", "ResourceName": "TestVPCPrivateC", "AvailabilityZoneIndex": 2, "Tier": "Private", "CIDR": ipaddress.IPv4Network("10.1.2.192/27")},
-        "PrivateD": {"Name": "D", "ResourceName": "TestVPCPrivateD", "AvailabilityZoneIndex": 3, "Tier": "Private", "CIDR": ipaddress.IPv4Network("10.1.2.224/27")},
-        "RestrictedA": {"Name": "A", "ResourceName": "TestVPCRestrictedA", "AvailabilityZoneIndex": 0, "Tier": "Restricted", "CIDR": ipaddress.IPv4Network("10.1.3.0/27")},
-        "RestrictedB": {"Name": "B", "ResourceName": "TestVPCRestrictedB", "AvailabilityZoneIndex": 1, "Tier": "Restricted", "CIDR": ipaddress.IPv4Network("10.1.3.32/27")},
-        "RestrictedC": {"Name": "C", "ResourceName": "TestVPCRestrictedC", "AvailabilityZoneIndex": 2, "Tier": "Restricted", "CIDR": ipaddress.IPv4Network("10.1.3.64/27")},
-        "RestrictedD": {"Name": "D", "ResourceName": "TestVPCRestrictedD", "AvailabilityZoneIndex": 3, "Tier": "Restricted", "CIDR": ipaddress.IPv4Network("10.1.3.96/27")},
-        "NetworkingA": {"Name": "A", "ResourceName": "TestVPCNetworkingA", "AvailabilityZoneIndex": 0, "Tier": "Networking", "CIDR": ipaddress.IPv4Network("10.1.3.128/27")},
-        "NetworkingB": {"Name": "B", "ResourceName": "TestVPCNetworkingB", "AvailabilityZoneIndex": 1, "Tier": "Networking", "CIDR": ipaddress.IPv4Network("10.1.3.160/27")},
-        "NetworkingC": {"Name": "C", "ResourceName": "TestVPCNetworkingC", "AvailabilityZoneIndex": 2, "Tier": "Networking", "CIDR": ipaddress.IPv4Network("10.1.3.192/27")},
-        "NetworkingD": {"Name": "D", "ResourceName": "TestVPCNetworkingD", "AvailabilityZoneIndex": 3, "Tier": "Networking", "CIDR": ipaddress.IPv4Network("10.1.3.224/27")}
+        "PublicA": {"Name": "A", "ResourceName": "TestVPCPublicA", "AvailabilityZoneIndex": 0, "Tier": "Public", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.2.0/27")},
+        "PublicB": {"Name": "B", "ResourceName": "TestVPCPublicB", "AvailabilityZoneIndex": 1, "Tier": "Public", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.2.32/27")},
+        "PublicC": {"Name": "C", "ResourceName": "TestVPCPublicC", "AvailabilityZoneIndex": 2, "Tier": "Public", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.2.64/27")},
+        "PublicD": {"Name": "D", "ResourceName": "TestVPCPublicD", "AvailabilityZoneIndex": 3, "Tier": "Public", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.2.96/27")},
+        "PrivateA": {"Name": "A", "ResourceName": "TestVPCPrivateA", "AvailabilityZoneIndex": 0, "Tier": "Private", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.2.128/27")},
+        "PrivateB": {"Name": "B", "ResourceName": "TestVPCPrivateB", "AvailabilityZoneIndex": 1, "Tier": "Private", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.2.160/27")},
+        "PrivateC": {"Name": "C", "ResourceName": "TestVPCPrivateC", "AvailabilityZoneIndex": 2, "Tier": "Private", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.2.192/27")},
+        "PrivateD": {"Name": "D", "ResourceName": "TestVPCPrivateD", "AvailabilityZoneIndex": 3, "Tier": "Private", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.2.224/27")},
+        "RestrictedA": {"Name": "A", "ResourceName": "TestVPCRestrictedA", "AvailabilityZoneIndex": 0, "Tier": "Restricted", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.3.0/27")},
+        "RestrictedB": {"Name": "B", "ResourceName": "TestVPCRestrictedB", "AvailabilityZoneIndex": 1, "Tier": "Restricted", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.3.32/27")},
+        "RestrictedC": {"Name": "C", "ResourceName": "TestVPCRestrictedC", "AvailabilityZoneIndex": 2, "Tier": "Restricted", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.3.64/27")},
+        "RestrictedD": {"Name": "D", "ResourceName": "TestVPCRestrictedD", "AvailabilityZoneIndex": 3, "Tier": "Restricted", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.3.96/27")},
+        "NetworkingA": {"Name": "A", "ResourceName": "TestVPCNetworkingA", "AvailabilityZoneIndex": 0, "Tier": "Networking", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.3.128/27")},
+        "NetworkingB": {"Name": "B", "ResourceName": "TestVPCNetworkingB", "AvailabilityZoneIndex": 1, "Tier": "Networking", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.3.160/27")},
+        "NetworkingC": {"Name": "C", "ResourceName": "TestVPCNetworkingC", "AvailabilityZoneIndex": 2, "Tier": "Networking", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.3.192/27")},
+        "NetworkingD": {"Name": "D", "ResourceName": "TestVPCNetworkingD", "AvailabilityZoneIndex": 3, "Tier": "Networking", "Routes": [], "CIDR": ipaddress.IPv4Network("10.1.3.224/27")}
     }
 
   def testAllocateSubnetsEqual(self):
