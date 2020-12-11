@@ -43,6 +43,14 @@ Resources:
                   - logs:PutLogEvents
                 Resource: "*"
 
+  Parameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Description: Lambda ARN for the NetworkingVPC Macro for calling from Macro Proxy
+      Name: /LittleOrange/CloudFormation/Macro/NetworkingVPC
+      Type: String
+      Value: !GetAtt CloudFormationMacroFunction.Arn
+
 Outputs:
   FunctionArn:
     Value: !GetAtt CloudFormationMacroFunction.Arn
