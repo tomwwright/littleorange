@@ -1,0 +1,50 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange Networking VPC Macro Stack Sets
+Parameters:
+  OrganizationRootId:
+    Description: Root ID of the Organization to apply as deployment target
+    Type: String
+  Regions:
+    Description: AWS Regions to deploy Stack Set to
+    Type: CommaDelimitedList
+  StackTemplate:
+    Description: Stack template to deploy in set
+    Type: String
+Resources:
+  StackSet:
+    Type: AWS::CloudFormation::StackSet
+    Properties:
+      Capabilities:
+        - CAPABILITY_NAMED_IAM
+      Description: Networking VPC Macro via Macro Proxy deployed across regions of Organization master
+      Parameters:
+        - ParameterKey: MacroProxyAccountId
+          ParameterValue: !Ref "AWS::AccountId"
+      PermissionModel: SELF_MANAGED
+      StackInstancesGroup:
+        - DeploymentTargets:
+            Accounts: [!Ref "AWS::AccountId"]
+          Regions: !Ref Regions
+      StackSetName: !Sub "${AWS::StackName}"
+      TemplateBody: !Ref StackTemplate
+
+  OrganizationStackSet:
+    Type: AWS::CloudFormation::StackSet
+    Properties:
+      AutoDeployment:
+        Enabled: true
+        RetainStacksOnAccountRemoval: true
+      Capabilities:
+        - CAPABILITY_NAMED_IAM
+      Description: Networking VPC Macro via Macro Proxy deployed across Organization
+      Parameters:
+        - ParameterKey: MacroProxyAccountId
+          ParameterValue: !Ref "AWS::AccountId"
+      PermissionModel: SERVICE_MANAGED
+      StackInstancesGroup:
+        - DeploymentTargets:
+            OrganizationalUnitIds: [!Ref OrganizationRootId]
+          Regions: !Ref Regions
+      StackSetName: !Sub "${AWS::StackName}Organization"
+      TemplateBody: !Ref StackTemplate

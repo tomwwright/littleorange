@@ -1,0 +1,13 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  MacroProxyAccountId:
+    Description: Account ID of the account containing the CloudFormation Macros
+    Type: String
+Resources:
+  Macro:
+    Type: AWS::CloudFormation::Macro
+    Properties:
+      Name: NetworkingVPC
+      Description: Expands LittleOrange::Networking::VPC Resources into CloudFormation VPC Resources
+      FunctionName: !Sub arn:aws:lambda:${AWS::Region}:${MacroProxyAccountId}:function:LittleOrangeCloudFormationMacroProxy
