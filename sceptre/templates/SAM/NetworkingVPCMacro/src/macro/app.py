@@ -36,12 +36,3 @@ def handler(event, context):
 
   logger.info(f"Returning response: {response}")
   return response
-
-# VPC
-# Subnets
-# Route Tables
-# NACLs
-
-
-# Flow Log
-# Role for Flow Log

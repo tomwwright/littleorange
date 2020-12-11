@@ -1,8 +1,9 @@
-from . import util
-from .vpc import VPC
 import ipaddress
 import re
 from typing import Dict
+
+from . import util
+from .vpc import VPC
 
 REGEX_IPV4 = re.compile(r'^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))?$')
 

@@ -8,7 +8,7 @@ Resources:
     Properties:
       Description: CloudFormation Macro for LittleOrange::Networking::VPC Resource
       CodeUri: ./src
-      Handler: app.handler
+      Handler: macro.app.handler
       MemorySize: 128
       Runtime: python3.8
       Role: !GetAtt Role.Arn

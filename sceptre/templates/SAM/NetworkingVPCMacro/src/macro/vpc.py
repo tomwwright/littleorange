@@ -1,6 +1,7 @@
-from . import util
 import ipaddress
 import math
+
+from . import util
 
 AVAILABILITY_ZONE_LABELS = ["A", "B", "C", "D", "E", "F"]
 
