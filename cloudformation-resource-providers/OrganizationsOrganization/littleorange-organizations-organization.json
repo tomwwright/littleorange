@@ -70,9 +70,6 @@
     }
   },
   "additionalProperties": false,
-  "required": [
-    "/properties/Id"
-  ],
   "createOnlyProperties": [
     "/properties/FeatureSet"
   ],
