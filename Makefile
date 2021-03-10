@@ -15,6 +15,10 @@ DockerLintCloudFormation: LintCloudFormation
 GenerateAWSProfiles:
 	@ python3 bin/generate_aws_profiles.py
 
+GenerateDrawio: NeedsDrawioPath
+	drawio --export --output '${DrawioPath}.png' --border 20 '${DrawioPath}.drawio'
+
+
 Install: DockerBuildCfnLint InstallLib
 
 InstallLib: ## Install project Python libraries using pip
