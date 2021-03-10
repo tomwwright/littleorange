@@ -9,7 +9,7 @@ boto3-stubs = {extras = ["organizations"],version = "*"}
 cfn-response = "*"
 cloudformation-cli = "*"
 cloudformation-cli-python-plugin = "*"
-cloudformation-cli-python-lib = "*"
+cloudformation-cli-python-lib = ">=2.1.5"
 mypy = "*"
 moto = "*"
 
@@ -25,6 +25,7 @@ aws-cdk-aws-lambda = "*"
 aws-cdk-aws-iam = "*"
 aws-cdk-aws-ssm = "*"
 aws-cdk-aws-sns = "*"
+requests = "*"
 
 [requires]
 python_version = "3.8"
