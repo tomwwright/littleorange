@@ -59,3 +59,7 @@ https://aws.amazon.com/blogs/aws/the-next-evolution-in-aws-single-sign-on/
 ## Federated Identity with IAM SAML Identity Provider
 
 ![Federated Identity with Azure AD](./FederatedIdentity.png)
+
+## VPC Factory with CloudFormation Macro
+
+![VPC Factory with CloudFormation Macro](./NetworkingVPCMacro.png)
