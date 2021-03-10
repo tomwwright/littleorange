@@ -1,0 +1,20 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Little Orange Minimal VPC
+Transform: NetworkingVPC
+Metadata:
+  cfn-lint:
+    config:
+      ignore_checks:
+        - E3001
+Parameters:
+  VPCCIDR:
+    Type: String
+Resources:
+  VPC:
+    Type: LittleOrange::Networking::VPC
+    Properties:
+      AvailabilityZones: 2
+      CIDR:
+        Ref: VPCCIDR
+      InternetGateway: false
+      NATGateways: false

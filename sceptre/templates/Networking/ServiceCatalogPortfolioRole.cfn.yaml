@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Little Orange Networking Service Catalog Portfolio Role
+Resources:
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: servicecatalog.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /LittleOrange/
+      Policies:
+        - PolicyName: ServiceCatalogPrerequisites
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: ServiceCatalog
+                Effect: Allow
+                Action:
+                  - servicecatalog:*
+                  - cloudformation:CreateChangeSet
+                  - cloudformation:CreateStack
+                  - cloudformation:DeleteStack
+                  - cloudformation:DescribeStackEvents
+                  - cloudformation:DescribeStacks
+                  - cloudformation:GetTemplateSummary
+                  - cloudformation:SetStackPolicy
+                  - cloudformation:ValidateTemplate
+                  - cloudformation:UpdateStack
+                  - s3:GetObject
+                Resource: "*"
+        - PolicyName: NetworkingPermissions
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: InvokeCloudFormationMacroLambda
+                Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: "*"
+              - Sid: NetworkingEC2
+                Effect: Allow
+                Action:
+                  - ec2:*
+                Resource: "*"
+      RoleName: LittleOrangeNetworkingServiceCatalogRole
+Outputs:
+  RoleArn:
+    Value:
+      Fn::GetAtt: Role.Arn
