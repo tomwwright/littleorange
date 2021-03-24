@@ -20,4 +20,6 @@ enabled_regions:
   # - us-east-2
   # - us-west-1
   # - us-west-2
+
+# yamllint disable-line rule:line-length
 federated_identity_saml_metadata_url: https://login.microsoftonline.com/614dfa03-04ae-4b58-a783-f27b940e4399/federationmetadata/2007-06/federationmetadata.xml?appid=060fad48-bb2a-4693-86e9-57269217a117

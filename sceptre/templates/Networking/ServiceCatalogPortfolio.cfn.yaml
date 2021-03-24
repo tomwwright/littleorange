@@ -1,3 +1,4 @@
+---
 AWSTemplateFormatVersion: 2010-09-09
 Description: Little Orange Networking Service Catalog Portfolio
 Parameters:
