@@ -9,7 +9,7 @@ phases:
       - make Pipenv
       - pipenv run make Install
       - mkdir -p "${HOME}/.aws"
-      - pipenv run make GenerateAWSProfiles | tee "${HOME}/.aws/config"
+      - pipenv run make GenerateECSAWSProfiles | tee "${HOME}/.aws/config"
   build:
     commands:
       - >

@@ -13,7 +13,10 @@ DockerLintCloudFormation: CfnLint=docker run --rm -v ${PWD}:/path --name cfn-lin
 DockerLintCloudFormation: LintCloudFormation
 
 GenerateAWSProfiles:
-	@ python3 bin/generate_aws_profiles.py
+	@ python3 bin/generate_aws_profiles.py --profile-type SOURCE_PROFILE
+
+GenerateECSAWSProfiles:
+	@ python3 bin/generate_aws_profiles.py --profile-type ECS
 
 Install: DockerBuildCfnLint InstallLib
 
