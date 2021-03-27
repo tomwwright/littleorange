@@ -25,6 +25,7 @@ LittleOrange is a minimalist multi-account blueprint for AWS. It attempts to del
 | [Moto](https://github.com/spulec/moto)                                                                                               | Testing             | Moto is a mocking library for **Boto3**, used to write tests around AWS-related **Python** code. Preferred                                                                                                                                                                    |
 | [Botocore Stubber](https://botocore.amazonaws.com/v1/documentation/api/latest/reference/stubber.html)                                | Testing             | Botocore Stubber is a utility included in the Botocore library for writing custom stubs for **Boto3** for testing. Botocore Stubber is used when writing tests for **Python** code that use **Boto3** endpoints not covered by **Moto** mocks                                 |
 | [Python Unittest](https://docs.python.org/3/library/unittest.mock.html)                                                              | Testing             | The **Python** unit testing library is used to hand-roll mocks for tests that cannot be covered by **Moto** or **Botocore Stubber**                                                                                                                                           |
+| [Pipenv](https://pipenv.pypa.io/en/latest/install/)                                                                                  | Code                | Pipenv provides dependency management for **Python**                                                                                                                                                                                                                          |
 
 ## Features
 
@@ -60,23 +61,92 @@ LittleOrange is a minimalist multi-account blueprint for AWS. It attempts to del
 | Networking      | Centralised Egress                                 | Squid in Fargate                                      | `[ ] 0%`            |
 | Cost Management | Instance Scheduling                                | `???`                                                 | `[ ] 0%`            |
 
+Core
+IAM
+Logging + Audit
+Security
+Networking
+Workload Services
+
+0. Orchestration and Deployment
+
+- 0.1 Sceptre
+- 0.2 Linting with cfn-lint and yamllint
+- 0.3 Deployment Automation with CodeBuild
+- 0.4 Orchestration of CloudFormation with Sceptre
+
+1. Core
+
+- 1.1 AWS Organizations
+  - 1.1.1 Infrastructure-as-code with CloudFormation Resource Providers
+  - 1.1.2 Quarantine OU for incident response for compromised account
+- 1.2 Custom Resource Proxy
+- 1.3 CloudFormation Stack Sets support
+
+2. Billing
+
+- 2.1 Cost and Usage Reports
+- 2.2 AWS Budgets
+
+3. Logging and Audit
+
+- 3.1 CloudTrail
+- 3.2 Config
+- 3.3 Centralised Logging for CloudWatch Logs
+- 3.4 VPC Flow Logs
+
+4. IAM
+
+- 4.1 Federated Identity with AWS SSO and Azure AD
+- 4.2 Federated Identity with IAM SAML Identity Providers and Azure AD
+- 4.3 Delegation of IAM Roles with IAM Permissions Boundary
+
+5. Security
+
+- 5.1 GuardDuty `[ ]`
+- 5.2 SecurityHub
+
+6. Networking
+
+- 6.1 VPC Factory via Service Catalog
+- 6.2 Transit Gateway
+- 6.3 Centralised VPC Endpoints
+- 6.4 Route53 Resolvers
+- 6.5 Prefix Lists
+
+7. Workload Services
+
+- 7.1 SOE Baking with EC2 Image Builder
+  - 7.1.1 Automated Semantic Versioning for Components and Recipes
+- 7.2 Instance Patching with Patch Manager
+- 7.3 Instance Scheduling
+
 - Automated account creation and onboarding
-- GuardDuty
+- Tagging
+
 - CloudTrail
 - Config
+
+- GuardDuty
 - Security Hub
-- VPC Flow Logs
+- CIS Compliance checks and autoremediation where possible
+
 - Centralised CloudWatch Logging
+
+- Federation using AWS SSO and Azure AD
+- Federation using IAM Identity Provider and Azure AD
+- Developer IAM Role with Permissions Boundary
+
+- VPC Flow Logs
 - Automated Athena configuration/consumption of the above
 - Delete default VPC
-- CIS Compliance checks and autoremediation where possible
-- SSM Patching (baseline scan and scaffold to implement)
-- Instance scheduling
 - Route 53 Resolvers
 - Centralised VPC Endpoints (resolvable from workload VPCs)
-- AWS SSO
-- Developer IAM Role with Permissions Boundary
 - VPC Factory via Service Catalogue
+
+- SSM Patching (baseline scan and scaffold to implement)
+- Instance scheduling
+- Backup plans
 
 ### AWS Organisations
 

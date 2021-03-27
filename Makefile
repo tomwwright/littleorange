@@ -18,6 +18,10 @@ GenerateAWSProfiles:
 GenerateECSAWSProfiles:
 	@ python3 bin/generate_aws_profiles.py --profile-type ECS
 
+GenerateDrawio: NeedsDrawioPath
+	drawio --export --output '${DrawioPath}.png' --border 20 '${DrawioPath}.drawio'
+
+
 Install: DockerBuildCfnLint InstallLib
 
 InstallLib: ## Install project Python libraries using pip

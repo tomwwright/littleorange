@@ -29,6 +29,7 @@ class UploadS3(Resolver):
       if isinstance(v, Resolver):
         if v.stack == None:
           v.stack = self.stack
+        v.setup()
         resolved[k] = v.resolve()
       else:
         resolved[k] = v

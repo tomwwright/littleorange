@@ -1,0 +1,86 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: Little Orange Networking Service Catalog Portfolio
+Parameters:
+  OrganizationId:
+    Description: Organization ID to share portfolio with
+    Type: String
+  OrganizationRootId:
+    Description: Root ID of the Organization to share portfolio with
+    Type: String
+  ProductS3URLMinimalVPCv1:
+    Description: S3 URL for Minimal VPC v1 Product
+    Type: String
+  ServiceCatalogOrganizationPortfolioShareServiceToken:
+    Description: Service Token for CloudFormation Custom Resource
+    Type: String
+  StackTemplateURL:
+    Description: Stack template as S3 URL of IAM Role for launch constraint to deploy in set
+    Type: String
+Resources:
+  Portfolio:
+    Type: AWS::ServiceCatalog::Portfolio
+    Properties:
+      Description: Networking CloudFormation products provided as part of the Little Orange AWS Blueprint
+      DisplayName: Little Orange Networking
+      ProviderName: Little Orange
+
+  MinimalVPCProduct:
+    Type: AWS::ServiceCatalog::CloudFormationProduct
+    Properties:
+      Description: Minimal VPC with 2 AZs and no external connectivity
+      Name: Minimal VPC
+      Owner: Little Orange
+      ProvisioningArtifactParameters:
+        - Description: Initial Version
+          Info:
+            LoadTemplateFromURL: !Ref ProductS3URLMinimalVPCv1
+          Name: v1
+      SupportUrl: https://github.com/tomwwright/littleorange
+
+  MinimalVPCProductLaunchConstraint:
+    Type: AWS::ServiceCatalog::LaunchRoleConstraint
+    DependsOn: [ManagementAccountRoleStack]
+    Properties:
+      Description: Link product to LittleOrange-defined Networking Role
+      LocalRoleName: LittleOrange/LittleOrangeNetworkingServiceCatalogRole
+      PortfolioId: !Ref Portfolio
+      ProductId: !Ref MinimalVPCProduct
+
+  MinimalVPCProductPortfolioAssociation:
+    Type: AWS::ServiceCatalog::PortfolioProductAssociation
+    Properties:
+      PortfolioId: !Ref Portfolio
+      ProductId: !Ref MinimalVPCProduct
+
+  OrganizationPortfolioShare:
+    Type: Custom::ServiceCatalogOrganizationPortfolioShare
+    Properties:
+      ServiceToken: !Ref ServiceCatalogOrganizationPortfolioShareServiceToken
+      AccountId: !Ref "AWS::AccountId"
+      Region: !Ref "AWS::Region"
+      PortfolioShareConfiguration:
+        PortfolioId: !Ref Portfolio
+        OrganizationNodeId: !Ref OrganizationId
+
+  ManagementAccountRoleStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Ref StackTemplateURL
+
+  RoleStackSet:
+    Type: AWS::CloudFormation::StackSet
+    Properties:
+      AutoDeployment:
+        Enabled: true
+        RetainStacksOnAccountRemoval: false
+      Capabilities:
+        - CAPABILITY_NAMED_IAM
+      Description: IAM Role for Networking Service Catalog Portfolio across Organization
+      PermissionModel: SERVICE_MANAGED
+      StackInstancesGroup:
+        - DeploymentTargets:
+            OrganizationalUnitIds: [!Ref OrganizationRootId]
+          Regions: [!Ref "AWS::Region"]
+      StackSetName: !Sub "${AWS::StackName}Role"
+      TemplateURL: !Ref StackTemplateURL

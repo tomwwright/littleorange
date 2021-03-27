@@ -1,0 +1,7 @@
+---
+template_path: SAM/BuildSAM.py
+dependencies:
+  - Core/SAMDeploymentResources.yaml
+sceptre_user_data:
+  ApplySAMTranslate: true
+  SAMProject: ServiceCatalogOrganizationPortfolioShare
