@@ -64,6 +64,8 @@ https://aws.amazon.com/blogs/aws/the-next-evolution-in-aws-single-sign-on/
 
 ![VPC Factory with CloudFormation Macro](./NetworkingVPCMacro.png)
 
+![VPC Architecture](./VPCArchitecture.png)
+
 ## Service Catalog for VPC Deployment
 
 ![Service Catalog for VPC Deployment](./ServiceCatalogNetworking.png)
