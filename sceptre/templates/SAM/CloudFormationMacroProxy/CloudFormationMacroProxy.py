@@ -45,6 +45,14 @@ class CloudFormationMacroProxyStack(Cdk.Stack):
         action="lambda:InvokeFunction"
     )
 
+    # Allowing Principal * is a security issue
+    # https://github.com/tomwwright/littleorange/issues/29
+    function.add_permission(
+        "AllAccountsPermission",
+        principal=Iam.AccountPrincipal("*"),
+        action="lambda:InvokeFunction"
+    )
+
     function.add_to_role_policy(
         Iam.PolicyStatement(
             actions=["lambda:InvokeFunction"],
