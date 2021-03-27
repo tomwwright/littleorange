@@ -1,0 +1,27 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange CloudFormation Macro Proxy Stack Set
+Parameters:
+  Regions:
+    Description: AWS Regions to deploy Stack Set to
+    Type: CommaDelimitedList
+  StackTemplateURL:
+    Description: S3 URL of uploaded CloudFormation template to deploy in set
+    Type: String
+Resources:
+  StackSet:
+    Type: AWS::CloudFormation::StackSet
+    Properties:
+      Capabilities:
+        - CAPABILITY_IAM
+      Description: CloudFormation Custom Resource Macro Proxy
+      Parameters:
+        - ParameterKey: LookupRegion
+          ParameterValue: !Ref "AWS::Region"
+      PermissionModel: SELF_MANAGED
+      StackInstancesGroup:
+        - DeploymentTargets:
+            Accounts: [!Ref "AWS::AccountId"]
+          Regions: !Ref Regions
+      StackSetName: !Sub "${AWS::StackName}"
+      TemplateURL: !Ref StackTemplateURL

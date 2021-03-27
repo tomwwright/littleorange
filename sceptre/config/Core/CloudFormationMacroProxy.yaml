@@ -1,0 +1,8 @@
+---
+template_path: Core/CloudFormationMacroProxyStackSet.cfn.yaml
+parameters:
+  Regions: "{{ var.enabled_regions | join(',') }}"
+  StackTemplateURL: !UploadS3
+    Bucket: littleorange-sam-deployment-resources
+    Content: !Command python sceptre/templates/SAM/CloudFormationMacroProxy/CloudFormationMacroProxy.py
+    Key: Sceptre/CloudFormationMacroProxy
