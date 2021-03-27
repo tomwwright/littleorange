@@ -11,3 +11,32 @@ Resources:
       Name: NetworkingVPC
       Description: Expands LittleOrange::Networking::VPC Resources into CloudFormation VPC Resources
       FunctionName: !Sub arn:aws:lambda:${AWS::Region}:${MacroProxyAccountId}:function:LittleOrangeCloudFormationMacroProxy
+      LogRoleARN: !GetAtt Role.Arn
+      LogGroupName: !Ref LogGroup
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /LittleOrange/CloudFormation/Macro/NetworkingVPC
+      RetentionInDays: 365
+
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudformation.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /LittleOrange/
+      Policies:
+        - PolicyName: CloudWatchLogs
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${LogGroup}:*
