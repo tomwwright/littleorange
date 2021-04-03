@@ -1,0 +1,12 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange prerequisites for AWS Resource Access Manager
+Parameters:
+  RAMEnableOrganizationSharingServiceToken:
+    Description: Service Token for CloudFormation Custom Resource
+    Type: String
+Resources:
+  RAMEnableOrganizationSharing:
+    Type: Custom::RAMEnableOrganizationSharing
+    Properties:
+      ServiceToken: !Ref RAMEnableOrganizationSharingServiceToken

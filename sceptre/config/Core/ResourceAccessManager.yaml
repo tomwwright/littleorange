@@ -1,0 +1,4 @@
+---
+template_path: Core/ResourceAccessManager.cfn.yaml
+parameters:
+  RAMEnableOrganizationSharingServiceToken: !stack_output Core/RAMEnableOrganizationSharing.yaml::ServiceToken
