@@ -1,0 +1,60 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Little Orange CloudFormation Custom Resource for enabling AWS Organizations support in AWS Resource Access Manager
+Resources:
+  CloudFormationCustomResourceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: CloudFormation Custom Resource for enabling AWS Organizations support in AWS Resource Access Manager
+      CodeUri: ./src
+      Handler: app.handler
+      MemorySize: 128
+      Runtime: python3.8
+      Role: !GetAtt Role.Arn
+      Timeout: 120
+
+  CloudFormationCustomResourcePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt CloudFormationCustomResourceFunction.Arn
+      Principal: cloudformation.amazonaws.com
+
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /LittleOrange/
+      Policies:
+        - PolicyName: ResourceAccessManager
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - iam:CreateServiceLinkedRole
+                  - organizations:DescribeOrganization
+                  - organizations:EnableAWSServiceAccess
+                  - organizations:ListAWSServiceAccessForOrganization
+                  - ram:EnableSharingWithAwsOrganization
+                Resource: "*"
+        - PolicyName: CloudWatchLogs
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+
+Outputs:
+  ServiceToken:
+    Value: !GetAtt CloudFormationCustomResourceFunction.Arn
