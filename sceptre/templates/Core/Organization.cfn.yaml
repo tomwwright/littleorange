@@ -33,6 +33,7 @@ Resources:
         - ServicePrincipal: cloudtrail.amazonaws.com # CloudTrail
         - ServicePrincipal: guardduty.amazonaws.com # GuardDuty
         - ServicePrincipal: member.org.stacksets.cloudformation.amazonaws.com # CloudFormation StackSets
+        - ServicePrincipal: ram.amazonaws.com # Resource Access Manager
         - ServicePrincipal: servicecatalog.amazonaws.com # Service Catalog
         - ServicePrincipal: sso.amazonaws.com # Single Sign-On
       FeatureSet: ALL
