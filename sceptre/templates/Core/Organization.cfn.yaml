@@ -10,6 +10,7 @@ Metadata:
 Mappings:
   Configuration:
     AccountEmails:
+      Networking: little.orange.aws+networking@gmail.com
       Sandbox: little.orange.aws+sandbox@gmail.com
       Security: little.orange.aws+security@gmail.com
 Resources:
@@ -128,6 +129,14 @@ Resources:
   # Core Accounts
   #
 
+  NetworkingAccount:
+    DependsOn: [Organization]
+    Type: LittleOrange::Organizations::Account
+    Properties:
+      Email: !FindInMap [Configuration, AccountEmails, Networking]
+      Name: Networking
+      ParentId: !Ref MainOU
+
   SandboxAccount:
     DependsOn: [Organization]
     Type: LittleOrange::Organizations::Account
@@ -156,6 +165,10 @@ Outputs:
     Value: !GetAtt Organization.MasterAccountEmail
   MasterAccountId:
     Value: !GetAtt Organization.MasterAccountId
+  NetworkingAccountEmail:
+    Value: !FindInMap [Configuration, AccountEmails, Networking]
+  NetworkingAccountId:
+    Value: !Ref NetworkingAccount
   SandboxAccountEmail:
     Value: !FindInMap [Configuration, AccountEmails, Sandbox]
   SandboxAccountId:
