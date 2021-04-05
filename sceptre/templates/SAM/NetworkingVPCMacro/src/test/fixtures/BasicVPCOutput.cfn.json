@@ -999,6 +999,25 @@
       "Description": "IPv4 CIDR of the Public Tier of VPC",
       "Value": "10.0.0.0/24"
     },
+    "VPCPublicSubnetIds": {
+      "Description": "Subnet IDs of the Public Tier of VPC",
+      "Value": {
+        "Fn::Join": [
+          ",",
+          [
+            {
+              "Ref": "VPCPublicA"
+            },
+            {
+              "Ref": "VPCPublicB"
+            },
+            {
+              "Ref": "VPCPublicC"
+            }
+          ]
+        ]
+      }
+    },
     "VPCPublicNACLId": {
       "Description": "NACL ID of the Public Tier of VPC",
       "Value": {
@@ -1008,6 +1027,25 @@
     "VPCPrivateTierCIDR": {
       "Description": "IPv4 CIDR of the Private Tier of VPC",
       "Value": "10.0.1.0/24"
+    },
+    "VPCPrivateSubnetIds": {
+      "Description": "Subnet IDs of the Private Tier of VPC",
+      "Value": {
+        "Fn::Join": [
+          ",",
+          [
+            {
+              "Ref": "VPCPrivateA"
+            },
+            {
+              "Ref": "VPCPrivateB"
+            },
+            {
+              "Ref": "VPCPrivateC"
+            }
+          ]
+        ]
+      }
     },
     "VPCPrivateNACLId": {
       "Description": "NACL ID of the Private Tier of VPC",
@@ -1019,6 +1057,25 @@
       "Description": "IPv4 CIDR of the Restricted Tier of VPC",
       "Value": "10.0.2.0/24"
     },
+    "VPCRestrictedSubnetIds": {
+      "Description": "Subnet IDs of the Restricted Tier of VPC",
+      "Value": {
+        "Fn::Join": [
+          ",",
+          [
+            {
+              "Ref": "VPCRestrictedA"
+            },
+            {
+              "Ref": "VPCRestrictedB"
+            },
+            {
+              "Ref": "VPCRestrictedC"
+            }
+          ]
+        ]
+      }
+    },
     "VPCRestrictedNACLId": {
       "Description": "NACL ID of the Restricted Tier of VPC",
       "Value": {
@@ -1028,6 +1085,25 @@
     "VPCNetworkingTierCIDR": {
       "Description": "IPv4 CIDR of the Networking Tier of VPC",
       "Value": "10.0.3.0/24"
+    },
+    "VPCNetworkingSubnetIds": {
+      "Description": "Subnet IDs of the Networking Tier of VPC",
+      "Value": {
+        "Fn::Join": [
+          ",",
+          [
+            {
+              "Ref": "VPCNetworkingA"
+            },
+            {
+              "Ref": "VPCNetworkingB"
+            },
+            {
+              "Ref": "VPCNetworkingC"
+            }
+          ]
+        ]
+      }
     },
     "VPCNetworkingNACLId": {
       "Description": "NACL ID of the Networking Tier of VPC",

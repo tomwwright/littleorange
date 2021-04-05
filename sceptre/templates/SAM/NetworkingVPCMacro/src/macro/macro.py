@@ -150,6 +150,18 @@ class NetworkingVPCMacro(object):
           "Value": str(tier["CIDR"])
       }
 
+      self.template["Outputs"][f"{tier['ResourceName']}SubnetIds"] = {
+          "Description": f"Subnet IDs of the {tier['Name']} Tier of {vpc.name}",
+          "Value": {
+            "Fn::Join": [
+              ",",
+              [
+                {"Ref": f"{subnet['ResourceName']}"} for subnet in tier["Subnets"]
+              ]
+            ]
+          }
+      }
+
       naclResourceName = f"{tier['ResourceName']}NACL"
       self.template["Resources"][naclResourceName] = {
           "Type": "AWS::EC2::NetworkAcl",
