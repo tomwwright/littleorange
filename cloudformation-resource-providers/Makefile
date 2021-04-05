@@ -30,3 +30,6 @@ CreateKMSKeyAliasForCloudFormationCLI: KmsKeyId=$(shell aws cloudformation descr
 CreateKMSKeyAliasForCloudFormationCLI:
 	$(info [+] Creating KMS Key Alias for CloudFormationManagedUploadInfrastructure (${KmsKeyId}))
 	aws kms create-alias --alias-name alias/CloudFormationManagedUploadInfrastructure --target-key-id ${KmsKeyId}
+
+HackPipenvForCloudFormationCLI:
+	pip install 'urllib3<1.26' 'colorama>=0.4.1' 'networkx~=2.4'

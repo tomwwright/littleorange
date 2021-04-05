@@ -9,6 +9,7 @@ phases:
       python: 3.8
     commands:
       - make Pipenv
+      - pipenv run make HackPipenvForCloudFormationCLI
   build:
     commands:
       - pipenv run make ValidateResourceProvider SubmitResourceProvider ResourceProvider=${ResourceProvider}

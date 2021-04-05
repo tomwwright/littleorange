@@ -7,9 +7,9 @@ verify_ssl = true
 autopep8 = "*"
 boto3-stubs = {extras = ["organizations"],version = "*"}
 cfn-response = "*"
-cloudformation-cli = "*"
+cloudformation-cli = "==0.2.7"
 cloudformation-cli-python-plugin = "*"
-cloudformation-cli-python-lib = ">=2.1.5"
+cloudformation-cli-python-lib = "==2.1.5"
 mypy = "*"
 moto = "*"
 
