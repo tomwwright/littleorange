@@ -9,12 +9,17 @@ Metadata:
         - E3001
 Parameters:
   VPCCIDR:
+    Description: The IPv4 CIDR range of the VPC
+    Type: String
+  AvailabilityZones:
+    Description: The number of AZs to deploy subnets for in the VPC
     Type: String
 Resources:
   VPC:
     Type: LittleOrange::Networking::VPC
     Properties:
-      AvailabilityZones: 2
+      AvailabilityZones: 
+        Ref: AvailabilityZones
       CIDR:
         Ref: VPCCIDR
       InternetGateway: false
