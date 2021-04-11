@@ -1,7 +1,7 @@
 ---
 template_path: Networking/VPCMacroProxiedStackSets.cfn.yaml
 dependencies:
-  - Core/VPCMacro.yaml
+  - Core/Networking/VPCMacro.yaml
 parameters:
   OrganizationRootId: !stack_output Core/Organization.yaml::RootId
   Regions: "{{ var.enabled_regions | join(',') }}"
