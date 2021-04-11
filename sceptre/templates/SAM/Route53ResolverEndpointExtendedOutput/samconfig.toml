@@ -1,0 +1,11 @@
+version = 0.1
+[default.build.parameters]
+manifest = "requirements.txt"
+template_file = "Route53ResolverEndpointExtendedOutput.sam.yml"
+
+[default.package.parameters]
+s3_bucket = "littleorange-sam-deployment-resources"
+output_template_file = "template.cfn.yaml"
+
+[default.deploy.parameters]
+s3_bucket = "littleorange-sam-deployment-resources"

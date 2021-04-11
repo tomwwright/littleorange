@@ -17,9 +17,9 @@ Parameters:
   ResolverEndpointSubnetIds:
     Description: List of 3 VPC Subnet IDs to use for deploying Resolver Endpoint
     Type: List<AWS::EC2::Subnet::Id>
-  ResolverEndpointIpAddresses:
-    Description: List of 3 IP Addresses to use for deploying Resolver Endpoint that correspond with ResolverEndpointSubnetIds
-    Type: CommaDelimitedList
+  Route53ResolverEndpointExtendedOutputServiceToken:
+    Description: Service Token for CloudFormation Custom Resource to provide extra outputs for AWS::Route53::ResolverEndpoint
+    Type: String
 Resources:
   ResolverEndpointSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -44,12 +44,9 @@ Resources:
     Properties: 
       Direction: INBOUND
       IpAddresses: 
-        - Ip: !Select [0, !Ref ResolverEndpointIpAddresses]
-          SubnetId: !Select [0, !Ref ResolverEndpointSubnetIds]
-        - Ip: !Select [1, !Ref ResolverEndpointIpAddresses]
-          SubnetId: !Select [1, !Ref ResolverEndpointSubnetIds]
-        - Ip: !Select [2, !Ref ResolverEndpointIpAddresses]
-          SubnetId: !Select [2, !Ref ResolverEndpointSubnetIds]
+        - SubnetId: !Select [0, !Ref ResolverEndpointSubnetIds]
+        - SubnetId: !Select [1, !Ref ResolverEndpointSubnetIds]
+        - SubnetId: !Select [2, !Ref ResolverEndpointSubnetIds]
       Name: Little Orange Inbound Resolver
       SecurityGroupIds: 
         - !Ref ResolverEndpointSecurityGroup
@@ -67,6 +64,12 @@ Resources:
       SecurityGroupIds: 
         - !Ref ResolverEndpointSecurityGroup
 
+  ResolverEndpointExtendedOutput:
+    Type: Custom::Route53ResolverEndpointExtendedOutput
+    Properties:
+      ServiceToken: !Ref Route53ResolverEndpointExtendedOutputServiceToken
+      ResolverEndpointId: !Ref ResolverEndpointInbound
+
   ResolverRule:
     Type: AWS::Route53Resolver::ResolverRule
     Properties: 
@@ -75,9 +78,9 @@ Resources:
       ResolverEndpointId: !Ref ResolverEndpointOutbound
       RuleType: FORWARD
       TargetIps:
-        - Ip: !Select [0, !Ref ResolverEndpointIpAddresses]
-        - Ip: !Select [1, !Ref ResolverEndpointIpAddresses]
-        - Ip: !Select [2, !Ref ResolverEndpointIpAddresses]
+        - Ip: !Select [0, !GetAtt ResolverEndpointExtendedOutput.IpAddresses]
+        - Ip: !Select [1, !GetAtt ResolverEndpointExtendedOutput.IpAddresses]
+        - Ip: !Select [2, !GetAtt ResolverEndpointExtendedOutput.IpAddresses]
   
   ResolverRuleShare:
     Type: AWS::RAM::ResourceShare
@@ -92,3 +95,6 @@ Outputs:
   ResolverRuleArn:
     Description: Resolver Rule ARN for Little Orange AWS DNS
     Value: !GetAtt ResolverRule.Arn
+  ResolverInboundEndpointIpAddresses:
+    Description: IP Addresses for the Route 53 Resolver Inbound Endpoint
+    Value: !Join [",", !GetAtt ResolverEndpointExtendedOutput.IpAddresses]
