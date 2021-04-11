@@ -69,3 +69,9 @@ https://aws.amazon.com/blogs/aws/the-next-evolution-in-aws-single-sign-on/
 ## Service Catalog for VPC Deployment
 
 ![Service Catalog for VPC Deployment](./ServiceCatalogNetworking.png)
+
+## Centralised DNS with Route 53 Resolver
+
+![Centralised DNS with Route 53 Resolver](./Route53Resolver.png)
+
+![Resolving DNS between VPCs with Route 53 Resolver](./Route53ResolverVPCs.png)

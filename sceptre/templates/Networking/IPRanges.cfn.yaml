@@ -1,0 +1,34 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: Little Orange IP Ranges
+Parameters:
+  OrganizationAccountId:
+    Description: ID of the Little Orange Organization management account
+    Type: String
+  OrganizationId:
+    Description: ID of the Little Orange Organization
+    Type: String
+Resources:
+  PrefixList:
+    Type: AWS::EC2::PrefixList
+    Properties: 
+      AddressFamily: IPv4
+      Entries: 
+        - Cidr: 10.1.0.0/16
+          Description: Little Orange IPv4 CIDR Range
+      MaxEntries: 20
+      PrefixListName: LittleOrangeIpRanges
+
+  PrefixListShare:
+    Type: AWS::RAM::ResourceShare
+    Properties:
+      AllowExternalPrincipals: false
+      Name: LittleOrangeIPRanges
+      Principals:
+        - !Sub arn:aws:organizations::${OrganizationAccountId}:organization/${OrganizationId}
+      ResourceArns:
+        - !GetAtt PrefixList.Arn
+Outputs:
+  PrefixListId:
+    Description: Prefix List ID of the Little Orange IPv4 CIDR Range
+    Value: !Ref PrefixList

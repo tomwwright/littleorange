@@ -1,0 +1,94 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: Little Orange VPC for DNS
+Parameters:
+  DnsVpcId:
+    Description: VPC ID to deploy Resolver Endpoint
+    Type: AWS::EC2::VPC::Id
+  IpRangesPrefixListId:
+    Description: Prefix List ID for the CIDRs to allow to reach Resolver Endpoint
+    Type: String
+  OrganizationAccountId:
+    Description: ID of the Little Orange Organization management account
+    Type: String
+  OrganizationId:
+    Description: ID of the Little Orange Organization
+    Type: String
+  ResolverEndpointSubnetIds:
+    Description: List of 3 VPC Subnet IDs to use for deploying Resolver Endpoint
+    Type: List<AWS::EC2::Subnet::Id>
+  ResolverEndpointIpAddresses:
+    Description: List of 3 IP Addresses to use for deploying Resolver Endpoint that correspond with ResolverEndpointSubnetIds
+    Type: CommaDelimitedList
+Resources:
+  ResolverEndpointSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: String
+      GroupName: LittleOrangeResolverEndpoints
+      SecurityGroupIngress: 
+        - Description: Allow Little Orange CIDR on TCP 53
+          FromPort: 53
+          IpProtocol: tcp
+          SourcePrefixListId: !Ref IpRangesPrefixListId
+          ToPort: 53
+        - Description: Allow Little Orange CIDR on UDP 53
+          FromPort: 53
+          IpProtocol: udp
+          SourcePrefixListId: !Ref IpRangesPrefixListId
+          ToPort: 53
+      VpcId: !Ref DnsVpcId
+
+  ResolverEndpointInbound:
+    Type: AWS::Route53Resolver::ResolverEndpoint
+    Properties: 
+      Direction: INBOUND
+      IpAddresses: 
+        - Ip: !Select [0, !Ref ResolverEndpointIpAddresses]
+          SubnetId: !Select [0, !Ref ResolverEndpointSubnetIds]
+        - Ip: !Select [1, !Ref ResolverEndpointIpAddresses]
+          SubnetId: !Select [1, !Ref ResolverEndpointSubnetIds]
+        - Ip: !Select [2, !Ref ResolverEndpointIpAddresses]
+          SubnetId: !Select [2, !Ref ResolverEndpointSubnetIds]
+      Name: Little Orange Inbound Resolver
+      SecurityGroupIds: 
+        - !Ref ResolverEndpointSecurityGroup
+
+  ResolverEndpointOutbound:
+    Type: AWS::Route53Resolver::ResolverEndpoint
+    DependsOn: [ResolverEndpointInbound]
+    Properties: 
+      Direction: OUTBOUND
+      IpAddresses: 
+        - SubnetId: !Select [0, !Ref ResolverEndpointSubnetIds]
+        - SubnetId: !Select [1, !Ref ResolverEndpointSubnetIds]
+        - SubnetId: !Select [2, !Ref ResolverEndpointSubnetIds]
+      Name: Little Orange Outbound Resolver
+      SecurityGroupIds: 
+        - !Ref ResolverEndpointSecurityGroup
+
+  ResolverRule:
+    Type: AWS::Route53Resolver::ResolverRule
+    Properties: 
+      DomainName: littleorange.aws
+      Name: Little Orange AWS DNS Resolver
+      ResolverEndpointId: !Ref ResolverEndpointOutbound
+      RuleType: FORWARD
+      TargetIps:
+        - Ip: !Select [0, !Ref ResolverEndpointIpAddresses]
+        - Ip: !Select [1, !Ref ResolverEndpointIpAddresses]
+        - Ip: !Select [2, !Ref ResolverEndpointIpAddresses]
+  
+  ResolverRuleShare:
+    Type: AWS::RAM::ResourceShare
+    Properties:
+      AllowExternalPrincipals: false
+      Name: LittleOrangeDNS
+      Principals:
+        - !Sub arn:aws:organizations::${OrganizationAccountId}:organization/${OrganizationId}
+      ResourceArns:
+        - !GetAtt ResolverRule.Arn
+Outputs:
+  ResolverRuleArn:
+    Description: Resolver Rule ARN for Little Orange AWS DNS
+    Value: !GetAtt ResolverRule.Arn

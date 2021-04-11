@@ -1,0 +1,12 @@
+---
+template_path: Networking/Route53Resolver.cfn.yaml
+parameters:
+  DnsVpcId: !stack_output Networking/DNSVPC.yaml::VpcId
+  IpRangesPrefixListId: !stack_output Networking/IPRanges.yaml::PrefixListId
+  OrganizationAccountId: !stack_output Core/Organization.yaml::MasterAccountId
+  OrganizationId: !stack_output Core/Organization.yaml::OrganizationId
+  ResolverEndpointIpAddresses:
+    - 10.1.1.68
+    - 10.1.1.84
+    - 10.1.1.100
+  ResolverEndpointSubnetIds: !stack_output Networking/DNSVPC.yaml::VpcPrivateSubnetIds
