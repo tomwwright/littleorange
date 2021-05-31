@@ -1,0 +1,41 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: Little Orange Global Network
+Parameters:
+  TransitGatewayArn:
+    Description: Transit Gateway ARN to attach to Global Network
+    Type: String
+Resources:
+  GlobalNetwork:
+    Type: AWS::NetworkManager::GlobalNetwork
+    Properties:
+      Description: Little Orange Global Network
+      Tags:
+        - Key: Name
+          Value: LittleOrangeGlobalNetwork
+
+  TransitGatewayRegistration:
+    Type: AWS::NetworkManager::TransitGatewayRegistration
+    Properties: 
+      GlobalNetworkId: !Ref GlobalNetwork
+      TransitGatewayArn: !Ref TransitGatewayArn
+
+  EventsLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /LittleOrange/Networking/NetworkManagerEvents
+      RetentionInDays: 365
+
+  EventsRule:
+    Type: AWS::Events::Rule
+    Properties: 
+      Description: Little Orange logging of Network Manager Events
+      EventPattern:
+        source: ["aws.networkmanager"]
+      Targets:
+        - Id: CloudWatchLogs
+          Arn: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${EventsLogGroup}
+
+Outputs:
+  GlobalNetworkId:
+    Value: !Ref GlobalNetwork

@@ -1,0 +1,63 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: Little Orange Network Manager Event Forwarding from Oregon (us-west-2)
+Resources:
+
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /LittleOrange/
+      Policies:
+        - PolicyName: AllowPublish
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: sns:Publish
+                Resource: !Ref LambdaInvokeTopic
+
+  TransitGatewayRouteManager:
+    Type: AWS::Events::Rule
+    Properties: 
+      Description: Little Orange cross-region forwarding of events for Transit Gateway Route Manager
+      EventPattern:
+        source: ["aws.networkmanager"]
+        detail-type: ["Network Manager Topology Change"]
+        detail:
+          changeType:
+            - VPC-ATTACHMENT-CREATED
+            - VPC-ATTACHMENT-DELETED
+      RoleArn: !GetAtt Role.Arn
+      Targets:
+        - Id: SNS
+          Arn: !Ref LambdaInvokeTopic
+
+  LambdaInvokeTopic:
+    Type: AWS::SNS::Topic # invoke must be performed via SNS as EventBridge cross-region rules to ap-southeast-2 not yet supported
+    Properties:
+      TopicName: LittleOrangeTransitGatewayRouteManager
+      Subscription:
+        - Endpoint: arn:aws:lambda:ap-southeast-2:730376727266:function:LittleOrange-Networking-TransitGateway-SnsFunction-gQvdXn3UkX88
+          Protocol: lambda
+  
+  LambdaInvokeTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties: 
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowEventBridge
+            Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sns:Publish
+            Resource: !Ref LambdaInvokeTopic
+      Topics: 
+        - !Ref LambdaInvokeTopic

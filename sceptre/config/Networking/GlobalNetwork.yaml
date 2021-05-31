@@ -1,0 +1,4 @@
+---
+template_path: Networking/GlobalNetwork.cfn.yaml
+parameters:
+  TransitGatewayArn: !stack_output Networking/TransitGateway.yaml::TransitGatewayArn

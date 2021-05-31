@@ -52,5 +52,7 @@ Resources:
           Value: LittleOrangeIsolated
       TransitGatewayId: !Ref TransitGateway
 Outputs:
+  TransitGatewayArn:
+    Value: !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway/${TransitGateway}
   TransitGatewayId:
     Value: !Ref TransitGateway
