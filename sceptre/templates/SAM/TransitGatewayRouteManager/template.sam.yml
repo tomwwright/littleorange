@@ -8,18 +8,41 @@ Resources:
     Properties:
       Description: Manages CloudFormation stacks for Transit Gateway Attachments route table associations and propagation
       CodeUri: ./src
-      Handler: app.handler
+      Handler: transit_gateway_route_manager.app.handler
+      MemorySize: 128
+      Runtime: python3.8
+      Role: !GetAtt Role.Arn
+      Timeout: 120
+      Events:
+        NetworkManagerTopologyEvents:
+          Type: EventBridgeRule
+          Properties:
+            Pattern:
+              source: ["aws.networkmanager"]
+              detail-type: ["Network Manager Topology Change"]
+              detail:
+                changeType:
+                  - VPC-ATTACHMENT-CREATED
+                  - VPC-ATTACHMENT-DELETED
+
+  SnsFunction: # provide Function that expects SNS to support cross-region invocation
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: Manages CloudFormation stacks for Transit Gateway Attachments route table associations and propagation (handles SNS payload)
+      CodeUri: ./src
+      Handler: transit_gateway_route_manager.app.snshandler
       MemorySize: 128
       Runtime: python3.8
       Role: !GetAtt Role.Arn
       Timeout: 120
 
-  CloudFormationCustomResourcePermission:
+  SnsFunctionPermission:
     Type: AWS::Lambda::Permission
-    Properties:
+    Properties: 
       Action: lambda:InvokeFunction
-      FunctionName: !GetAtt CloudFormationCustomResourceFunction.Arn
-      Principal: events.amazonaws.com
+      FunctionName: !GetAtt SnsFunction.Arn
+      Principal: sns.amazonaws.com
+      SourceArn: !Sub arn:aws:sns:us-west-2:${AWS::AccountId}:LittleOrangeTransitGatewayRouteManager
 
   Role:
     Type: AWS::IAM::Role
@@ -73,7 +96,3 @@ Resources:
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                 Resource: "*"
-
-Outputs:
-  ServiceToken:
-    Value: !GetAtt CloudFormationCustomResourceFunction.Arn

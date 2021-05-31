@@ -150,6 +150,10 @@ def handler(event, context):
     if event["detail"]["changeType"] == "VPC-ATTACHMENT-DELETED":
         handle_detach(event["detail"]["transitGatewayAttachmentArn"])
 
+def snshandler(sns_event, context):
+  event = json.loads(sns_event["Records"][0]["Sns"]["Message"])
+  return handler(event, context)
+
 
 if __name__ == '__main__':
     template = stack.generate_cdk_stack_template("ATTACHMENT_ID", "ASSOCIATE_WITH", [
