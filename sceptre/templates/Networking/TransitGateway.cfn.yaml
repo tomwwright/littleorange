@@ -1,0 +1,56 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  OrganizationAccountId:
+    Description: ID of the Little Orange Organization management account
+    Type: String
+  OrganizationId:
+    Description: ID of the Little Orange Organization
+    Type: String
+Resources:
+  TransitGateway:
+    Type: AWS::EC2::TransitGateway
+    Properties:
+      AmazonSideAsn: 65000
+      Description: Little Orange Transit Gateway
+      AutoAcceptSharedAttachments: "enable"
+      DefaultRouteTableAssociation: "disable"
+      DefaultRouteTablePropagation: "disable"
+      DnsSupport: "enable"
+
+  TransitGatewayShare:
+    Type: AWS::RAM::ResourceShare
+    Properties:
+      AllowExternalPrincipals: false
+      Name: LittleOrangeTransitGateway
+      Principals:
+        - !Sub arn:aws:organizations::${OrganizationAccountId}:organization/${OrganizationId}
+      ResourceArns:
+        - !Sub "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway/${TransitGateway}"
+
+  ServicesRouteTable:
+    Type: AWS::EC2::TransitGatewayRouteTable
+    Properties: 
+      Tags: 
+        - Key: Name
+          Value: LittleOrangeServices
+      TransitGatewayId: !Ref TransitGateway
+  
+  EastWestRouteTable:
+    Type: AWS::EC2::TransitGatewayRouteTable
+    Properties: 
+      Tags: 
+        - Key: Name
+          Value: LittleOrangeEastWest
+      TransitGatewayId: !Ref TransitGateway
+  
+  IsolatedRouteTable:
+    Type: AWS::EC2::TransitGatewayRouteTable
+    Properties: 
+      Tags: 
+        - Key: Name
+          Value: LittleOrangeIsolated
+      TransitGatewayId: !Ref TransitGateway
+Outputs:
+  TransitGatewayId:
+    Value: !Ref TransitGateway

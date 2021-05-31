@@ -1,0 +1,5 @@
+---
+template_path: Networking/TransitGateway.cfn.yaml
+parameters:
+  OrganizationAccountId: !stack_output Core/Organization.yaml::MasterAccountId
+  OrganizationId: !stack_output Core/Organization.yaml::OrganizationId

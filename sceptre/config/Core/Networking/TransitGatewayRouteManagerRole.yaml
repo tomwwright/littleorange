@@ -1,0 +1,10 @@
+---
+template_path: Networking/TransitGatewayRouteManagerRoleStacks.cfn.yaml
+parameters:
+  NetworkingAccountId: !stack_output Core/Organization.yaml::NetworkingAccountId
+  OrganizationRootId: !stack_output Core/Organization.yaml::RootId
+  RoleStackTemplateUrl: !UploadS3
+    Bucket: littleorange-sam-deployment-resources
+    Content: !file_contents "{{ project_path }}/templates/Networking/TransitGatewayRouteManagerRole.cfn.yaml"
+    Key: Sceptre/TransitGatewayRouteManagerRole
+

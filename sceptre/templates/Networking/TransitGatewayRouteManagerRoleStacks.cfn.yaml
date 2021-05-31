@@ -1,0 +1,40 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: Little Orange Transit Gateway Route Manager IAM Role Stacks
+Parameters:
+  NetworkingAccountId:
+    Description: Account ID of the Little Orange Networking account
+    Type: String
+  OrganizationRootId:
+    Description: Root ID of the Little Orange Organization
+    Type: String
+  RoleStackTemplateUrl:
+    Description: S3 URL of uploaded CloudFormation template to deploy Transit Gateway Route Manager Role
+    Type: String
+Resources:
+  RoleStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        AssumingAccountId: !Ref NetworkingAccountId
+      TemplateURL: !Ref RoleStackTemplateUrl
+
+  RoleStackSet:
+    Type: AWS::CloudFormation::StackSet
+    Properties:
+      AutoDeployment:
+        Enabled: true
+        RetainStacksOnAccountRemoval: true
+      Capabilities:
+        - CAPABILITY_NAMED_IAM
+      Description: Transit Gateway Route Manager Role across Organization
+      Parameters:
+        - ParameterKey: AssumingAccountId
+          ParameterValue: !Ref NetworkingAccountId
+      PermissionModel: SERVICE_MANAGED
+      StackInstancesGroup:
+        - DeploymentTargets:
+            OrganizationalUnitIds: [!Ref OrganizationRootId]
+          Regions: [!Ref "AWS::Region"]
+      StackSetName: TransitGatewayRouteManagerRoles
+      TemplateURL: !Ref RoleStackTemplateUrl

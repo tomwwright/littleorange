@@ -1,0 +1,32 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange Transit Gateway Route Manager IAM Role
+Parameters:
+  AssumingAccountId:
+    AllowedPattern: "[0-9]{12}"
+    Description: Account ID to be allowed to assume role
+    Type: String
+Resources:
+  TransitGatewayRouteManagerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              AWS:
+                - !Sub arn:aws:iam::${AssumingAccountId}:root
+      Path: /LittleOrange/
+      Policies:
+        - PolicyName: ReadTransitGateway
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action:
+                  - ec2:DescribeTransitGatewayAttachments
+                  - ec2:DescribeTransitGatewayRouteTables
+                Resource: '*'
+                Effect: Allow
+      RoleName: TransitGatewayRouteManagerRole
