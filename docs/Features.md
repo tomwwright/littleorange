@@ -75,3 +75,7 @@ https://aws.amazon.com/blogs/aws/the-next-evolution-in-aws-single-sign-on/
 ![Centralised DNS with Route 53 Resolver](./Route53Resolver.png)
 
 ![Resolving DNS between VPCs with Route 53 Resolver](./Route53ResolverVPCs.png)
+
+## Transit Gateway
+
+![Automated management of Transit Gateway VPC Attachments](./TransitGatewayRouteManager.png)
