@@ -3,6 +3,9 @@ from aws_cdk import (
     aws_ec2 as Ec2
 )
 
+# the AWS CDK was originally used to generate the stack -- but there is an internal dependency on node that breaks AWS CDK in non-node Lambda
+# https://github.com/aws/jsii/issues/2129
+
 class TransitGatewayAttachmentStack(Cdk.Stack):
 
   def __init__(self, scope: Cdk.Construct, id: str,
@@ -27,7 +30,6 @@ class TransitGatewayAttachmentStack(Cdk.Stack):
         transit_gateway_attachment_id=transit_gateway_attachment_id,
         transit_gateway_route_table_id=route_table_id
       )
-
 
 def generate_cdk_stack_template(transit_gateway_attachment_id, association_route_table_id, propagation_route_table_ids):
 

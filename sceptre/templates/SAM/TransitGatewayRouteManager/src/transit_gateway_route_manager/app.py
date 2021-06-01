@@ -2,7 +2,6 @@ import botocore
 import boto3
 import logging
 import json
-from . import stack
 
 
 logger = logging.getLogger(__name__)
@@ -69,6 +68,28 @@ def enumerate_transit_gateway_route_tables(transit_gateway_id):
 
     return route_tables_mapping
 
+def cloudformation_template(transit_gateway_attachment_id, associate_with, propagate_to):
+    return {
+        "Description": f"Transit Gateway Route Manager stack for {transit_gateway_attachment_id}",
+        "Resources": {
+            "RouteTableAssociation": {
+                "Type": "AWS::EC2::TransitGatewayRouteTableAssociation",
+                "Properties": {
+                    "TransitGatewayAttachmentId": transit_gateway_attachment_id,
+                    "TransitGatewayRouteTableId": associate_with
+                },
+            },
+            **{
+                f"RouteTablePropagation{i}": {
+                    "Type": "AWS::EC2::TransitGatewayRouteTablePropagation",
+                    "Properties": {
+                        "TransitGatewayAttachmentId": transit_gateway_attachment_id,
+                        "TransitGatewayRouteTableId": propagate_to[i]
+                    }
+                } for i in range(0, len(propagate_to))
+            }
+        }
+    }
 
 def generate_stack_template(transit_gateway_attachment_arn):
 
@@ -83,7 +104,7 @@ def generate_stack_template(transit_gateway_attachment_arn):
     associate_with = route_tables_mapping[associate_with]
     propagate_to = [route_tables_mapping[name] for name in propagate_to]
 
-    template = stack.generate_cdk_stack_template(
+    template = cloudformation_template(
         transit_gateway_attachment_id, associate_with, propagate_to)
     return template
 
@@ -156,6 +177,5 @@ def snshandler(sns_event, context):
 
 
 if __name__ == '__main__':
-    template = stack.generate_cdk_stack_template("ATTACHMENT_ID", "ASSOCIATE_WITH", [
-                                  "PROPAGATE_1", "PROPAGATE_2"])
-    print(template)
+    print(cloudformation_template("ATTACHMENT_ID", "ASSOCIATE_WITH", [
+                                  "PROPAGATE_1", "PROPAGATE_2"]))
