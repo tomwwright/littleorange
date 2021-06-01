@@ -60,7 +60,7 @@ Resources:
           PolicyDocument:
             Statement:
               - Effect: Allow
-                Action: iam:AssumeRole
+                Action: sts:AssumeRole
                 Resource: arn:aws:iam::*:role/LittleOrange/TransitGatewayRouteManagerRole
         - PolicyName: ManageRouteManagerStacks
           PolicyDocument:

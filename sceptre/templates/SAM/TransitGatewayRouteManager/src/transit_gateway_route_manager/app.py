@@ -10,7 +10,7 @@ logger.setLevel(logging.INFO)
 
 def assume_role(account_id, region):
     sts = boto3.client("sts")
-    role_name = "TransitGatewayRouteManagerRole"
+    role_name = "LittleOrange/TransitGatewayRouteManagerRole"
 
     credentials = sts.assume_role(
         RoleArn=f"arn:aws:iam::{account_id}:role/{role_name}", RoleSessionName="TransitGatewayRouteManager")
@@ -41,6 +41,8 @@ def discover_attachment_tags(transit_gateway_attachment_arn):
     transit_gateway_id = response["TransitGatewayAttachments"][0]["TransitGatewayId"]
     tags_as_dict = {tag["Key"]: tag["Value"]
                     for tag in response["TransitGatewayAttachments"][0]["Tags"]}
+
+    logger.info(f"EC2 DescribeTransitGatewayAttachments {response}")
 
     return transit_gateway_id, tags_as_dict.get("TransitGateway:AssociateWith", "Default"), tags_as_dict.get("TransitGateway:PropagateTo", "Default").split(",")
 
@@ -97,6 +99,12 @@ def generate_stack_template(transit_gateway_attachment_arn):
         "/")
     transit_gateway_id, associate_with, propagate_to = discover_attachment_tags(
         transit_gateway_attachment_arn)
+    logger.info({
+        "transitGatewayAttachmentId": transit_gateway_attachment_id,
+        "transitGatewayId": transit_gateway_id,
+        "associateWith": associate_with,
+        "propagateTo": propagate_to
+    })
 
     route_tables_mapping = enumerate_transit_gateway_route_tables(
         transit_gateway_id)
