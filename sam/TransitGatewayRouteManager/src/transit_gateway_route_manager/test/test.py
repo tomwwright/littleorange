@@ -75,7 +75,7 @@ def setup_transit_gateway_responses(stubs):
       "assume_role",
       {"Credentials": {"AccessKeyId": "AccessKeyIdXXXXX", "SecretAccessKey": "SecretAccessKey",
                         "SessionToken": "SessionToken", "Expiration": datetime.datetime.now()}},
-      expected_params={"RoleArn": "arn:aws:iam::730376727266:role/TransitGatewayRouteManagerRole",
+      expected_params={"RoleArn": "arn:aws:iam::730376727266:role/LittleOrange/TransitGatewayRouteManagerRole",
                         "RoleSessionName": "TransitGatewayRouteManager"}
   )
 
