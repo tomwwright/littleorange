@@ -1,6 +1,10 @@
 ---
 AWSTemplateFormatVersion: 2010-09-09
 Description: Little Orange Network Manager Event Forwarding from Oregon (us-west-2)
+Parameters:
+  TransitGatewayRouteManagerFunctionArn:
+    Description: Function ARN to invoke with Network Manager events
+    Type: String
 Resources:
 
   Role:
@@ -44,7 +48,7 @@ Resources:
     Properties:
       TopicName: LittleOrangeTransitGatewayRouteManager
       Subscription:
-        - Endpoint: arn:aws:lambda:ap-southeast-2:730376727266:function:LittleOrange-Networking-TransitGateway-SnsFunction-gQvdXn3UkX88
+        - Endpoint: !Ref TransitGatewayRouteManagerFunctionArn
           Protocol: lambda
   
   LambdaInvokeTopicPolicy:

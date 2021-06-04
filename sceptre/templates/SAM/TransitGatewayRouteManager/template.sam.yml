@@ -96,3 +96,6 @@ Resources:
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                 Resource: "*"
+Outputs:
+  SnsFunctionArn:
+    Value: !GetAtt SnsFunction.Arn

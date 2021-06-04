@@ -1,3 +1,5 @@
 ---
 template_path: Networking/NetworkManagerEvents.cfn.yaml
 region: us-west-2 # Network Manager Events originate in us-west-2
+parameters:
+  TransitGatewayRouteManagerFunctionArn: !stack_output Networking/TransitGatewayRouteManager.yaml::SnsFunctionArn
