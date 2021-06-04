@@ -37,7 +37,7 @@ def build_project(project, logger):
     logger.error(f"Process standard error stream:\n{process.stderr}")
     raise Exception(f'Command failed with error code {process.returncode}')
 
-  with open(f"sceptre/templates/SAM/{project}/template.cfn.yaml", "r") as f:
+  with open(f"sam/{project}/template.cfn.yaml", "r") as f:
     return f.read()
 
 

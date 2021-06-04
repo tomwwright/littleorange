@@ -6,7 +6,7 @@ ignore: |
   cloudformation-resource-providers/*/resource-role.yaml
   cloudformation-resource-providers/*/template.yml
   **/.aws-sam/build/template.yaml
-  **/SAM/*/template.cfn.yaml
+  sam/*/template.cfn.yaml
 
 rules:
   braces:
