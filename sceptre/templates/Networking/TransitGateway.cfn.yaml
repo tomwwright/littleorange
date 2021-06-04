@@ -30,24 +30,24 @@ Resources:
 
   ServicesRouteTable:
     Type: AWS::EC2::TransitGatewayRouteTable
-    Properties: 
-      Tags: 
+    Properties:
+      Tags:
         - Key: Name
           Value: LittleOrangeServices
       TransitGatewayId: !Ref TransitGateway
-  
+
   EastWestRouteTable:
     Type: AWS::EC2::TransitGatewayRouteTable
-    Properties: 
-      Tags: 
+    Properties:
+      Tags:
         - Key: Name
           Value: LittleOrangeEastWest
       TransitGatewayId: !Ref TransitGateway
-  
+
   IsolatedRouteTable:
     Type: AWS::EC2::TransitGatewayRouteTable
-    Properties: 
-      Tags: 
+    Properties:
+      Tags:
         - Key: Name
           Value: LittleOrangeIsolated
       TransitGatewayId: !Ref TransitGateway

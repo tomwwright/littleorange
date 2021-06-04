@@ -38,7 +38,7 @@ Resources:
 
   SnsFunctionPermission:
     Type: AWS::Lambda::Permission
-    Properties: 
+    Properties:
       Action: lambda:InvokeFunction
       FunctionName: !GetAtt SnsFunction.Arn
       Principal: sns.amazonaws.com

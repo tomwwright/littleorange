@@ -3,4 +3,3 @@ template_path: Networking/IPRanges.cfn.yaml
 parameters:
   OrganizationAccountId: !stack_output Core/Organization.yaml::MasterAccountId
   OrganizationId: !stack_output Core/Organization.yaml::OrganizationId
-  

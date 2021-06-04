@@ -23,10 +23,10 @@ Parameters:
 Resources:
   ResolverEndpointSecurityGroup:
     Type: AWS::EC2::SecurityGroup
-    Properties: 
+    Properties:
       GroupDescription: String
       GroupName: LittleOrangeResolverEndpoints
-      SecurityGroupIngress: 
+      SecurityGroupIngress:
         - Description: Allow Little Orange CIDR on TCP 53
           FromPort: 53
           IpProtocol: tcp
@@ -41,27 +41,27 @@ Resources:
 
   ResolverEndpointInbound:
     Type: AWS::Route53Resolver::ResolverEndpoint
-    Properties: 
+    Properties:
       Direction: INBOUND
-      IpAddresses: 
+      IpAddresses:
         - SubnetId: !Select [0, !Ref ResolverEndpointSubnetIds]
         - SubnetId: !Select [1, !Ref ResolverEndpointSubnetIds]
         - SubnetId: !Select [2, !Ref ResolverEndpointSubnetIds]
       Name: Little Orange Inbound Resolver
-      SecurityGroupIds: 
+      SecurityGroupIds:
         - !Ref ResolverEndpointSecurityGroup
 
   ResolverEndpointOutbound:
     Type: AWS::Route53Resolver::ResolverEndpoint
     DependsOn: [ResolverEndpointInbound]
-    Properties: 
+    Properties:
       Direction: OUTBOUND
-      IpAddresses: 
+      IpAddresses:
         - SubnetId: !Select [0, !Ref ResolverEndpointSubnetIds]
         - SubnetId: !Select [1, !Ref ResolverEndpointSubnetIds]
         - SubnetId: !Select [2, !Ref ResolverEndpointSubnetIds]
       Name: Little Orange Outbound Resolver
-      SecurityGroupIds: 
+      SecurityGroupIds:
         - !Ref ResolverEndpointSecurityGroup
 
   ResolverEndpointExtendedOutput:
@@ -72,7 +72,7 @@ Resources:
 
   ResolverRule:
     Type: AWS::Route53Resolver::ResolverRule
-    Properties: 
+    Properties:
       DomainName: littleorange.aws
       Name: Little Orange AWS DNS Resolver
       ResolverEndpointId: !Ref ResolverEndpointOutbound
@@ -81,7 +81,7 @@ Resources:
         - Ip: !Select [0, !GetAtt ResolverEndpointExtendedOutput.IpAddresses]
         - Ip: !Select [1, !GetAtt ResolverEndpointExtendedOutput.IpAddresses]
         - Ip: !Select [2, !GetAtt ResolverEndpointExtendedOutput.IpAddresses]
-  
+
   ResolverRuleShare:
     Type: AWS::RAM::ResourceShare
     Properties:

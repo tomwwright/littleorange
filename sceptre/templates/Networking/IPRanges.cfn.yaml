@@ -11,9 +11,9 @@ Parameters:
 Resources:
   PrefixList:
     Type: AWS::EC2::PrefixList
-    Properties: 
+    Properties:
       AddressFamily: IPv4
-      Entries: 
+      Entries:
         - Cidr: 10.1.0.0/16
           Description: Little Orange IPv4 CIDR Range
       MaxEntries: 20

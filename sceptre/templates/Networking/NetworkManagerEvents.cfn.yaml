@@ -29,7 +29,7 @@ Resources:
 
   TransitGatewayRouteManager:
     Type: AWS::Events::Rule
-    Properties: 
+    Properties:
       Description: Little Orange cross-region forwarding of events for Transit Gateway Route Manager
       EventPattern:
         source: ["aws.networkmanager"]
@@ -50,10 +50,10 @@ Resources:
       Subscription:
         - Endpoint: !Ref TransitGatewayRouteManagerFunctionArn
           Protocol: lambda
-  
+
   LambdaInvokeTopicPolicy:
     Type: AWS::SNS::TopicPolicy
-    Properties: 
+    Properties:
       PolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -63,5 +63,5 @@ Resources:
               Service: events.amazonaws.com
             Action: sns:Publish
             Resource: !Ref LambdaInvokeTopic
-      Topics: 
+      Topics:
         - !Ref LambdaInvokeTopic

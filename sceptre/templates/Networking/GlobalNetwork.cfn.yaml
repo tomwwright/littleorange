@@ -16,7 +16,7 @@ Resources:
 
   TransitGatewayRegistration:
     Type: AWS::NetworkManager::TransitGatewayRegistration
-    Properties: 
+    Properties:
       GlobalNetworkId: !Ref GlobalNetwork
       TransitGatewayArn: !Ref TransitGatewayArn
 
@@ -28,7 +28,7 @@ Resources:
 
   EventsRule:
     Type: AWS::Events::Rule
-    Properties: 
+    Properties:
       Description: Little Orange logging of Network Manager Events
       EventPattern:
         source: ["aws.networkmanager"]

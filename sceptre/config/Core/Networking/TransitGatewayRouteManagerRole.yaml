@@ -7,4 +7,3 @@ parameters:
     Bucket: littleorange-sam-deployment-resources
     Content: !file_contents "{{ project_path }}/templates/Networking/TransitGatewayRouteManagerRole.cfn.yaml"
     Key: Sceptre/TransitGatewayRouteManagerRole
-
