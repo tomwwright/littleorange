@@ -24,7 +24,7 @@ Resources:
   ResolverEndpointSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: String
+      GroupDescription: Little Orange Route53 Resolver Endpoints
       GroupName: LittleOrangeResolverEndpoints
       SecurityGroupIngress:
         - Description: Allow Little Orange CIDR on TCP 53
@@ -98,3 +98,6 @@ Outputs:
   ResolverInboundEndpointIpAddresses:
     Description: IP Addresses for the Route 53 Resolver Inbound Endpoint
     Value: !Join [",", !GetAtt ResolverEndpointExtendedOutput.IpAddresses]
+  ResolverOutboundEndpointId:
+    Description: Route 53 Resolver Outbound Endpoint ID
+    Value: !GetAtt ResolverEndpointOutbound.ResolverEndpointId

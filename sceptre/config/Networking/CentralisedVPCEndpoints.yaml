@@ -1,0 +1,10 @@
+---
+template_path: Networking/CentralisedVPCEndpoints.cfn.yaml
+parameters:
+  OutboundResolverEndpointId: !stack_output Networking/Route53Resolver.yaml::ResolverOutboundEndpointId
+  InboundResolverEndpointIpAddresses: !stack_output Networking/Route53Resolver.yaml::ResolverInboundEndpointIpAddresses
+  IpRangesPrefixListId: !stack_output Networking/IPRanges.yaml::PrefixListId
+  OrganizationAccountId: !stack_output Core/Organization.yaml::MasterAccountId
+  OrganizationId: !stack_output Core/Organization.yaml::OrganizationId
+  SubnetIds: !stack_output Networking/DNSVPC.yaml::VpcNetworkingSubnetIds
+  VpcId: !stack_output Networking/DNSVPC.yaml::VpcId

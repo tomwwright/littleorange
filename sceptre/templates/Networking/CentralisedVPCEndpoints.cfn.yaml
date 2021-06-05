@@ -1,0 +1,177 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: Little Orange Centralised VPC Endpoints
+Parameters:
+  OutboundResolverEndpointId:
+    Description: Route 53 Resolver Outbound Endpoint to use in Resolver Rules
+    Type: String
+  InboundResolverEndpointIpAddresses:
+    Description: List of IP Addresses to forward to in Resolver Rules
+    Type: CommaDelimitedList
+  IpRangesPrefixListId:
+    Description: Prefix List ID for the CIDRs to allow to reach VPC Endpoints
+    Type: String
+  OrganizationAccountId:
+    Description: AWS Organisation management account ID
+    Type: String
+  OrganizationId:
+    Description: AWS Organisation ARN to share Resolver Rules with
+    Type: String
+  SubnetIds:
+    Description: Subnet IDs to deploy VPC Endpoint interfaces into
+    Type: CommaDelimitedList
+  VpcId:
+    Description: VPC ID to deploy VPC Endpoint interfaces into
+    Type: String
+Resources:
+
+  ResolverRulesShare:
+    Type: AWS::RAM::ResourceShare
+    Properties:
+      AllowExternalPrincipals: false
+      Name: LittleOrangeVPCEndpoints
+      Principals:
+        - !Sub arn:aws:organizations::${OrganizationAccountId}:organization/${OrganizationId}
+      ResourceArns:
+        - !GetAtt Ec2MessagesResolverRule.Arn
+        - !GetAtt SsmResolverRule.Arn
+        - !GetAtt SsmMessagesResolverRule.Arn
+
+  VpcEndpointSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Little Orange VPC Endpoints
+      GroupName: LittleOrangeVPCEndpoints
+      SecurityGroupIngress:
+        - Description: Allow Little Orange CIDR on HTTPS
+          FromPort: 443
+          IpProtocol: tcp
+          SourcePrefixListId: !Ref IpRangesPrefixListId
+          ToPort: 443
+      VpcId: !Ref VpcId
+
+  # EC2 Messages
+
+  Ec2MessagesVpcEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      PrivateDnsEnabled: false
+      SecurityGroupIds: [!Ref VpcEndpointSecurityGroup]
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ec2messages
+      SubnetIds: !Ref SubnetIds
+      VpcEndpointType: Interface
+      VpcId: !Ref VpcId
+
+  Ec2MessagesHostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: !Sub ec2messages.${AWS::Region}.amazonaws.com.
+      VPCs: 
+        - VPCId: !Ref VpcId
+          VPCRegion: !Ref "AWS::Region"
+
+  Ec2MessagesHostedZoneRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref Ec2MessagesHostedZone
+      Name: !Sub ec2messages.${AWS::Region}.amazonaws.com.
+      AliasTarget:
+        DNSName: !Select [1, !Split [":" , !Select [0, !GetAtt Ec2MessagesVpcEndpoint.DnsEntries]]]
+        HostedZoneId: !Select [0, !Split [":" , !Select [0, !GetAtt Ec2MessagesVpcEndpoint.DnsEntries]]]
+      Type: A
+
+  Ec2MessagesResolverRule:
+    Type: AWS::Route53Resolver::ResolverRule
+    Properties:
+      DomainName: !Sub ec2messages.${AWS::Region}.amazonaws.com.
+      Name: !Sub Little Orange VPC Endpoint - ec2messages
+      ResolverEndpointId: !Ref OutboundResolverEndpointId
+      RuleType: FORWARD
+      TargetIps:
+        - Ip: !Select [0, !Ref InboundResolverEndpointIpAddresses]
+        - Ip: !Select [1, !Ref InboundResolverEndpointIpAddresses]
+        - Ip: !Select [2, !Ref InboundResolverEndpointIpAddresses]
+
+  # SSM
+
+  SsmVpcEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      PrivateDnsEnabled: false
+      SecurityGroupIds: [!Ref VpcEndpointSecurityGroup]
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ssm
+      SubnetIds: !Ref SubnetIds
+      VpcEndpointType: Interface
+      VpcId: !Ref VpcId
+
+  SsmHostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: !Sub ssm.${AWS::Region}.amazonaws.com.
+      VPCs: 
+        - VPCId: !Ref VpcId
+          VPCRegion: !Ref "AWS::Region"
+
+  SsmHostedZoneRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref SsmHostedZone
+      Name: !Sub ssm.${AWS::Region}.amazonaws.com.
+      AliasTarget:
+        DNSName: !Select [1, !Split [":" , !Select [0, !GetAtt SsmVpcEndpoint.DnsEntries]]]
+        HostedZoneId: !Select [0, !Split [":" , !Select [0, !GetAtt SsmVpcEndpoint.DnsEntries]]]
+      Type: A
+
+  SsmResolverRule:
+    Type: AWS::Route53Resolver::ResolverRule
+    Properties:
+      DomainName: !Sub ssm.${AWS::Region}.amazonaws.com.
+      Name: !Sub Little Orange VPC Endpoint - ssm
+      ResolverEndpointId: !Ref OutboundResolverEndpointId
+      RuleType: FORWARD
+      TargetIps:
+        - Ip: !Select [0, !Ref InboundResolverEndpointIpAddresses]
+        - Ip: !Select [1, !Ref InboundResolverEndpointIpAddresses]
+        - Ip: !Select [2, !Ref InboundResolverEndpointIpAddresses]
+
+  # SSM Messages
+
+  SsmMessagesVpcEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      PrivateDnsEnabled: false
+      SecurityGroupIds: [!Ref VpcEndpointSecurityGroup]
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ssmmessages
+      SubnetIds: !Ref SubnetIds
+      VpcEndpointType: Interface
+      VpcId: !Ref VpcId
+
+  SsmMessagesHostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: !Sub ssmmessages.${AWS::Region}.amazonaws.com.
+      VPCs: 
+        - VPCId: !Ref VpcId
+          VPCRegion: !Ref "AWS::Region"
+
+  SsmMessagesHostedZoneRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref SsmMessagesHostedZone
+      Name: !Sub ssmmessages.${AWS::Region}.amazonaws.com.
+      AliasTarget:
+        DNSName: !Select [1, !Split [":" , !Select [0, !GetAtt SsmMessagesVpcEndpoint.DnsEntries]]]
+        HostedZoneId: !Select [0, !Split [":" , !Select [0, !GetAtt SsmMessagesVpcEndpoint.DnsEntries]]]
+      Type: A
+
+  SsmMessagesResolverRule:
+    Type: AWS::Route53Resolver::ResolverRule
+    Properties:
+      DomainName: !Sub ssmmessages.${AWS::Region}.amazonaws.com.
+      Name: !Sub Little Orange VPC Endpoint - ssmmessages
+      ResolverEndpointId: !Ref OutboundResolverEndpointId
+      RuleType: FORWARD
+      TargetIps:
+        - Ip: !Select [0, !Ref InboundResolverEndpointIpAddresses]
+        - Ip: !Select [1, !Ref InboundResolverEndpointIpAddresses]
+        - Ip: !Select [2, !Ref InboundResolverEndpointIpAddresses]
