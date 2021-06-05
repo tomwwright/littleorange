@@ -1,0 +1,40 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange Security Hub Delegated Administrator delivered via Stack Set
+Parameters:
+  OrganizationRootId:
+    Description: Root ID of the Organization to use as deployment target of Stack Set
+    Type: String
+  Regions:
+    Description: AWS Regions to deploy Stack Set to
+    Type: CommaDelimitedList
+  SecurityHubAccountId:
+    AllowedPattern: "[0-9]{12}"
+    Description: Account ID for the account to enable as Security Hub Delegated Administrator account
+    Type: String
+  SecurityHubDelegatedAdministratorServiceToken:
+    Description: Service Token for CloudFormation Custom Resource to enable Delegated Administrator
+    Type: String
+  StackTemplate:
+    Description: CloudFormation Stack template to deploy in Stack Set
+    Type: String
+Resources:
+  StackSet:
+    Type: AWS::CloudFormation::StackSet
+    Properties:
+      Description: Security Hub Delegated Administrator
+      Parameters:
+        - ParameterKey: AccountId
+          ParameterValue: !Ref SecurityHubAccountId
+        - ParameterKey: OrganizationMasterAccountId
+          ParameterValue: !Ref "AWS::AccountId"
+        - ParameterKey: SecurityHubDelegatedAdministratorServiceToken
+          ParameterValue: !Ref SecurityHubDelegatedAdministratorServiceToken
+      PermissionModel: SELF_MANAGED
+      StackInstancesGroup:
+        - DeploymentTargets:
+            Accounts:
+              - !Ref "AWS::AccountId"
+          Regions: !Ref Regions
+      StackSetName: !Sub "${AWS::StackName}"
+      TemplateBody: !Ref StackTemplate

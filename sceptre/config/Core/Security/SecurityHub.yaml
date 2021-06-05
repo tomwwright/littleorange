@@ -1,0 +1,11 @@
+---
+template_path: Security/SecurityHubDelegatedAdministratorStackSet.cfn.yaml
+dependencies:
+  - Core/CloudFormationRolesStackSet.yaml
+  - Core/CustomResourceProxy.yaml
+parameters:
+  OrganizationRootId: !stack_output Core/Organization.yaml::RootId
+  Regions: "{{ var.enabled_regions | join(',') }}"
+  SecurityHubAccountId: !stack_output Core/Organization.yaml::SecurityAccountId
+  SecurityHubDelegatedAdministratorServiceToken: !stack_output Core/Security/SecurityHubDelegatedAdministrator.yaml::ServiceToken
+  StackTemplate: !file_contents "{{ project_path }}/templates/Security/SecurityHubDelegatedAdministrator.cfn.yaml"

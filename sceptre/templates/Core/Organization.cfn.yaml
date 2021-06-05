@@ -36,6 +36,7 @@ Resources:
         - ServicePrincipal: member.org.stacksets.cloudformation.amazonaws.com # CloudFormation StackSets
         - ServicePrincipal: ram.amazonaws.com # Resource Access Manager
         - ServicePrincipal: servicecatalog.amazonaws.com # Service Catalog
+        - ServicePrincipal: securityhub.amazonaws.com # Security Hub
         - ServicePrincipal: sso.amazonaws.com # Single Sign-On
       FeatureSet: ALL
 
@@ -152,6 +153,7 @@ Resources:
       DelegatedAdministratorServices:
         - config-multiaccountsetup.amazonaws.com
         - guardduty.amazonaws.com
+        - securityhub.amazonaws.com
       Email: !FindInMap [Configuration, AccountEmails, Security]
       Name: Security
       ParentId: !Ref MainOU

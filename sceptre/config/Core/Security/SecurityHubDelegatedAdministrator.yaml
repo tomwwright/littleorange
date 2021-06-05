@@ -4,4 +4,4 @@ dependencies:
   - Core/SAMDeploymentResources.yaml
 sceptre_user_data:
   ApplySAMTranslate: true
-  SAMProject: SecurityHubOnboarding
+  SAMProject: SecurityHubDelegatedAdministrator

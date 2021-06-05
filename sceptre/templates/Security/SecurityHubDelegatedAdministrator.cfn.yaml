@@ -1,0 +1,24 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange Security Delegated Administrator
+Parameters:
+  AccountId:
+    AllowedPattern: "[0-9]{12}"
+    Description: Account ID for the account to enable as Security Hub Delegated Administrator account
+    Type: String
+  OrganizationMasterAccountId:
+    AllowedPattern: "[0-9]{12}"
+    Description: Account ID for the Organization master account to invoke Custom Resource Proxy
+    Type: String
+  SecurityHubDelegatedAdministratorServiceToken:
+    Description: Service Token for CloudFormation Custom Resource to enable Delegated Administrator
+    Type: String
+Resources:
+  DelegatedAdministrator: # invoke onboarding Custom Resource via proxy
+    Type: Custom::SecurityHubDelegatedAdministrator
+    Properties:
+      ServiceToken: !Sub "arn:aws:sns:${AWS::Region}:${OrganizationMasterAccountId}:LittleOrangeCustomResourceProxy"
+      CustomResourceProperties:
+        ServiceToken: !Ref SecurityHubDelegatedAdministratorServiceToken
+        AccountId: !Ref AccountId
+        Region: !Ref "AWS::Region"
