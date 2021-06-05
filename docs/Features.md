@@ -79,3 +79,5 @@ https://aws.amazon.com/blogs/aws/the-next-evolution-in-aws-single-sign-on/
 ## Transit Gateway
 
 ![Automated management of Transit Gateway VPC Attachments](./TransitGatewayRouteManager.png)
+
+![Centralised VPC Endpoints](./CentralisedVPCEndpoints.png)
