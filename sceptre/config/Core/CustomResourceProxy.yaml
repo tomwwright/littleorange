@@ -6,5 +6,5 @@ parameters:
   Regions: "{{ var.enabled_regions | join(',') }}"
   StackTemplateURL: !UploadS3
     Bucket: littleorange-sam-deployment-resources
-    Content: !Command python sceptre/templates/SAM/CustomResourceProxy/CustomResourceProxy.py
+    Content: !Command python sam/CustomResourceProxy/CustomResourceProxy.py
     Key: Sceptre/CustomResourceProxy
