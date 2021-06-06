@@ -4,6 +4,12 @@
 
 ## AWS SAM Support
 
+## AWS Billing
+
+- Cost and Usage Reports
+- AWS Budget: forecasted and actual
+- Cost Explorer Anomaly Detection: daily and weekly
+
 ## AWS CloudTrail
 
 - CloudTrail trail deployed to `Core` account

@@ -1,0 +1,5 @@
+---
+template_path: Core/CostExplorer.cfn.yaml
+parameters:
+  NotificationsEmail: !stack_output Core/Organization.yaml::MasterAccountEmail
+region: us-east-1

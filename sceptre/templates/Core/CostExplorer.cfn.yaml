@@ -1,0 +1,36 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange Cost Explorer
+Parameters:
+  NotificationsEmail:
+    Description: Email address to subscribe to for Cost Explorer notifications
+    Type: String
+Resources:
+  CostExplorerServiceAnomalyMonitor:
+    Type: AWS::CE::AnomalyMonitor
+    Properties:
+      MonitorName: LittleOrangeServiceAnomalyMonitor
+      MonitorDimension: SERVICE
+      MonitorType: DIMENSIONAL
+
+  CostExplorerAnomalyDailySubscription:
+    Type: AWS::CE::AnomalySubscription
+    Properties: 
+      Frequency: DAILY
+      MonitorArnList: [!Ref CostExplorerServiceAnomalyMonitor]
+      Subscribers: 
+        - Address: !Ref NotificationsEmail
+          Type: EMAIL
+      SubscriptionName: LittleOrangeDailyAnomalySubscription
+      Threshold: 5
+  
+  CostExplorerAnomalyWeeklySubscription:
+    Type: AWS::CE::AnomalySubscription
+    Properties: 
+      Frequency: WEEKLY
+      MonitorArnList: [!Ref CostExplorerServiceAnomalyMonitor]
+      Subscribers: 
+        - Address: !Ref NotificationsEmail
+          Type: EMAIL
+      SubscriptionName: LittleOrangeWeeklyAnomalySubscription
+      Threshold: 10
