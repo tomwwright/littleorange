@@ -40,13 +40,10 @@
 
 ## AWS SecurityHub
 
-- SecurityHub Hub deployed across Organization accounts and regions via Stack Set in `Core` account (and Stack Set for `Core` account directly)
-- SecurityHub Hub deployed directly across `Security` account regions via Stack Set in `Security` account
-- Onboarding of Hubs in all accounts as members of `Security` account Hub via SAM Custom Resource in `Core` account
+- SecurityHub Hub deployed across Organization accounts and regions via Stack Set in `Core` account
+- Custom Resource registers `Security` account as Delegated Administrator for Security Hub and handles registering existing accounts as members
 
 ![SecurityHub Architecture](./SecurityHub.png)
-
-![SecurityHub Stacks](./SecurityHubStacks.png)
 
 ## Federated Identify with AWS SSO
 
