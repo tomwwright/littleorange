@@ -2,8 +2,8 @@
 # file renamed from Config.yaml to ConfigService.yaml as Sceptre on MacOS resolves files without case-insensitivity and presumes is is a StackGroup config
 template_path: Security/ConfigStackSets.cfn.yaml
 parameters:
-  ConfigAggregatorAccountId: !stack_output Core/Organization.yaml::MasterAccountId
-  ConfigS3BucketName: !stack_output Core/ConfigAggregator.yaml::ConfigS3BucketName
+  ConfigAggregatorAccountId: !stack_output Core/Organization.yaml::SecurityAccountId
+  ConfigS3BucketName: !stack_output Security/ConfigAggregator.yaml::ConfigS3BucketName
   OrganizationRootId: !stack_output Core/Organization.yaml::RootId
   Regions: "{{ var.enabled_regions | join(',') }}"
   StackTemplate: !file_contents "{{ project_path }}/templates/Security/Config.cfn.yaml"

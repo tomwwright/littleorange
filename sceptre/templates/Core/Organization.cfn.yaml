@@ -151,6 +151,7 @@ Resources:
     Type: LittleOrange::Organizations::Account
     Properties:
       DelegatedAdministratorServices:
+        - config.amazonaws.com
         - config-multiaccountsetup.amazonaws.com
         - guardduty.amazonaws.com
         - securityhub.amazonaws.com
