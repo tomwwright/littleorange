@@ -14,9 +14,9 @@
 ## AWS Config
 
 - AWS Organisation Trusted Access enabled for Config and Config Rules
-- `Security` account enabled as Delegated Administrator for Config Rules
+- `Security` account enabled as Delegated Administrator for Config Rules and Config
 - Config deployed across Organization via Stack Set deployed to `Core` account (and Stack Set for `Core` account directly)
-- Config Aggregator and S3 Bucket for Config snapshots deployed to `Core` account
+- Config Aggregator and S3 Bucket for Config snapshots deployed to `Security` account
 
 ![Config Architecture](./Config.png)
 
