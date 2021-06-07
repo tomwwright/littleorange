@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Little Orange Custom Resource Proxy Stack Set
+Description: 2.2.1 Little Orange Custom Resource Proxy Stack Set
 Parameters:
   AllowedRoleName:
     Description: Role name to allow to publish to the SNS topic of the Custom Resource Proxy to enable cross-account use

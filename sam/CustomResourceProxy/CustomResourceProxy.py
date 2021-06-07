@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+"""
+2.2.1 CloudFormation Custom Resource Proxy
+"""
+
 import os
 import yaml
 
@@ -18,7 +22,7 @@ class CustomResourceProxyStack(Cdk.Stack):
     super().__init__(
         scope,
         id,
-        description="CloudFormation Custom Resource Lambda for invoking cross-region Custom Resources",
+        description="2.2.1 CloudFormation Custom Resource Lambda for invoking cross-region Custom Resources",
         **kwargs
     )
 

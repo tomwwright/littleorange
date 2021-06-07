@@ -1,5 +1,6 @@
 # LilOrange::Organizations:Organization Resource Provider
 
+> 2.1.1 CloudFormation Resource Providers for AWS Organizations
 ## Commands
 
 Regenerate code from schema definition

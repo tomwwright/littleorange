@@ -1,4 +1,4 @@
-![Little Orange](docs/LittleOrangeFlat.svg)
+![Little Orange](./LittleOrangeFlat.svg)
 
 # Little Orange Features
 
@@ -95,7 +95,7 @@ DeployPipeline                Deploy CodeBuild projects with webhook to run test
 ...
 ```
 
-See also the _Tooling_ section of the main [README](../README.md).
+> See also the _Tooling_ section of the main [README](../README.md).
 
 ### 1.1 Sceptre for CloudFormation Orchestration
 
@@ -103,7 +103,7 @@ See also the _Tooling_ section of the main [README](../README.md).
 
 The Sceptre config is separated into multiple Stack Groups (`Core`, `Security`, `Networking`, etc.) that correspond to the core AWS Accounts created as part of Little Orange. The Stack Group Config ([config.yaml](../sceptre/config/networking/../config.yaml)) within each specifies the AWS Profile that will be used to access each role.
 
-See also the _Tooling_ section of the main [README](../README.md).
+> See also the _Tooling_ section of the main [README](../README.md).
 
 #### 1.1.2 Sceptre Resolver Library
 
@@ -136,7 +136,7 @@ For code that interact with the [AWS SDK for Python](https://aws.amazon.com/sdk-
 - **Botocore Stubber**- https://botocore.amazonaws.com/v1/documentation/api/latest/reference/stubber.html - provided stubbing in botocore
 - **Python Mocking** - https://docs.python.org/3/library/unittest.mock.html - roll own mocking from scratch in Python (not preferred)
 
-See also the _Tooling_ section of the main [README](../README.md).
+> See also the _Tooling_ section of the main [README](../README.md).
 
 ### 1.4 AWS SDK Profiles Generation
 
@@ -166,21 +166,45 @@ Little Orange configures webhooks to trigger a build project for changes to Pull
 
 Python dependencies are managed by [Pipenv](https://pipenv.pypa.io/en/latest/install/). This provides a simple way to track project dependencies and boostrap new copies of the project. Required Pipenv commands are maintained and documented as `make` targets.
 
-See also the _Tooling_ section of the main [README](../README.md).
+> See also the _Tooling_ section of the main [README](../README.md).
 
 ## 2 Centralised AWS Management
 
+Little Orange configures tools and services with a "core" management account that support the operation and maintenance of the AWS multi-account footprint.
 ### 2.1 Account Management with AWS Organizations
 
+Little Orange manages multiple accounts via [AWS Organizations](https://aws.amazon.com/organizations/).
 #### 2.1.1 CloudFormation Resource Providers for AWS Organizations
+
+CloudFormation Resource Providers provide the ability to manage AWS Organizations resources. This allows for the structure of the AWS Organization to be defined declaratively using CloudFormation.
+
+[Organizations.cfn.yaml](../sceptre/templates/Core/Organization.cfn.yaml)
 
 #### 2.1.2 Quarantine Organizational Unit (OU)
 
+The `Quarantine` OU allows for a compromised AWS Account to be detained and all access to AWS APIs revoked. The `Quarantine` OU has a Service Control Policy (SCP) attached that assigns `Deny` to all AWS IAM Actions.
+
 ### 2.2 Resource Management with CloudFormation
 
+Little Orange provisions and manages all resources via the AWS CloudFormation service. Resources and services not natively supported by CloudFormation are implemented using CloudFormation Custom Resources or CloudFormation Resource Providers.
 #### 2.2.1 CloudFormation Custom Resource Proxy
 
+The CloudFormation Custom Resource Proxy allows for a single Custom Resource Lambda Function deployment to be leveraged from multiple accounts and regions. For Custom Resources implemented as AWS SAM projects this pattern is necessary as limitations exist for deploying the same AWS SAM template across many accounts or regions. The proxy is implemented as a lightweight, inlined Lambda Function that can be deployed across all accounts and regions -- Lambda-backed Custom Resources can only be invoked in the same account and region as the source CloudFormation Stack.
+
+References:
+- https://github.com/tomwwright/littleorange/issues/16
+- https://github.com/tomwwright/littleorange/issues/15
+
+![GuardDuty via CloudFormation Custom Resource Proxy](./CloudFormationCustomResourceProxy.png)
+
+- The CloudFormation Stack defines a Custom Resource using the Custom Resource Proxy deployed within the same account and region.
+- The Custom Resource Proxy unwraps the actual target Custom Resource service token and parameters from the `Properties` payload.
+- The Custom Resource Proxy is configured with the appropriate IAM Role to perform a cross-region, cross-account invoke of the Custom Resource Lambda Function.
+- The `crhelper` library of the target Custom Resource handles completing the callback to CloudFormation for the resource.
+
 #### 2.2.2 CloudFormation Macro Proxy
+
+
 
 #### 2.2.3 CloudFormation Self-Managed Roles using CloudFormation Stack Sets
 

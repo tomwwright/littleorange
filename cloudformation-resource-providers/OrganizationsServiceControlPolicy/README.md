@@ -1,5 +1,7 @@
 # LittleOrange::Organizations::ServiceControlPolicy
 
+> 2.1.1 CloudFormation Resource Providers for AWS Organizations
+
 Congratulations on starting development! Next steps:
 
 1. Write the JSON schema describing your resource, `littleorange-organizations-servicecontrolpolicy.json`

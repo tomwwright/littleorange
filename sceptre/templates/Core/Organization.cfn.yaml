@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Little Orange Organizations
+Description: 2.1 Little Orange Account Management with AWS Organizations
 Metadata:
   cfn-lint:
     config:
@@ -41,7 +41,7 @@ Resources:
       FeatureSet: ALL
 
   #
-  # Quarantine OU
+  # 2.1.2 Quarantine Organizational Unit (OU)
   # Provides secure quarantine location for compromised accounts -- no access to AWS services
   #
 

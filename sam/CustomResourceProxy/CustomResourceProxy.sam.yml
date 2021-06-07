@@ -1,7 +1,7 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: Little Orange CloudFormation Custom Resource for proxying requests cross-region to another Custom Resource
+Description: 2.2.1 Little Orange CloudFormation Custom Resource for proxying requests cross-region to another Custom Resource
 Parameters:
   AllowedRoleName:
     Description: Role name to allow to publish to the SNS topic of the Custom Resource Proxy to enable cross-account use
