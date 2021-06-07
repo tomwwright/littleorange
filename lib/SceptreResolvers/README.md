@@ -1,4 +1,6 @@
-# Sceptre Custom Resolvers
+# Little Orange Sceptre Custom Resolvers
+
+> 1.1.2 Sceptre Resolver Library
 
 Sceptre Custom Resolvers as per https://sceptre.cloudreach.com/2.3.0/docs/resolvers.html
 

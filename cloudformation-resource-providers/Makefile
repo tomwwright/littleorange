@@ -1,14 +1,14 @@
-#
-# CloudFormation Resource Providers Makefile
-#
+# -----------------------------
+# 2.1.1 CloudFormation Resource Providers for AWS Organizations
+# -----------------------------
 
-ValidateResourceProvider: NeedsResourceProvider ## Run validation on Resource Provider using CFN CLI, e.g. validate-resouce-provider ResourceProvider=OrganizationsOrganization
+ValidateResourceProvider: NeedsResourceProvider ## 2.1.1 Run validation on Resource Provider using CFN CLI, e.g. validate-resouce-provider ResourceProvider=OrganizationsOrganization
 	cd cloudformation-resource-providers/${ResourceProvider} && cfn validate
 
-SubmitResourceProvider: NeedsResourceProvider ## Submit Resource Provider using CFN CLI, e.g. submit-resouce-provider ResourceProvider=OrganizationsOrganization
+SubmitResourceProvider: NeedsResourceProvider ## 2.1.1 Submit Resource Provider using CFN CLI, e.g. submit-resouce-provider ResourceProvider=OrganizationsOrganization
 	cd cloudformation-resource-providers/${ResourceProvider} && cfn submit --set-default -v
 
-DeployResourceProviderDevOps: NeedsResourceProvider ## Deploy CodeBuild projects with webhooks for running tests and deployments for a CloudFormation Resource Provider
+DeployResourceProviderDevOps: NeedsResourceProvider ## 2.1.1 Deploy CodeBuild projects with webhooks for running tests and deployments for a CloudFormation Resource Provider
 	$(info [+] Deploying DevOps for CloudFormation Resource Provider '${ResourceProvider}')
 	aws cloudformation deploy \
 		--template-file cloudformation-resource-providers/devops/cloudformation/ResourceProvider.cfn.yml \
@@ -18,7 +18,7 @@ DeployResourceProviderDevOps: NeedsResourceProvider ## Deploy CodeBuild projects
 		--parameter-overrides \
 			$(call CloudFormationParam,ResourceProvider)
 
-DeployResourceProviders: ## Deploys DevOps automation for all Resource Providers
+DeployResourceProviders: ## 2.1.1 Deploys DevOps automation for all Resource Providers
 	@ $(MAKE) DeployResourceProviderDevOps ResourceProvider=OrganizationsAccount
 	@ $(MAKE) DeployResourceProviderDevOps ResourceProvider=OrganizationsOrganization
 	@ $(MAKE) DeployResourceProviderDevOps ResourceProvider=OrganizationsOrganizationalUnit

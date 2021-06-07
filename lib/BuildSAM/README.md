@@ -1,17 +1,31 @@
-# Command - Sceptre Custom Resolver
+#  Little Orange Sceptre Integration for AWS SAM
 
-Sceptre Custom Resolver as per https://sceptre.cloudreach.com/2.3.0/docs/resolvers.html
+> 1.1.3 AWS SAM Build Integration Library
 
-Resolves argument as a shell command
+This library provides a Python entrypoint to invoke `make` to build an AWS SAM project and then read and return the resulting CloudFormation template.
 
-```yml
-# config/MyGroup/MyStack.yaml
----
-template_path: MyStack.yaml
-parameters:
-  WhereAmI: !Command aws sts get-caller-identity --query 'Account' --output text
+## Usage
+
+Invoke from a [Sceptre handler](../../sceptre/templates/BuildSAM.py)
+
+```python
+from littleorange_build_sam import sam
+
+def sceptre_handler(sceptre_user_data):
+  template = sam.build_sam(sceptre_user_data)
+  return template
 ```
 
-## Environment Variables
+## Options
 
-Environment variables `AWS_DEFAULT_REGION` and `AWS_PROFILE` are set in the command's environment if they are set by Sceptre configuration (`region` and `profile`)
+```python
+from littleorange_build_sam import sam
+
+parameters = {
+  "SAMProject": "ExampleProject"    # invokes 'make BuildExampleProject' to trigger AWS SAM build. Required.
+  "ApplySAMTranslate": True | False # apply the AWS SAM Transform inline to transform the resulting template into vanilla CloudFormation
+}
+
+template = sam.build_sam(parameters)
+```
+

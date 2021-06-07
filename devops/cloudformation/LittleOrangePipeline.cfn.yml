@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Little Orange DevOps Pipeline
+Description: 1.5 Little Orange DevOps Pipeline
 Parameters:
   GitHubUrl:
     Default: https://github.com/tomwwright/littleorange.git
@@ -35,7 +35,7 @@ Resources:
             - Type: HEAD_REF
               Pattern: !Sub "^refs/heads/${GitHubBranch}$"
 
-  PRTestProject:
+  PRTestProject: # 1.5.1 Pull Request Validation using CodeBuild
     Type: AWS::CodeBuild::Project
     Properties:
       Name: LittleOrangePRTest

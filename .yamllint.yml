@@ -1,4 +1,6 @@
 ---
+# 1.2 Linting of YAML and CloudFormation
+
 extends: default
 
 ignore: |
