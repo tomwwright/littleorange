@@ -1,0 +1,105 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange Email Receiving to S3 Domain Configuration
+Parameters:
+  DomainName:
+    Description: Domain name to register for S3 mail receiving
+    Type: String
+  SESDomainIdentityServiceToken:
+    Description: Service Token for CloudFormation Custom Resource
+    Type: String
+Resources:
+  MXRecord:
+    Type: AWS::Route53::RecordSet
+    Properties: 
+      HostedZoneName: !Sub ${DomainName}.
+      Name: !Ref DomainName
+      ResourceRecords: 
+        - !Sub 10 inbound-smtp.${AWS::Region}.amazonaws.com
+      TTL: 900
+      Type: MX
+
+  MailDomainIdentity:
+    Type: Custom::SESDomainIdentity
+    Properties:
+      ServiceToken: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:LittleOrangeCustomResourceProxy"
+      CustomResourceProperties:  
+        DomainName: !Ref DomainName
+        ServiceToken: !Ref SESDomainIdentityServiceToken
+
+  DKIMTokenRecord1:
+    DependsOn: [MailDomainIdentity]
+    Type: AWS::Route53::RecordSet
+    Properties: 
+      HostedZoneName: !Sub ${DomainName}.
+      Name: !Join ["", [!Select [0, !GetAtt MailDomainIdentity.DkimTokens], ._domainkey., !Ref DomainName]]
+      ResourceRecords: 
+        - !Join ["", [!Select [0, !GetAtt MailDomainIdentity.DkimTokens], .dkim.amazonses.com]]
+      TTL: 900
+      Type: CNAME
+  
+  DKIMTokenRecord2:
+    DependsOn: [MailDomainIdentity]
+    Type: AWS::Route53::RecordSet
+    Properties: 
+      HostedZoneName: !Sub ${DomainName}.
+      Name: !Join ["", [!Select [1, !GetAtt MailDomainIdentity.DkimTokens], ._domainkey., !Ref DomainName]]
+      ResourceRecords: 
+        - !Join ["", [!Select [1, !GetAtt MailDomainIdentity.DkimTokens], .dkim.amazonses.com]]
+      TTL: 900
+      Type: CNAME
+
+  DKIMTokenRecord3:
+    DependsOn: [MailDomainIdentity]
+    Type: AWS::Route53::RecordSet
+    Properties: 
+      HostedZoneName: !Sub ${DomainName}.
+      Name: !Join ["", [!Select [2, !GetAtt MailDomainIdentity.DkimTokens], ._domainkey., !Ref DomainName]]
+      ResourceRecords: 
+        - !Join ["", [!Select [2, !GetAtt MailDomainIdentity.DkimTokens], .dkim.amazonses.com]]
+      TTL: 900
+      Type: CNAME
+
+  ReceiptRuleSet:
+    Type: AWS::SES::ReceiptRuleSet
+    Properties: 
+      RuleSetName: LittleOrange
+
+  ReceiptRule:
+    Type: AWS::SES::ReceiptRule
+    Properties:
+      RuleSetName: !Ref ReceiptRuleSet
+      Rule:
+        Name: LittleOrangeReceiptRule
+        Enabled: true
+        ScanEnabled: true
+        Recipients:
+          - !Ref DomainName
+        Actions:
+          - S3Action:
+              BucketName: !Ref Bucket
+              ObjectKeyPrefix: !Sub LittleOrange/${DomainName}/
+
+  Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub littleorange-mail-${DomainName}
+
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Bucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AllowSESPuts
+            Effect: Allow
+            Principal:
+              Service: ses.amazonaws.com
+            Action: s3:PutObject
+            Resource: !Sub arn:aws:s3:::${Bucket}/*
+            Condition:
+              StringEquals:
+                aws:Referer: !Ref "AWS::AccountId"
+
+    

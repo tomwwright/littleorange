@@ -1,0 +1,8 @@
+---
+template_path: BuildSAM.py
+dependencies:
+  - Core/SAMDeploymentResources.yaml
+  - Core/CustomResourceProxy.yaml
+sceptre_user_data:
+  SAMProject: SESDomainIdentity
+  ApplySAMTranslate: true
