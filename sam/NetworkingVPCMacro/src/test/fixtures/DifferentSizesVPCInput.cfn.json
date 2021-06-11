@@ -1,0 +1,83 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Little Orange Minimal VPC",
+  "Metadata": {
+    "cfn-lint": {
+      "config": {
+        "ignore_checks": ["E3001"]
+      }
+    }
+  },
+  "Parameters": {
+    "VPCCIDR": {
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "PlaceholderRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Path": "/LittleOrange/",
+        "Policies": [
+          {
+            "PolicyName": "CloudWatchLogs",
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "VPC": {
+      "Type": "LittleOrange::Networking::VPC",
+      "Properties": {
+        "AvailabilityZones": 2,
+        "CIDR": {
+          "Ref": "VPCCIDR"
+        },
+        "InternetGateway": false,
+        "NATGateways": false,
+        "Tiers": [
+          { "Name": "Public", "Size": 0.125 },
+          { "Name": "Private", "Size": 0.5 },
+          { "Name": "Restricted", "Size": 0.125 },
+          { "Name": "Networking", "Size": 0.25 }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "PlaceholderRoleArn": {
+      "Value": {
+        "Fn::GetAtt": ["PlaceholderRole", "Arn"]
+      }
+    },
+    "VPCCIDR": {
+      "Value": {
+        "Ref": "VPCCIDR"
+      }
+    }
+  }
+}

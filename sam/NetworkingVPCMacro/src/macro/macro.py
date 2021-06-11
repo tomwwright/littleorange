@@ -206,6 +206,7 @@ class NetworkingVPCMacro(object):
     internetGatewayRouteCIDR = self.resolveParameter(resource["Properties"].get("InternetGatewayRouteCIDR", "0.0.0.0/0"))
     transitGatewayId = self.resolveParameter(resource["Properties"].get("TransitGatewayId", None))
     transitGatewayRouteCIDR = self.resolveParameter(resource["Properties"].get("TransitGatewayRouteCIDR", "0.0.0.0/0"))
+    tiers = self.resolveParameter(resource["Properties"].get("Tiers", None))
 
     if useInternetGateway and transitGatewayId and transitGatewayRouteCIDR == internetGatewayRouteCIDR:
       raise Exception(f"Conflicting route CIDRs for internet and transit gateway: {internetGatewayRouteCIDR}")
@@ -218,7 +219,8 @@ class NetworkingVPCMacro(object):
         InternetGatewayRouteCIDR=internetGatewayRouteCIDR,
         NATGateways=useNATGateways,
         TransitGatewayId=transitGatewayId,
-        TransitGatewayRouteCIDR=transitGatewayRouteCIDR
+        TransitGatewayRouteCIDR=transitGatewayRouteCIDR,
+        Tiers=tiers
     )
 
     self.template["Resources"][name] = {

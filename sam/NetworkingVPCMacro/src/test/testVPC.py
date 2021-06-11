@@ -163,6 +163,26 @@ class Test(TestCase):
         ("D", ipaddress.IPv4Network("10.0.1.192/26"))
     ]
 
+
+  def testAllocateSubnetsTwo(self):
+
+    divisions = [
+        ("A", 26),
+        ("B", 24),
+        ("C", 26),
+        ("D", 25)
+    ]
+    subnet = ipaddress.IPv4Network("10.0.0.0/23")
+
+    allocations = allocateSubnets(subnet, divisions)
+
+    assert allocations == [
+        ("B", ipaddress.IPv4Network("10.0.0.0/24")),
+        ("D", ipaddress.IPv4Network("10.0.1.0/25")),
+        ("A", ipaddress.IPv4Network("10.0.1.128/26")),
+        ("C", ipaddress.IPv4Network("10.0.1.192/26"))
+    ]
+
   def testAllocateSubnetsOddSubnets(self):
 
     divisions = [
