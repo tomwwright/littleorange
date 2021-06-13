@@ -1,0 +1,5 @@
+---
+template_path: Networking/Subdomains.cfn.yaml
+parameters:
+  DomainName: "{{ var.public_domain }}"
+  NetworkingNameServers: !stack_output Networking/NetworkingSubdomain.yaml::NameServers

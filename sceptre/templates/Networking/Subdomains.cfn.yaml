@@ -1,0 +1,19 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: Little Orange Subdomain Delegation
+Parameters:
+  DomainName:
+    Description: Public domain name for Little Orange
+    Type: String
+  NetworkingNameServers:
+    Description: List of NS records to insert for networking subdomain
+    Type: CommaDelimitedList
+Resources:
+  NetworkingSubdomainRecords:
+    Type: AWS::Route53::RecordSet
+    Properties: 
+      HostedZoneName: !Sub ${DomainName}.
+      Name: !Sub networking.${DomainName}
+      ResourceRecords: !Ref NetworkingNameServers
+      TTL: 900
+      Type: NS
