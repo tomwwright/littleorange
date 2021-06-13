@@ -2,7 +2,9 @@
 # 2.2.1 CloudFormation Custom Resource Proxy
 template_path: Core/CustomResourceProxyStackSet.cfn.yaml
 parameters:
-  AllowedRoleName: stacksets-exec-* # see https://github.com/tomwwright/littleorange/issues/19
+  AllowedRoleArns:
+    - arn:aws:iam::*:role/stacksets-exec-* # see https://github.com/tomwwright/littleorange/issues/19
+    - arn:aws:iam::*:role/OrganizationAccountAccessRole
   OrganizationId: !stack_output Core/Organization.yaml::OrganizationId
   Regions: "{{ var.enabled_regions | join(',') }}"
   StackTemplateURL: !UploadS3

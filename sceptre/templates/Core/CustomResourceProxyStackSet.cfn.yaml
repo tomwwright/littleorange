@@ -2,9 +2,9 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: 2.2.1 Little Orange Custom Resource Proxy Stack Set
 Parameters:
-  AllowedRoleName:
-    Description: Role name to allow to publish to the SNS topic of the Custom Resource Proxy to enable cross-account use
-    Type: String
+  AllowedRoleArns:
+    Description: Role ARNs to allow to publish to the SNS topic of the Custom Resource Proxy to enable cross-account use
+    Type: CommaDelimitedList
   OrganizationId:
     Description: Organization ID to use to allow access to the SNS topic of the Custom Resource Proxy
     Type: String
@@ -22,8 +22,8 @@ Resources:
         - CAPABILITY_IAM
       Description: CloudFormation Custom Resource Proxy
       Parameters:
-        - ParameterKey: AllowedRoleName
-          ParameterValue: !Ref AllowedRoleName
+        - ParameterKey: AllowedRoleArns
+          ParameterValue: !Join [",", !Ref AllowedRoleArns]
         - ParameterKey: OrganizationId
           ParameterValue: !Ref OrganizationId
       PermissionModel: SELF_MANAGED

@@ -26,8 +26,8 @@ class CustomResourceProxyStack(Cdk.Stack):
         **kwargs
     )
 
-    allowedRoleNameParameter = Cdk.CfnParameter(
-        self, "AllowedRoleName", description="Role name to allow to publish to the SNS topic of the Custom Resource Proxy to enable cross-account use", type="String")
+    allowedRoleArnsParameter = Cdk.CfnParameter(
+        self, "AllowedRoleArns", description="Role ARNs to allow to publish to the SNS topic of the Custom Resource Proxy to enable cross-account use", type="CommaDelimitedList")
     organizationIdParameter = Cdk.CfnParameter(
         self, "OrganizationId", description="Organization ID to use to allow access to the SNS topic of the Custom Resource Proxy", type="String")
 
@@ -55,7 +55,7 @@ class CustomResourceProxyStack(Cdk.Stack):
             actions=["sns:Publish"],
             conditions={
                 "StringLike": {
-                    "aws:PrincipalArn": f"arn:aws:iam::*:role/{allowedRoleNameParameter.value_as_string}"
+                    "aws:PrincipalArn": allowedRoleArnsParameter.value_as_list
                 },
                 "StringEquals": {
                     "aws:CalledViaLast": "cloudformation.amazonaws.com",
