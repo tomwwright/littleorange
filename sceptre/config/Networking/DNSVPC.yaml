@@ -1,2 +1,4 @@
 ---
 template_path: Networking/DNSVPC.cfn.yaml
+parameters:
+  VpcCidr: "{{ var.cidrs.dns }}"

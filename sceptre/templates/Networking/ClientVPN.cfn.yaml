@@ -1,0 +1,135 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: Little Orange Client VPN
+Parameters:
+  CertificateArn:
+    Description: ACM Certificate ARN to configure as server certificate of Client VPN Endpoint
+    Type: String
+  ClientIpCidr:
+    Description: IPv4 CIDR to allocate for client connections
+    Type: String
+  DnsIpAddresses:
+    Description: IP Addresses of Route 53 Resolver Inbound Endpoints to configure for VPN DNS
+    Type: CommaDelimitedList
+  IamSamlProviderServiceToken:
+    Description: CloudFormation Custom Resource Service Token
+    Type: String
+  LittleOrangeCidr:
+    Description: IPv4 CIDR of the Little Orange network
+    Type: String
+  OrganizationMasterAccountId:
+    AllowedPattern: "[0-9]{12}"
+    Description: Account ID for the Organization master account to invoke Custom Resource Proxy
+    Type: String
+  SamlIdpMetadataUrl:
+    Description: SAML IdP Metadata XML URL to configure for use with Client VPN
+    Type: String
+  SubnetIds:
+    Description: Subnet IDs to associate with Client VPN Endpoint interfaces
+    Type: CommaDelimitedList
+  VpcId:
+    Description: VPC ID to deploy Client VPN Endpoint to
+    Type: String
+Resources:
+
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Little Orange Client VPN
+      GroupName: LittleOrangeClientVPN
+      VpcId: !Ref VpcId
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /LittleOrange/ClientVPN
+      RetentionInDays: 365
+
+  IdentityProvider:
+    Type: Custom::IAMSAMLProvider
+    Properties:
+      ServiceToken: !Sub "arn:aws:sns:${AWS::Region}:${OrganizationMasterAccountId}:LittleOrangeCustomResourceProxy"
+      CustomResourceProperties:
+        ServiceToken: !Ref IamSamlProviderServiceToken
+        AccountId: !Ref "AWS::AccountId"
+        Region: !Ref "AWS::Region"
+        SamlProvider:
+          MetadataUrl: !Ref SamlIdpMetadataUrl
+          Name: LittleOrangeClientVPNSAMLProvider
+
+  ClientVPNEndpoint:
+    Type: AWS::EC2::ClientVpnEndpoint
+    Properties: 
+      AuthenticationOptions: 
+        - FederatedAuthentication:
+            SAMLProviderArn: !Ref IdentityProvider
+          Type: federated-authentication
+      ClientCidrBlock: !Ref ClientIpCidr
+      ConnectionLogOptions: 
+        CloudwatchLogGroup: !Ref LogGroup
+        Enabled: true
+      Description: Little Orange VPN
+      DnsServers: 
+        - !Select [0, !Ref DnsIpAddresses]
+        - !Select [1, !Ref DnsIpAddresses]
+      SecurityGroupIds: 
+        - !Ref SecurityGroup
+      SelfServicePortal: false
+      ServerCertificateArn: !Ref CertificateArn
+      SplitTunnel: true
+      TransportProtocol: tcp
+      VpcId: !Ref VpcId
+      VpnPort: 443
+
+  ClientVPNAuthorization:
+    Type: AWS::EC2::ClientVpnAuthorizationRule
+    Properties:
+      ClientVpnEndpointId: !Ref ClientVPNEndpoint
+      AuthorizeAllGroups: true
+      TargetNetworkCidr: 0.0.0.0/0
+      Description: LittleOrangeAllowAll
+
+  ClientVPNSubnetA:
+    Type: AWS::EC2::ClientVpnTargetNetworkAssociation
+    Properties: 
+      ClientVpnEndpointId: !Ref ClientVPNEndpoint
+      SubnetId: !Select [0, !Ref SubnetIds]
+
+  ClientVPNSubnetB:
+    Type: AWS::EC2::ClientVpnTargetNetworkAssociation
+    Properties: 
+      ClientVpnEndpointId: !Ref ClientVPNEndpoint
+      SubnetId: !Select [1, !Ref SubnetIds]
+
+  ClientVPNSubnetC:
+    Type: AWS::EC2::ClientVpnTargetNetworkAssociation
+    Properties: 
+      ClientVpnEndpointId: !Ref ClientVPNEndpoint
+      SubnetId: !Select [2, !Ref SubnetIds]
+
+  ClientVPNRouteA:
+    Type: AWS::EC2::ClientVpnRoute
+    DependsOn: [ClientVPNSubnetA]
+    Properties: 
+      ClientVpnEndpointId: !Ref ClientVPNEndpoint
+      Description: Little Orange CIDR AZ-A
+      DestinationCidrBlock: !Ref LittleOrangeCidr
+      TargetVpcSubnetId: !Select [0, !Ref SubnetIds]
+
+  ClientVPNRouteB:
+    Type: AWS::EC2::ClientVpnRoute
+    DependsOn: [ClientVPNSubnetB]
+    Properties: 
+      ClientVpnEndpointId: !Ref ClientVPNEndpoint
+      Description: Little Orange CIDR AZ-B
+      DestinationCidrBlock: !Ref LittleOrangeCidr
+      TargetVpcSubnetId: !Select [1, !Ref SubnetIds]
+  
+  ClientVPNRouteC:
+    Type: AWS::EC2::ClientVpnRoute
+    DependsOn: [ClientVPNSubnetC]
+    Properties: 
+      ClientVpnEndpointId: !Ref ClientVPNEndpoint
+      Description: Little Orange CIDR AZ-C
+      DestinationCidrBlock: !Ref LittleOrangeCidr
+      TargetVpcSubnetId: !Select [2, !Ref SubnetIds]

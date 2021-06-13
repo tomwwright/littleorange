@@ -7,12 +7,16 @@ Metadata:
     config:
       ignore_checks:
         - E3001
+Parameters:
+  VpcCidr:
+    Description: IPv4 CIDR to provision for the VPC
+    Type: String
 Resources:
   Vpc:
     Type: LittleOrange::Networking::VPC
     Properties:
       AvailabilityZones: 3
-      CIDR: 10.1.1.0/24
+      CIDR: !Ref VpcCidr
       InternetGateway: false
       NATGateways: false
       Tiers:

@@ -2,6 +2,12 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: Little Orange IP Ranges
 Parameters:
+  LittleOrangeCidr:
+    Description: IPv4 CIDR of the Little Orange network
+    Type: String
+  ClientVpnCidr:
+    Description: IPv4 CIDR of the Little Orange Client VPN endpoints
+    Type: String
   OrganizationAccountId:
     Description: ID of the Little Orange Organization management account
     Type: String
@@ -14,8 +20,10 @@ Resources:
     Properties:
       AddressFamily: IPv4
       Entries:
-        - Cidr: 10.1.0.0/16
+        - Cidr: !Ref LittleOrangeCidr
           Description: Little Orange IPv4 CIDR Range
+        - Cidr: !Ref ClientVpnCidr
+          Description: Little Orange Client VPN IPv4 CIDR Range
       MaxEntries: 20
       PrefixListName: LittleOrangeIpRanges
 

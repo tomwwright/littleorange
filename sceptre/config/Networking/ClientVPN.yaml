@@ -1,0 +1,12 @@
+---
+template_path: Networking/ClientVPN.cfn.yaml
+parameters:
+  CertificateArn: !stack_output Networking/NetworkingSubdomain.yaml::CertificateArn
+  ClientIpCidr: "{{ var.cidrs.client_vpn }}"
+  DnsIpAddresses: !stack_output Networking/Route53Resolver.yaml::ResolverInboundEndpointIpAddresses
+  LittleOrangeCidr: "{{ var.cidrs.littleorange }}"
+  IamSamlProviderServiceToken: !stack_output Core/IAMSAMLProvider.yaml::ServiceToken
+  OrganizationMasterAccountId: !stack_output Core/Organization.yaml::MasterAccountId
+  SamlIdpMetadataUrl: "{{ var.client_vpn_saml_metadata_url }}"
+  SubnetIds: !stack_output Networking/DNSVPC.yaml::VpcPrivateSubnetIds
+  VpcId: !stack_output Networking/DNSVPC.yaml::VpcId

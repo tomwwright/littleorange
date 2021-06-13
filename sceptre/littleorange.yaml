@@ -3,6 +3,11 @@
 # Little Orange Configuration
 # ---
 
+cidrs:
+  littleorange: 10.1.0.0/16
+  dns: 10.1.4.0/23
+  client_vpn: 10.0.0.0/22
+
 public_domain: littleorange.cloud
 
 enabled_regions:
@@ -25,3 +30,5 @@ enabled_regions:
 
 # yamllint disable-line rule:line-length
 federated_identity_saml_metadata_url: https://login.microsoftonline.com/614dfa03-04ae-4b58-a783-f27b940e4399/federationmetadata/2007-06/federationmetadata.xml?appid=060fad48-bb2a-4693-86e9-57269217a117
+# yamllint disable-line rule:line-length
+client_vpn_saml_metadata_url: https://littleorange.okta.com/app/exkzm38koSNRSJ4kR5d6/sso/saml/metadata
