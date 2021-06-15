@@ -45,6 +45,11 @@ Resources:
       LogGroupName: /LittleOrange/ClientVPN
       RetentionInDays: 365
 
+  LogStream:
+    Type: AWS::Logs::LogStream
+    Properties: 
+      LogGroupName: !Ref LogGroup
+
   IdentityProvider:
     Type: Custom::IAMSAMLProvider
     Properties:
@@ -67,6 +72,7 @@ Resources:
       ClientCidrBlock: !Ref ClientIpCidr
       ConnectionLogOptions: 
         CloudwatchLogGroup: !Ref LogGroup
+        CloudwatchLogStream: !Ref LogStream
         Enabled: true
       Description: Little Orange VPN
       DnsServers: 
