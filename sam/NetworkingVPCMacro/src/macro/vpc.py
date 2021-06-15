@@ -64,24 +64,29 @@ class VPC(object):
     networkingTier = [tier for tier in self.tiers if tier["Name"] == "Networking"][0]
 
     publicTier["NACLs"] = [
-        (100, "ALLOW", "ALL", 0, 0, "0.0.0.0/0")
+        ("INGRESS", 100, "ALLOW", "ALL", 0, 0, "0.0.0.0/0")
     ]
 
     privateTier["NACLs"] = [
-        (100, "ALLOW", "TCP", 1024, 65535, "0.0.0.0/0"),
-        (200, "ALLOW", "UDP", 1024, 65535, "0.0.0.0/0"),
-        (300, "ALLOW", "ALL", 0, 0, str(self.cidr))
+        ("INGRESS", 100, "ALLOW", "TCP", 1024, 65535, "0.0.0.0/0"),
+        ("INGRESS", 200, "ALLOW", "UDP", 1024, 65535, "0.0.0.0/0"),
+        ("INGRESS", 300, "ALLOW", "ALL", 0, 0, str(self.cidr))
     ]
     if self.transitGatewayId:
-      privateTier["NACLs"].append((400, "ALLOW", "ALL", 0, 0, str(self.transitGatewayRouteCIDR)))
+      privateTier["NACLs"].append(("INGRESS", 400, "ALLOW", "ALL", 0, 0, str(self.transitGatewayRouteCIDR)))
 
     restrictedTier["NACLs"] = [
-        (100, "ALLOW", "ALL", 0, 0, str(privateTier["CIDR"]))
+        ("INGRESS", 100, "ALLOW", "ALL", 0, 0, str(privateTier["CIDR"]))
     ]
 
     networkingTier["NACLs"] = [
-        (100, "ALLOW", "ALL", 0, 0, str(self.cidr))
+        ("INGRESS", 100, "ALLOW", "ALL", 0, 0, str(self.cidr))
     ]
+
+    publicTier["NACLs"].append(("EGRESS", 100, "ALLOW", "ALL", 0, 0, "0.0.0.0/0"))
+    privateTier["NACLs"].append(("EGRESS", 100, "ALLOW", "ALL", 0, 0, "0.0.0.0/0"))
+    restrictedTier["NACLs"].append(("EGRESS", 100, "ALLOW", "ALL", 0, 0, "0.0.0.0/0"))
+    networkingTier["NACLs"].append(("EGRESS", 100, "ALLOW", "ALL", 0, 0, "0.0.0.0/0"))
 
   def calculateRoutes(self):
     publicTier = [tier for tier in self.tiers if tier["Name"] == "Public"][0]

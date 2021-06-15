@@ -16,8 +16,10 @@ def isValidIPv4CIDR(cidr):
 
 
 def buildNACLEntry(naclResourceName, nacl):
-  (ruleId, action, protocol, fromPortOrIcmpCode, toPortOrIcmpType, cidr) = nacl
-  resourceName = f"{naclResourceName}Ingress{ruleId}"
+  (ingressOrEgress, ruleId, action, protocol, fromPortOrIcmpCode, toPortOrIcmpType, cidr) = nacl
+  isEgress = ingressOrEgress == "EGRESS"
+
+  resourceName = f"{naclResourceName}Egress{ruleId}" if isEgress else f"{naclResourceName}Ingress{ruleId}"
 
   protocols = {
       "ICMP": 1,
@@ -30,7 +32,7 @@ def buildNACLEntry(naclResourceName, nacl):
       "Properties": {
           "NetworkAclId": {"Ref": naclResourceName},
           "CidrBlock": cidr,
-          "Egress": False,
+          "Egress": isEgress,
           "Protocol": protocols.get(protocol, -1),
           "RuleAction": action.lower(),
           "RuleNumber": ruleId
@@ -174,9 +176,11 @@ class NetworkingVPCMacro(object):
           "Value": {"Ref": naclResourceName}
       }
 
+
       for nacl in tier["NACLs"]:
         (naclEntryResourceName, naclEntryResource) = buildNACLEntry(naclResourceName, nacl)
         self.template["Resources"][naclEntryResourceName] = naclEntryResource
+
 
   def buildTransitGatewayAttachment(self, vpcName, availabilityZoneCount, transitGatewayId):
 
