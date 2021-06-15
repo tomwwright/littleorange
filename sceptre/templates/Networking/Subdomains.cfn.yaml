@@ -11,7 +11,7 @@ Parameters:
 Resources:
   NetworkingSubdomainRecords:
     Type: AWS::Route53::RecordSet
-    Properties: 
+    Properties:
       HostedZoneName: !Sub ${DomainName}.
       Name: !Sub networking.${DomainName}
       ResourceRecords: !Ref NetworkingNameServers

@@ -15,21 +15,21 @@ Resources:
 
   CostExplorerAnomalyDailySubscription:
     Type: AWS::CE::AnomalySubscription
-    Properties: 
+    Properties:
       Frequency: DAILY
       MonitorArnList: [!Ref CostExplorerServiceAnomalyMonitor]
-      Subscribers: 
+      Subscribers:
         - Address: !Ref NotificationsEmail
           Type: EMAIL
       SubscriptionName: LittleOrangeDailyAnomalySubscription
       Threshold: 5
-  
+
   CostExplorerAnomalyWeeklySubscription:
     Type: AWS::CE::AnomalySubscription
-    Properties: 
+    Properties:
       Frequency: WEEKLY
       MonitorArnList: [!Ref CostExplorerServiceAnomalyMonitor]
-      Subscribers: 
+      Subscribers:
         - Address: !Ref NotificationsEmail
           Type: EMAIL
       SubscriptionName: LittleOrangeWeeklyAnomalySubscription

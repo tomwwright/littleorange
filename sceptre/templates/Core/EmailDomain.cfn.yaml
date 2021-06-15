@@ -11,10 +11,10 @@ Parameters:
 Resources:
   MXRecord:
     Type: AWS::Route53::RecordSet
-    Properties: 
+    Properties:
       HostedZoneName: !Sub ${DomainName}.
       Name: !Ref DomainName
-      ResourceRecords: 
+      ResourceRecords:
         - !Sub 10 inbound-smtp.${AWS::Region}.amazonaws.com
       TTL: 900
       Type: MX
@@ -23,28 +23,28 @@ Resources:
     Type: Custom::SESDomainIdentity
     Properties:
       ServiceToken: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:LittleOrangeCustomResourceProxy"
-      CustomResourceProperties:  
+      CustomResourceProperties:
         DomainName: !Ref DomainName
         ServiceToken: !Ref SESDomainIdentityServiceToken
 
   DKIMTokenRecord1:
     DependsOn: [MailDomainIdentity]
     Type: AWS::Route53::RecordSet
-    Properties: 
+    Properties:
       HostedZoneName: !Sub ${DomainName}.
       Name: !Join ["", [!Select [0, !GetAtt MailDomainIdentity.DkimTokens], ._domainkey., !Ref DomainName]]
-      ResourceRecords: 
+      ResourceRecords:
         - !Join ["", [!Select [0, !GetAtt MailDomainIdentity.DkimTokens], .dkim.amazonses.com]]
       TTL: 900
       Type: CNAME
-  
+
   DKIMTokenRecord2:
     DependsOn: [MailDomainIdentity]
     Type: AWS::Route53::RecordSet
-    Properties: 
+    Properties:
       HostedZoneName: !Sub ${DomainName}.
       Name: !Join ["", [!Select [1, !GetAtt MailDomainIdentity.DkimTokens], ._domainkey., !Ref DomainName]]
-      ResourceRecords: 
+      ResourceRecords:
         - !Join ["", [!Select [1, !GetAtt MailDomainIdentity.DkimTokens], .dkim.amazonses.com]]
       TTL: 900
       Type: CNAME
@@ -52,17 +52,17 @@ Resources:
   DKIMTokenRecord3:
     DependsOn: [MailDomainIdentity]
     Type: AWS::Route53::RecordSet
-    Properties: 
+    Properties:
       HostedZoneName: !Sub ${DomainName}.
       Name: !Join ["", [!Select [2, !GetAtt MailDomainIdentity.DkimTokens], ._domainkey., !Ref DomainName]]
-      ResourceRecords: 
+      ResourceRecords:
         - !Join ["", [!Select [2, !GetAtt MailDomainIdentity.DkimTokens], .dkim.amazonses.com]]
       TTL: 900
       Type: CNAME
 
   ReceiptRuleSet:
     Type: AWS::SES::ReceiptRuleSet
-    Properties: 
+    Properties:
       RuleSetName: LittleOrange
 
   ReceiptRule:
@@ -101,5 +101,3 @@ Resources:
             Condition:
               StringEquals:
                 aws:Referer: !Ref "AWS::AccountId"
-
-    

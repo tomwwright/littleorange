@@ -24,7 +24,6 @@ Parameters:
     Description: VPC ID to deploy VPC Endpoint interfaces into
     Type: String
 Resources:
-
   ResolverRulesShare:
     Type: AWS::RAM::ResourceShare
     Properties:
@@ -66,7 +65,7 @@ Resources:
     Type: AWS::Route53::HostedZone
     Properties:
       Name: !Sub ec2messages.${AWS::Region}.amazonaws.com.
-      VPCs: 
+      VPCs:
         - VPCId: !Ref VpcId
           VPCRegion: !Ref "AWS::Region"
 
@@ -76,8 +75,22 @@ Resources:
       HostedZoneId: !Ref Ec2MessagesHostedZone
       Name: !Sub ec2messages.${AWS::Region}.amazonaws.com.
       AliasTarget:
-        DNSName: !Select [1, !Split [":" , !Select [0, !GetAtt Ec2MessagesVpcEndpoint.DnsEntries]]]
-        HostedZoneId: !Select [0, !Split [":" , !Select [0, !GetAtt Ec2MessagesVpcEndpoint.DnsEntries]]]
+        DNSName:
+          !Select [
+            1,
+            !Split [
+              ":",
+              !Select [0, !GetAtt Ec2MessagesVpcEndpoint.DnsEntries],
+            ],
+          ]
+        HostedZoneId:
+          !Select [
+            0,
+            !Split [
+              ":",
+              !Select [0, !GetAtt Ec2MessagesVpcEndpoint.DnsEntries],
+            ],
+          ]
       Type: A
 
   Ec2MessagesResolverRule:
@@ -108,7 +121,7 @@ Resources:
     Type: AWS::Route53::HostedZone
     Properties:
       Name: !Sub ssm.${AWS::Region}.amazonaws.com.
-      VPCs: 
+      VPCs:
         - VPCId: !Ref VpcId
           VPCRegion: !Ref "AWS::Region"
 
@@ -118,8 +131,16 @@ Resources:
       HostedZoneId: !Ref SsmHostedZone
       Name: !Sub ssm.${AWS::Region}.amazonaws.com.
       AliasTarget:
-        DNSName: !Select [1, !Split [":" , !Select [0, !GetAtt SsmVpcEndpoint.DnsEntries]]]
-        HostedZoneId: !Select [0, !Split [":" , !Select [0, !GetAtt SsmVpcEndpoint.DnsEntries]]]
+        DNSName:
+          !Select [
+            1,
+            !Split [":", !Select [0, !GetAtt SsmVpcEndpoint.DnsEntries]],
+          ]
+        HostedZoneId:
+          !Select [
+            0,
+            !Split [":", !Select [0, !GetAtt SsmVpcEndpoint.DnsEntries]],
+          ]
       Type: A
 
   SsmResolverRule:
@@ -150,7 +171,7 @@ Resources:
     Type: AWS::Route53::HostedZone
     Properties:
       Name: !Sub ssmmessages.${AWS::Region}.amazonaws.com.
-      VPCs: 
+      VPCs:
         - VPCId: !Ref VpcId
           VPCRegion: !Ref "AWS::Region"
 
@@ -160,8 +181,22 @@ Resources:
       HostedZoneId: !Ref SsmMessagesHostedZone
       Name: !Sub ssmmessages.${AWS::Region}.amazonaws.com.
       AliasTarget:
-        DNSName: !Select [1, !Split [":" , !Select [0, !GetAtt SsmMessagesVpcEndpoint.DnsEntries]]]
-        HostedZoneId: !Select [0, !Split [":" , !Select [0, !GetAtt SsmMessagesVpcEndpoint.DnsEntries]]]
+        DNSName:
+          !Select [
+            1,
+            !Split [
+              ":",
+              !Select [0, !GetAtt SsmMessagesVpcEndpoint.DnsEntries],
+            ],
+          ]
+        HostedZoneId:
+          !Select [
+            0,
+            !Split [
+              ":",
+              !Select [0, !GetAtt SsmMessagesVpcEndpoint.DnsEntries],
+            ],
+          ]
       Type: A
 
   SsmMessagesResolverRule:

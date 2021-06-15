@@ -8,14 +8,14 @@ Parameters:
 Resources:
   HostedZone:
     Type: AWS::Route53::HostedZone
-    Properties: 
-      HostedZoneConfig: 
+    Properties:
+      HostedZoneConfig:
         Comment: Little Orange Networking subdomain
       Name: !Sub networking.${DomainName}.
 
   Certificate:
     Type: AWS::CertificateManager::Certificate
-    Properties: 
+    Properties:
       DomainName: !Sub networking.${DomainName}
       DomainValidationOptions:
         - DomainName: !Sub networking.${DomainName}
@@ -29,4 +29,3 @@ Outputs:
     Value: !Ref Certificate
   NameServers:
     Value: !Join [",", !GetAtt HostedZone.NameServers]
-    
