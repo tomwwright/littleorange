@@ -4,9 +4,7 @@
   "Metadata": {
     "cfn-lint": {
       "config": {
-        "ignore_checks": [
-          "E3001"
-        ]
+        "ignore_checks": ["E3001"]
       }
     }
   },
@@ -62,17 +60,15 @@
         "InternetGateway": true,
         "NATGateways": true,
         "TransitGatewayId": "tgw-xxxxxx",
-        "TransitGatewayRouteCIDR": "10.16.0.0/24"
+        "TransitGatewayRouteCIDR": "10.16.0.0/24",
+        "ResolverRuleIds": ["rr-xxxx", "rr-yyyy", "rr-zzzz"]
       }
     }
   },
   "Outputs": {
     "PlaceholderRoleArn": {
       "Value": {
-        "Fn::GetAtt": [
-          "PlaceholderRole",
-          "Arn"
-        ]
+        "Fn::GetAtt": ["PlaceholderRole", "Arn"]
       }
     },
     "VPCCIDR": {

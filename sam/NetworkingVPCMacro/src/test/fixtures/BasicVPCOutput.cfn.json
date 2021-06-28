@@ -4,9 +4,7 @@
   "Metadata": {
     "cfn-lint": {
       "config": {
-        "ignore_checks": [
-          "E3001"
-        ]
+        "ignore_checks": ["E3001"]
       }
     }
   },
@@ -59,6 +57,27 @@
         "EnableDnsHostnames": true,
         "EnableDnsSupport": true,
         "InstanceTenancy": "default"
+      }
+    },
+    "VPCResolverRulerr-xxxx": {
+      "Type": "AWS::Route53Resolver::ResolverRuleAssociation",
+      "Properties": {
+        "ResolverRuleId": "rr-xxxx",
+        "VPCId": { "Ref": "VPC" }
+      }
+    },
+    "VPCResolverRulerr-yyyy": {
+      "Type": "AWS::Route53Resolver::ResolverRuleAssociation",
+      "Properties": {
+        "ResolverRuleId": "rr-yyyy",
+        "VPCId": { "Ref": "VPC" }
+      }
+    },
+    "VPCResolverRulerr-zzzz": {
+      "Type": "AWS::Route53Resolver::ResolverRuleAssociation",
+      "Properties": {
+        "ResolverRuleId": "rr-zzzz",
+        "VPCId": { "Ref": "VPC" }
       }
     },
     "VPCIGW": {
@@ -1030,10 +1049,7 @@
   "Outputs": {
     "PlaceholderRoleArn": {
       "Value": {
-        "Fn::GetAtt": [
-          "PlaceholderRole",
-          "Arn"
-        ]
+        "Fn::GetAtt": ["PlaceholderRole", "Arn"]
       }
     },
     "VPCCIDR": {
