@@ -43,6 +43,27 @@
                     "logs:PutLogEvents"
                   ],
                   "Resource": "*"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ec2:CreateNetworkAclEntry",
+                    "ec2:DeleteNetworkAclEntry"
+                  ],
+                  "Resource": [
+                    {
+                      "Ref": "VPCPublicNACL"
+                    },
+                    {
+                      "Ref": "VPCPrivateNACL"
+                    },
+                    {
+                      "Ref": "VPCRestrictedNACL"
+                    },
+                    {
+                      "Ref": "VPCNetworkingNACL"
+                    }
+                  ]
                 }
               ]
             }

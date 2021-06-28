@@ -45,6 +45,39 @@
                     "logs:PutLogEvents"
                   ],
                   "Resource": "*"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ec2:CreateNetworkAclEntry",
+                    "ec2:DeleteNetworkAclEntry"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "VPC",
+                        "PublicNACLId"
+                      ]
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "VPC",
+                        "PrivateNACLId"
+                      ]
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "VPC",
+                        "RestrictedNACLId"
+                      ]
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "VPC",
+                        "NetworkingNACLId"
+                      ]
+                    }
+                  ]
                 }
               ]
             }

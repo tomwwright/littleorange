@@ -277,6 +277,59 @@ class NetworkingVPCMacro(object):
 
     self.buildVPC(name, resource)
 
+  def transformVpcAttributeLookups(self, name):
+    resources = self.template.get("Resources", {})
+    resource = resources[name]
+    self.enumerateAndTransformProperties(resource, "Properties")
+
+  def enumerateAndTransformProperties(self, properties, key):
+    if isinstance(properties[key], list):
+      for index, _ in enumerate(properties[key]):
+        self.enumerateAndTransformProperties(properties[key], index)
+    elif isinstance(properties[key], dict):
+      attributeLookupOrFalse = self.isVpcAttributeLookup(properties[key])
+      if attributeLookupOrFalse != False:
+        self.transformVpcAttributeLookupProperty(properties, key)
+      else:
+        for innerKey in properties[key].keys():
+          self.enumerateAndTransformProperties(properties[key], innerKey)
+        
+  def transformVpcAttributeLookupProperty(self, properties, key):
+    [resource, attribute] = properties[key]["Fn::GetAtt"]
+
+    if attribute in ["CidrBlock", "CidrBlockAssociations", "DefaultNetworkAcl", "DefaultSecurityGroup", "Ipv6CidrBlocks"]:
+      return # leave unchanged as to resolve attributes of AWS::EC2::VPC resource type
+
+    tiers = "(Public|Private|Restricted|Networking)"
+    azs = "(A|B|C|D|E|F)"
+
+    mapping = {
+      re.compile(f"{tiers}NACLId"): lambda match: {"Ref": f"{resource}{match.group(1)}NACL"},
+      re.compile(f"{tiers}Subnet{azs}Id"): lambda match: {"Ref": f"{resource}{match.group(1)}Subnet{match.group(2)}"},
+      re.compile(f"{tiers}Subnet{azs}RouteTableId"): lambda match: {"Ref": f"{resource}{match.group(1)}Subnet{match.group(2)}RouteTable"}
+    }
+
+    for pattern, resolver in mapping.items():
+      match = pattern.match(attribute)
+      if match:
+        properties[key] = resolver(match)
+        return
+
+  def isVpcAttributeLookup(self, property):
+    if not isinstance(property, dict) or "Fn::GetAtt" not in property:
+      return False
+    getAtt = property["Fn::GetAtt"]
+    if not isinstance(getAtt, list):
+      return False
+    if not self.isResourceVpc(getAtt[0]):
+      return False
+    return True
+
+  def isResourceVpc(self, name):
+    resources = self.template.get("Resources", {})
+    resource = resources[name]
+    return resource["Type"] == "LittleOrange::Networking::VPC"
+
   def transform(self, template, parameters):
 
     self.template = dict(template)
@@ -288,7 +341,9 @@ class NetworkingVPCMacro(object):
     resources = self.template.get("Resources", {})
     initialResourceNames = list(resources.keys())
     for name in initialResourceNames:
-      if resources[name]["Type"] == "LittleOrange::Networking::VPC":
+      if self.isResourceVpc(name):
         self.transformVPCResource(name)
+      else:
+        self.transformVpcAttributeLookups(name)
 
     return self.template
