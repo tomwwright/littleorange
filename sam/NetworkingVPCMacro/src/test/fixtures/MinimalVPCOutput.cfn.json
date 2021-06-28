@@ -1,18 +1,8 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "Little Orange Minimal VPC",
-  "Metadata": {
-    "cfn-lint": {
-      "config": {
-        "ignore_checks": ["E3001"]
-      }
-    }
-  },
-  "Parameters": {
-    "VPCCIDR": {
-      "Type": "String"
-    }
-  },
+  "Metadata": { "cfn-lint": { "config": { "ignore_checks": ["E3001"] } } },
+  "Parameters": { "VPCCIDR": { "Type": "String" } },
   "Resources": {
     "PlaceholderRole": {
       "Type": "AWS::IAM::Role",
@@ -22,9 +12,7 @@
           "Statement": [
             {
               "Effect": "Allow",
-              "Principal": {
-                "Service": "lambda.amazonaws.com"
-              },
+              "Principal": { "Service": "lambda.amazonaws.com" },
               "Action": "sts:AssumeRole"
             }
           ]
@@ -51,18 +39,10 @@
                     "ec2:DeleteNetworkAclEntry"
                   ],
                   "Resource": [
-                    {
-                      "Ref": "VPCPublicNACL"
-                    },
-                    {
-                      "Ref": "VPCPrivateNACL"
-                    },
-                    {
-                      "Ref": "VPCRestrictedNACL"
-                    },
-                    {
-                      "Ref": "VPCNetworkingNACL"
-                    }
+                    { "Ref": "VPCPublicNACL" },
+                    { "Ref": "VPCPrivateNACL" },
+                    { "Ref": "VPCRestrictedNACL" },
+                    { "Ref": "VPCNetworkingNACL" }
                   ]
                 }
               ]
@@ -77,38 +57,34 @@
         "CidrBlock": "10.0.0.0/22",
         "EnableDnsHostnames": true,
         "EnableDnsSupport": true,
-        "InstanceTenancy": "default"
+        "InstanceTenancy": "default",
+        "Tags": [{ "Key": "Name", "Value": "VPC" }]
       }
     },
     "VPCPublicNACL": {
       "Type": "AWS::EC2::NetworkAcl",
       "Properties": {
-        "VpcId": {
-          "Ref": "VPC"
-        }
-      }
-    },
-    "VPCPublicNACLEgress100": {
-      "Type": "AWS::EC2::NetworkAclEntry",
-      "Properties": {
-        "NetworkAclId": {
-          "Ref": "VPCPublicNACL"
-        },
-        "CidrBlock": "0.0.0.0/0",
-        "Egress": true,
-        "Protocol": -1,
-        "RuleAction": "allow",
-        "RuleNumber": 100
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCPublic" }]
       }
     },
     "VPCPublicNACLIngress100": {
       "Type": "AWS::EC2::NetworkAclEntry",
       "Properties": {
-        "NetworkAclId": {
-          "Ref": "VPCPublicNACL"
-        },
+        "NetworkAclId": { "Ref": "VPCPublicNACL" },
         "CidrBlock": "0.0.0.0/0",
         "Egress": false,
+        "Protocol": -1,
+        "RuleAction": "allow",
+        "RuleNumber": 100
+      }
+    },
+    "VPCPublicNACLEgress100": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "NetworkAclId": { "Ref": "VPCPublicNACL" },
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": true,
         "Protocol": -1,
         "RuleAction": "allow",
         "RuleNumber": 100
@@ -117,64 +93,38 @@
     "VPCPrivateNACL": {
       "Type": "AWS::EC2::NetworkAcl",
       "Properties": {
-        "VpcId": {
-          "Ref": "VPC"
-        }
-      }
-    },
-    "VPCPrivateNACLEgress100": {
-      "Type": "AWS::EC2::NetworkAclEntry",
-      "Properties": {
-        "NetworkAclId": {
-          "Ref": "VPCPrivateNACL"
-        },
-        "CidrBlock": "0.0.0.0/0",
-        "Egress": true,
-        "Protocol": -1,
-        "RuleAction": "allow",
-        "RuleNumber": 100
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCPrivate" }]
       }
     },
     "VPCPrivateNACLIngress100": {
       "Type": "AWS::EC2::NetworkAclEntry",
       "Properties": {
-        "NetworkAclId": {
-          "Ref": "VPCPrivateNACL"
-        },
+        "NetworkAclId": { "Ref": "VPCPrivateNACL" },
         "CidrBlock": "0.0.0.0/0",
         "Egress": false,
         "Protocol": 6,
         "RuleAction": "allow",
         "RuleNumber": 100,
-        "PortRange": {
-          "To": 65535,
-          "From": 1024
-        }
+        "PortRange": { "To": 65535, "From": 1024 }
       }
     },
     "VPCPrivateNACLIngress200": {
       "Type": "AWS::EC2::NetworkAclEntry",
       "Properties": {
-        "NetworkAclId": {
-          "Ref": "VPCPrivateNACL"
-        },
+        "NetworkAclId": { "Ref": "VPCPrivateNACL" },
         "CidrBlock": "0.0.0.0/0",
         "Egress": false,
         "Protocol": 17,
         "RuleAction": "allow",
         "RuleNumber": 200,
-        "PortRange": {
-          "To": 65535,
-          "From": 1024
-        }
+        "PortRange": { "To": 65535, "From": 1024 }
       }
     },
     "VPCPrivateNACLIngress300": {
       "Type": "AWS::EC2::NetworkAclEntry",
       "Properties": {
-        "NetworkAclId": {
-          "Ref": "VPCPrivateNACL"
-        },
+        "NetworkAclId": { "Ref": "VPCPrivateNACL" },
         "CidrBlock": "10.0.0.0/22",
         "Egress": false,
         "Protocol": -1,
@@ -182,20 +132,10 @@
         "RuleNumber": 300
       }
     },
-    "VPCRestrictedNACL": {
-      "Type": "AWS::EC2::NetworkAcl",
-      "Properties": {
-        "VpcId": {
-          "Ref": "VPC"
-        }
-      }
-    },
-    "VPCRestrictedNACLEgress100": {
+    "VPCPrivateNACLEgress100": {
       "Type": "AWS::EC2::NetworkAclEntry",
       "Properties": {
-        "NetworkAclId": {
-          "Ref": "VPCRestrictedNACL"
-        },
+        "NetworkAclId": { "Ref": "VPCPrivateNACL" },
         "CidrBlock": "0.0.0.0/0",
         "Egress": true,
         "Protocol": -1,
@@ -203,14 +143,30 @@
         "RuleNumber": 100
       }
     },
+    "VPCRestrictedNACL": {
+      "Type": "AWS::EC2::NetworkAcl",
+      "Properties": {
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCRestricted" }]
+      }
+    },
     "VPCRestrictedNACLIngress100": {
       "Type": "AWS::EC2::NetworkAclEntry",
       "Properties": {
-        "NetworkAclId": {
-          "Ref": "VPCRestrictedNACL"
-        },
+        "NetworkAclId": { "Ref": "VPCRestrictedNACL" },
         "CidrBlock": "10.0.1.0/24",
         "Egress": false,
+        "Protocol": -1,
+        "RuleAction": "allow",
+        "RuleNumber": 100
+      }
+    },
+    "VPCRestrictedNACLEgress100": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "NetworkAclId": { "Ref": "VPCRestrictedNACL" },
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": true,
         "Protocol": -1,
         "RuleAction": "allow",
         "RuleNumber": 100
@@ -219,32 +175,27 @@
     "VPCNetworkingNACL": {
       "Type": "AWS::EC2::NetworkAcl",
       "Properties": {
-        "VpcId": {
-          "Ref": "VPC"
-        }
-      }
-    },
-    "VPCNetworkingNACLEgress100": {
-      "Type": "AWS::EC2::NetworkAclEntry",
-      "Properties": {
-        "NetworkAclId": {
-          "Ref": "VPCNetworkingNACL"
-        },
-        "CidrBlock": "0.0.0.0/0",
-        "Egress": true,
-        "Protocol": -1,
-        "RuleAction": "allow",
-        "RuleNumber": 100
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCNetworking" }]
       }
     },
     "VPCNetworkingNACLIngress100": {
       "Type": "AWS::EC2::NetworkAclEntry",
       "Properties": {
-        "NetworkAclId": {
-          "Ref": "VPCNetworkingNACL"
-        },
+        "NetworkAclId": { "Ref": "VPCNetworkingNACL" },
         "CidrBlock": "10.0.0.0/22",
         "Egress": false,
+        "Protocol": -1,
+        "RuleAction": "allow",
+        "RuleNumber": 100
+      }
+    },
+    "VPCNetworkingNACLEgress100": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "NetworkAclId": { "Ref": "VPCNetworkingNACL" },
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": true,
         "Protocol": -1,
         "RuleAction": "allow",
         "RuleNumber": 100
@@ -253,585 +204,370 @@
     "VPCPublicA": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
-        "AvailabilityZone": {
-          "Fn::Select": [
-            "0",
-            {
-              "Fn::GetAZs": ""
-            }
-          ]
-        },
+        "AvailabilityZone": { "Fn::Select": ["0", { "Fn::GetAZs": "" }] },
         "CidrBlock": "10.0.0.0/26",
-        "VpcId": {
-          "Ref": "VPC"
-        }
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCPublicA" }]
       }
     },
     "VPCPublicANACLAssoc": {
       "Type": "AWS::EC2::SubnetNetworkAclAssociation",
       "Properties": {
-        "NetworkAclId": {
-          "Ref": "VPCPublicNACL"
-        },
-        "SubnetId": {
-          "Ref": "VPCPublicA"
-        }
+        "NetworkAclId": { "Ref": "VPCPublicNACL" },
+        "SubnetId": { "Ref": "VPCPublicA" }
       }
     },
     "VPCPublicARouteTable": {
       "Type": "AWS::EC2::RouteTable",
       "Properties": {
-        "VpcId": {
-          "Ref": "VPC"
-        }
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCPublicA" }]
       }
     },
     "VPCPublicARouteTableAssoc": {
       "Type": "AWS::EC2::SubnetRouteTableAssociation",
       "Properties": {
-        "RouteTableId": {
-          "Ref": "VPCPublicARouteTable"
-        },
-        "SubnetId": {
-          "Ref": "VPCPublicA"
-        }
+        "RouteTableId": { "Ref": "VPCPublicARouteTable" },
+        "SubnetId": { "Ref": "VPCPublicA" }
       }
     },
     "VPCPublicB": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
-        "AvailabilityZone": {
-          "Fn::Select": [
-            "1",
-            {
-              "Fn::GetAZs": ""
-            }
-          ]
-        },
+        "AvailabilityZone": { "Fn::Select": ["1", { "Fn::GetAZs": "" }] },
         "CidrBlock": "10.0.0.64/26",
-        "VpcId": {
-          "Ref": "VPC"
-        }
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCPublicB" }]
       }
     },
     "VPCPublicBNACLAssoc": {
       "Type": "AWS::EC2::SubnetNetworkAclAssociation",
       "Properties": {
-        "NetworkAclId": {
-          "Ref": "VPCPublicNACL"
-        },
-        "SubnetId": {
-          "Ref": "VPCPublicB"
-        }
+        "NetworkAclId": { "Ref": "VPCPublicNACL" },
+        "SubnetId": { "Ref": "VPCPublicB" }
       }
     },
     "VPCPublicBRouteTable": {
       "Type": "AWS::EC2::RouteTable",
       "Properties": {
-        "VpcId": {
-          "Ref": "VPC"
-        }
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCPublicB" }]
       }
     },
     "VPCPublicBRouteTableAssoc": {
       "Type": "AWS::EC2::SubnetRouteTableAssociation",
       "Properties": {
-        "RouteTableId": {
-          "Ref": "VPCPublicBRouteTable"
-        },
-        "SubnetId": {
-          "Ref": "VPCPublicB"
-        }
+        "RouteTableId": { "Ref": "VPCPublicBRouteTable" },
+        "SubnetId": { "Ref": "VPCPublicB" }
       }
     },
     "VPCPublicC": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
-        "AvailabilityZone": {
-          "Fn::Select": [
-            "2",
-            {
-              "Fn::GetAZs": ""
-            }
-          ]
-        },
+        "AvailabilityZone": { "Fn::Select": ["2", { "Fn::GetAZs": "" }] },
         "CidrBlock": "10.0.0.128/26",
-        "VpcId": {
-          "Ref": "VPC"
-        }
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCPublicC" }]
       }
     },
     "VPCPublicCNACLAssoc": {
       "Type": "AWS::EC2::SubnetNetworkAclAssociation",
       "Properties": {
-        "NetworkAclId": {
-          "Ref": "VPCPublicNACL"
-        },
-        "SubnetId": {
-          "Ref": "VPCPublicC"
-        }
+        "NetworkAclId": { "Ref": "VPCPublicNACL" },
+        "SubnetId": { "Ref": "VPCPublicC" }
       }
     },
     "VPCPublicCRouteTable": {
       "Type": "AWS::EC2::RouteTable",
       "Properties": {
-        "VpcId": {
-          "Ref": "VPC"
-        }
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCPublicC" }]
       }
     },
     "VPCPublicCRouteTableAssoc": {
       "Type": "AWS::EC2::SubnetRouteTableAssociation",
       "Properties": {
-        "RouteTableId": {
-          "Ref": "VPCPublicCRouteTable"
-        },
-        "SubnetId": {
-          "Ref": "VPCPublicC"
-        }
+        "RouteTableId": { "Ref": "VPCPublicCRouteTable" },
+        "SubnetId": { "Ref": "VPCPublicC" }
       }
     },
     "VPCPrivateA": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
-        "AvailabilityZone": {
-          "Fn::Select": [
-            "0",
-            {
-              "Fn::GetAZs": ""
-            }
-          ]
-        },
+        "AvailabilityZone": { "Fn::Select": ["0", { "Fn::GetAZs": "" }] },
         "CidrBlock": "10.0.1.0/26",
-        "VpcId": {
-          "Ref": "VPC"
-        }
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCPrivateA" }]
       }
     },
     "VPCPrivateANACLAssoc": {
       "Type": "AWS::EC2::SubnetNetworkAclAssociation",
       "Properties": {
-        "NetworkAclId": {
-          "Ref": "VPCPrivateNACL"
-        },
-        "SubnetId": {
-          "Ref": "VPCPrivateA"
-        }
+        "NetworkAclId": { "Ref": "VPCPrivateNACL" },
+        "SubnetId": { "Ref": "VPCPrivateA" }
       }
     },
     "VPCPrivateARouteTable": {
       "Type": "AWS::EC2::RouteTable",
       "Properties": {
-        "VpcId": {
-          "Ref": "VPC"
-        }
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCPrivateA" }]
       }
     },
     "VPCPrivateARouteTableAssoc": {
       "Type": "AWS::EC2::SubnetRouteTableAssociation",
       "Properties": {
-        "RouteTableId": {
-          "Ref": "VPCPrivateARouteTable"
-        },
-        "SubnetId": {
-          "Ref": "VPCPrivateA"
-        }
+        "RouteTableId": { "Ref": "VPCPrivateARouteTable" },
+        "SubnetId": { "Ref": "VPCPrivateA" }
       }
     },
     "VPCPrivateB": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
-        "AvailabilityZone": {
-          "Fn::Select": [
-            "1",
-            {
-              "Fn::GetAZs": ""
-            }
-          ]
-        },
+        "AvailabilityZone": { "Fn::Select": ["1", { "Fn::GetAZs": "" }] },
         "CidrBlock": "10.0.1.64/26",
-        "VpcId": {
-          "Ref": "VPC"
-        }
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCPrivateB" }]
       }
     },
     "VPCPrivateBNACLAssoc": {
       "Type": "AWS::EC2::SubnetNetworkAclAssociation",
       "Properties": {
-        "NetworkAclId": {
-          "Ref": "VPCPrivateNACL"
-        },
-        "SubnetId": {
-          "Ref": "VPCPrivateB"
-        }
+        "NetworkAclId": { "Ref": "VPCPrivateNACL" },
+        "SubnetId": { "Ref": "VPCPrivateB" }
       }
     },
     "VPCPrivateBRouteTable": {
       "Type": "AWS::EC2::RouteTable",
       "Properties": {
-        "VpcId": {
-          "Ref": "VPC"
-        }
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCPrivateB" }]
       }
     },
     "VPCPrivateBRouteTableAssoc": {
       "Type": "AWS::EC2::SubnetRouteTableAssociation",
       "Properties": {
-        "RouteTableId": {
-          "Ref": "VPCPrivateBRouteTable"
-        },
-        "SubnetId": {
-          "Ref": "VPCPrivateB"
-        }
+        "RouteTableId": { "Ref": "VPCPrivateBRouteTable" },
+        "SubnetId": { "Ref": "VPCPrivateB" }
       }
     },
     "VPCPrivateC": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
-        "AvailabilityZone": {
-          "Fn::Select": [
-            "2",
-            {
-              "Fn::GetAZs": ""
-            }
-          ]
-        },
+        "AvailabilityZone": { "Fn::Select": ["2", { "Fn::GetAZs": "" }] },
         "CidrBlock": "10.0.1.128/26",
-        "VpcId": {
-          "Ref": "VPC"
-        }
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCPrivateC" }]
       }
     },
     "VPCPrivateCNACLAssoc": {
       "Type": "AWS::EC2::SubnetNetworkAclAssociation",
       "Properties": {
-        "NetworkAclId": {
-          "Ref": "VPCPrivateNACL"
-        },
-        "SubnetId": {
-          "Ref": "VPCPrivateC"
-        }
+        "NetworkAclId": { "Ref": "VPCPrivateNACL" },
+        "SubnetId": { "Ref": "VPCPrivateC" }
       }
     },
     "VPCPrivateCRouteTable": {
       "Type": "AWS::EC2::RouteTable",
       "Properties": {
-        "VpcId": {
-          "Ref": "VPC"
-        }
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCPrivateC" }]
       }
     },
     "VPCPrivateCRouteTableAssoc": {
       "Type": "AWS::EC2::SubnetRouteTableAssociation",
       "Properties": {
-        "RouteTableId": {
-          "Ref": "VPCPrivateCRouteTable"
-        },
-        "SubnetId": {
-          "Ref": "VPCPrivateC"
-        }
+        "RouteTableId": { "Ref": "VPCPrivateCRouteTable" },
+        "SubnetId": { "Ref": "VPCPrivateC" }
       }
     },
     "VPCRestrictedA": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
-        "AvailabilityZone": {
-          "Fn::Select": [
-            "0",
-            {
-              "Fn::GetAZs": ""
-            }
-          ]
-        },
+        "AvailabilityZone": { "Fn::Select": ["0", { "Fn::GetAZs": "" }] },
         "CidrBlock": "10.0.2.0/26",
-        "VpcId": {
-          "Ref": "VPC"
-        }
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCRestrictedA" }]
       }
     },
     "VPCRestrictedANACLAssoc": {
       "Type": "AWS::EC2::SubnetNetworkAclAssociation",
       "Properties": {
-        "NetworkAclId": {
-          "Ref": "VPCRestrictedNACL"
-        },
-        "SubnetId": {
-          "Ref": "VPCRestrictedA"
-        }
+        "NetworkAclId": { "Ref": "VPCRestrictedNACL" },
+        "SubnetId": { "Ref": "VPCRestrictedA" }
       }
     },
     "VPCRestrictedARouteTable": {
       "Type": "AWS::EC2::RouteTable",
       "Properties": {
-        "VpcId": {
-          "Ref": "VPC"
-        }
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCRestrictedA" }]
       }
     },
     "VPCRestrictedARouteTableAssoc": {
       "Type": "AWS::EC2::SubnetRouteTableAssociation",
       "Properties": {
-        "RouteTableId": {
-          "Ref": "VPCRestrictedARouteTable"
-        },
-        "SubnetId": {
-          "Ref": "VPCRestrictedA"
-        }
+        "RouteTableId": { "Ref": "VPCRestrictedARouteTable" },
+        "SubnetId": { "Ref": "VPCRestrictedA" }
       }
     },
     "VPCRestrictedB": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
-        "AvailabilityZone": {
-          "Fn::Select": [
-            "1",
-            {
-              "Fn::GetAZs": ""
-            }
-          ]
-        },
+        "AvailabilityZone": { "Fn::Select": ["1", { "Fn::GetAZs": "" }] },
         "CidrBlock": "10.0.2.64/26",
-        "VpcId": {
-          "Ref": "VPC"
-        }
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCRestrictedB" }]
       }
     },
     "VPCRestrictedBNACLAssoc": {
       "Type": "AWS::EC2::SubnetNetworkAclAssociation",
       "Properties": {
-        "NetworkAclId": {
-          "Ref": "VPCRestrictedNACL"
-        },
-        "SubnetId": {
-          "Ref": "VPCRestrictedB"
-        }
+        "NetworkAclId": { "Ref": "VPCRestrictedNACL" },
+        "SubnetId": { "Ref": "VPCRestrictedB" }
       }
     },
     "VPCRestrictedBRouteTable": {
       "Type": "AWS::EC2::RouteTable",
       "Properties": {
-        "VpcId": {
-          "Ref": "VPC"
-        }
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCRestrictedB" }]
       }
     },
     "VPCRestrictedBRouteTableAssoc": {
       "Type": "AWS::EC2::SubnetRouteTableAssociation",
       "Properties": {
-        "RouteTableId": {
-          "Ref": "VPCRestrictedBRouteTable"
-        },
-        "SubnetId": {
-          "Ref": "VPCRestrictedB"
-        }
+        "RouteTableId": { "Ref": "VPCRestrictedBRouteTable" },
+        "SubnetId": { "Ref": "VPCRestrictedB" }
       }
     },
     "VPCRestrictedC": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
-        "AvailabilityZone": {
-          "Fn::Select": [
-            "2",
-            {
-              "Fn::GetAZs": ""
-            }
-          ]
-        },
+        "AvailabilityZone": { "Fn::Select": ["2", { "Fn::GetAZs": "" }] },
         "CidrBlock": "10.0.2.128/26",
-        "VpcId": {
-          "Ref": "VPC"
-        }
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCRestrictedC" }]
       }
     },
     "VPCRestrictedCNACLAssoc": {
       "Type": "AWS::EC2::SubnetNetworkAclAssociation",
       "Properties": {
-        "NetworkAclId": {
-          "Ref": "VPCRestrictedNACL"
-        },
-        "SubnetId": {
-          "Ref": "VPCRestrictedC"
-        }
+        "NetworkAclId": { "Ref": "VPCRestrictedNACL" },
+        "SubnetId": { "Ref": "VPCRestrictedC" }
       }
     },
     "VPCRestrictedCRouteTable": {
       "Type": "AWS::EC2::RouteTable",
       "Properties": {
-        "VpcId": {
-          "Ref": "VPC"
-        }
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCRestrictedC" }]
       }
     },
     "VPCRestrictedCRouteTableAssoc": {
       "Type": "AWS::EC2::SubnetRouteTableAssociation",
       "Properties": {
-        "RouteTableId": {
-          "Ref": "VPCRestrictedCRouteTable"
-        },
-        "SubnetId": {
-          "Ref": "VPCRestrictedC"
-        }
+        "RouteTableId": { "Ref": "VPCRestrictedCRouteTable" },
+        "SubnetId": { "Ref": "VPCRestrictedC" }
       }
     },
     "VPCNetworkingA": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
-        "AvailabilityZone": {
-          "Fn::Select": [
-            "0",
-            {
-              "Fn::GetAZs": ""
-            }
-          ]
-        },
+        "AvailabilityZone": { "Fn::Select": ["0", { "Fn::GetAZs": "" }] },
         "CidrBlock": "10.0.3.0/26",
-        "VpcId": {
-          "Ref": "VPC"
-        }
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCNetworkingA" }]
       }
     },
     "VPCNetworkingANACLAssoc": {
       "Type": "AWS::EC2::SubnetNetworkAclAssociation",
       "Properties": {
-        "NetworkAclId": {
-          "Ref": "VPCNetworkingNACL"
-        },
-        "SubnetId": {
-          "Ref": "VPCNetworkingA"
-        }
+        "NetworkAclId": { "Ref": "VPCNetworkingNACL" },
+        "SubnetId": { "Ref": "VPCNetworkingA" }
       }
     },
     "VPCNetworkingARouteTable": {
       "Type": "AWS::EC2::RouteTable",
       "Properties": {
-        "VpcId": {
-          "Ref": "VPC"
-        }
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCNetworkingA" }]
       }
     },
     "VPCNetworkingARouteTableAssoc": {
       "Type": "AWS::EC2::SubnetRouteTableAssociation",
       "Properties": {
-        "RouteTableId": {
-          "Ref": "VPCNetworkingARouteTable"
-        },
-        "SubnetId": {
-          "Ref": "VPCNetworkingA"
-        }
+        "RouteTableId": { "Ref": "VPCNetworkingARouteTable" },
+        "SubnetId": { "Ref": "VPCNetworkingA" }
       }
     },
     "VPCNetworkingB": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
-        "AvailabilityZone": {
-          "Fn::Select": [
-            "1",
-            {
-              "Fn::GetAZs": ""
-            }
-          ]
-        },
+        "AvailabilityZone": { "Fn::Select": ["1", { "Fn::GetAZs": "" }] },
         "CidrBlock": "10.0.3.64/26",
-        "VpcId": {
-          "Ref": "VPC"
-        }
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCNetworkingB" }]
       }
     },
     "VPCNetworkingBNACLAssoc": {
       "Type": "AWS::EC2::SubnetNetworkAclAssociation",
       "Properties": {
-        "NetworkAclId": {
-          "Ref": "VPCNetworkingNACL"
-        },
-        "SubnetId": {
-          "Ref": "VPCNetworkingB"
-        }
+        "NetworkAclId": { "Ref": "VPCNetworkingNACL" },
+        "SubnetId": { "Ref": "VPCNetworkingB" }
       }
     },
     "VPCNetworkingBRouteTable": {
       "Type": "AWS::EC2::RouteTable",
       "Properties": {
-        "VpcId": {
-          "Ref": "VPC"
-        }
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCNetworkingB" }]
       }
     },
     "VPCNetworkingBRouteTableAssoc": {
       "Type": "AWS::EC2::SubnetRouteTableAssociation",
       "Properties": {
-        "RouteTableId": {
-          "Ref": "VPCNetworkingBRouteTable"
-        },
-        "SubnetId": {
-          "Ref": "VPCNetworkingB"
-        }
+        "RouteTableId": { "Ref": "VPCNetworkingBRouteTable" },
+        "SubnetId": { "Ref": "VPCNetworkingB" }
       }
     },
     "VPCNetworkingC": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
-        "AvailabilityZone": {
-          "Fn::Select": [
-            "2",
-            {
-              "Fn::GetAZs": ""
-            }
-          ]
-        },
+        "AvailabilityZone": { "Fn::Select": ["2", { "Fn::GetAZs": "" }] },
         "CidrBlock": "10.0.3.128/26",
-        "VpcId": {
-          "Ref": "VPC"
-        }
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCNetworkingC" }]
       }
     },
     "VPCNetworkingCNACLAssoc": {
       "Type": "AWS::EC2::SubnetNetworkAclAssociation",
       "Properties": {
-        "NetworkAclId": {
-          "Ref": "VPCNetworkingNACL"
-        },
-        "SubnetId": {
-          "Ref": "VPCNetworkingC"
-        }
+        "NetworkAclId": { "Ref": "VPCNetworkingNACL" },
+        "SubnetId": { "Ref": "VPCNetworkingC" }
       }
     },
     "VPCNetworkingCRouteTable": {
       "Type": "AWS::EC2::RouteTable",
       "Properties": {
-        "VpcId": {
-          "Ref": "VPC"
-        }
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [{ "Key": "Name", "Value": "VPCNetworkingC" }]
       }
     },
     "VPCNetworkingCRouteTableAssoc": {
       "Type": "AWS::EC2::SubnetRouteTableAssociation",
       "Properties": {
-        "RouteTableId": {
-          "Ref": "VPCNetworkingCRouteTable"
-        },
-        "SubnetId": {
-          "Ref": "VPCNetworkingC"
-        }
+        "RouteTableId": { "Ref": "VPCNetworkingCRouteTable" },
+        "SubnetId": { "Ref": "VPCNetworkingC" }
       }
     }
   },
   "Outputs": {
     "PlaceholderRoleArn": {
-      "Value": {
-        "Fn::GetAtt": ["PlaceholderRole", "Arn"]
-      }
+      "Value": { "Fn::GetAtt": ["PlaceholderRole", "Arn"] }
     },
-    "VPCCIDR": {
-      "Value": {
-        "Ref": "VPCCIDR"
-      }
-    },
-    "VPCId": {
-      "Description": "VPC ID of VPC",
-      "Value": {
-        "Ref": "VPC"
-      }
-    },
+    "VPCCIDR": { "Value": { "Ref": "VPCCIDR" } },
+    "VPCId": { "Description": "VPC ID of VPC", "Value": { "Ref": "VPC" } },
     "VPCPublicTierCIDR": {
       "Description": "IPv4 CIDR of the Public Tier of VPC",
       "Value": "10.0.0.0/24"
@@ -842,24 +578,16 @@
         "Fn::Join": [
           ",",
           [
-            {
-              "Ref": "VPCPublicA"
-            },
-            {
-              "Ref": "VPCPublicB"
-            },
-            {
-              "Ref": "VPCPublicC"
-            }
+            { "Ref": "VPCPublicA" },
+            { "Ref": "VPCPublicB" },
+            { "Ref": "VPCPublicC" }
           ]
         ]
       }
     },
     "VPCPublicNACLId": {
       "Description": "NACL ID of the Public Tier of VPC",
-      "Value": {
-        "Ref": "VPCPublicNACL"
-      }
+      "Value": { "Ref": "VPCPublicNACL" }
     },
     "VPCPrivateTierCIDR": {
       "Description": "IPv4 CIDR of the Private Tier of VPC",
@@ -871,24 +599,16 @@
         "Fn::Join": [
           ",",
           [
-            {
-              "Ref": "VPCPrivateA"
-            },
-            {
-              "Ref": "VPCPrivateB"
-            },
-            {
-              "Ref": "VPCPrivateC"
-            }
+            { "Ref": "VPCPrivateA" },
+            { "Ref": "VPCPrivateB" },
+            { "Ref": "VPCPrivateC" }
           ]
         ]
       }
     },
     "VPCPrivateNACLId": {
       "Description": "NACL ID of the Private Tier of VPC",
-      "Value": {
-        "Ref": "VPCPrivateNACL"
-      }
+      "Value": { "Ref": "VPCPrivateNACL" }
     },
     "VPCRestrictedTierCIDR": {
       "Description": "IPv4 CIDR of the Restricted Tier of VPC",
@@ -900,24 +620,16 @@
         "Fn::Join": [
           ",",
           [
-            {
-              "Ref": "VPCRestrictedA"
-            },
-            {
-              "Ref": "VPCRestrictedB"
-            },
-            {
-              "Ref": "VPCRestrictedC"
-            }
+            { "Ref": "VPCRestrictedA" },
+            { "Ref": "VPCRestrictedB" },
+            { "Ref": "VPCRestrictedC" }
           ]
         ]
       }
     },
     "VPCRestrictedNACLId": {
       "Description": "NACL ID of the Restricted Tier of VPC",
-      "Value": {
-        "Ref": "VPCRestrictedNACL"
-      }
+      "Value": { "Ref": "VPCRestrictedNACL" }
     },
     "VPCNetworkingTierCIDR": {
       "Description": "IPv4 CIDR of the Networking Tier of VPC",
@@ -929,24 +641,16 @@
         "Fn::Join": [
           ",",
           [
-            {
-              "Ref": "VPCNetworkingA"
-            },
-            {
-              "Ref": "VPCNetworkingB"
-            },
-            {
-              "Ref": "VPCNetworkingC"
-            }
+            { "Ref": "VPCNetworkingA" },
+            { "Ref": "VPCNetworkingB" },
+            { "Ref": "VPCNetworkingC" }
           ]
         ]
       }
     },
     "VPCNetworkingNACLId": {
       "Description": "NACL ID of the Networking Tier of VPC",
-      "Value": {
-        "Ref": "VPCNetworkingNACL"
-      }
+      "Value": { "Ref": "VPCNetworkingNACL" }
     }
   }
 }

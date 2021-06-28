@@ -79,7 +79,14 @@ class NetworkingVPCMacro(object):
     def buildInternetGateway(self, vpcName):
         self.template["Resources"][f"{vpcName}IGW"] = {
             "Type": "AWS::EC2::InternetGateway",
-            "Properties": {}
+            "Properties": {
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": f"{vpcName}IGW"
+                    }
+                ]
+            }
         }
 
         self.template["Resources"][f"{vpcName}IGWAttachment"] = {
@@ -100,7 +107,13 @@ class NetworkingVPCMacro(object):
             self.template["Resources"][natGatewayIPResourceName] = {
                 "Type": "AWS::EC2::EIP",
                 "Properties": {
-                    "Domain": "vpc"
+                    "Domain": "vpc",
+                    "Tags": [
+                        {
+                            "Key": "Name",
+                            "Value": natGatewayIPResourceName
+                        }
+                    ]
                 }
             }
 
@@ -108,7 +121,13 @@ class NetworkingVPCMacro(object):
                 "Type": "AWS::EC2::NatGateway",
                 "Properties": {
                     "AllocationId": {"Fn::GetAtt": f"{natGatewayIPResourceName}.AllocationId"},
-                    "SubnetId": {"Ref": publicSubnetResourceName}
+                    "SubnetId": {"Ref": publicSubnetResourceName},
+                    "Tags": [
+                        {
+                            "Key": "Name",
+                            "Value": natGatewayResourceName
+                        }
+                    ]
                 }
             }
 
@@ -119,7 +138,13 @@ class NetworkingVPCMacro(object):
                 "Properties": {
                     "AvailabilityZone": {"Fn::Select": [str(subnet["AvailabilityZoneIndex"]), {"Fn::GetAZs": ""}]},
                     "CidrBlock": str(subnet["CIDR"]),
-                    "VpcId": {"Ref": vpc.name}
+                    "VpcId": {"Ref": vpc.name},
+                    "Tags": [
+                        {
+                            "Key": "Name",
+                            "Value": subnet["ResourceName"]
+                        }
+                    ]
                 }
             }
 
@@ -134,7 +159,13 @@ class NetworkingVPCMacro(object):
             self.template["Resources"][subnet["ResourceName"] + "RouteTable"] = {
                 "Type": "AWS::EC2::RouteTable",
                 "Properties": {
-                    "VpcId": {"Ref": vpc.name}
+                    "VpcId": {"Ref": vpc.name},
+                    "Tags": [
+                        {
+                            "Key": "Name",
+                            "Value": subnet["ResourceName"]
+                        }
+                    ]
                 }
             }
 
@@ -183,7 +214,13 @@ class NetworkingVPCMacro(object):
             self.template["Resources"][naclResourceName] = {
                 "Type": "AWS::EC2::NetworkAcl",
                 "Properties": {
-                    "VpcId": {"Ref": vpc.name}
+                    "VpcId": {"Ref": vpc.name},
+                    "Tags": [
+                        {
+                            "Key": "Name",
+                            "Value": tier['ResourceName']
+                        }
+                    ]
                 }
             }
             self.template["Outputs"][f"{tier['ResourceName']}NACLId"] = {
@@ -259,7 +296,13 @@ class NetworkingVPCMacro(object):
                 "CidrBlock": cidr,
                 "EnableDnsHostnames": True,
                 "EnableDnsSupport": True,
-                "InstanceTenancy": "default"
+                "InstanceTenancy": "default",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": name
+                    }
+                ]
             }
         }
 
