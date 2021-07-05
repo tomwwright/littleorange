@@ -3,10 +3,45 @@ import json
 import os
 from unittest import TestCase
 
-from ..macro import app
+from ..macro import app, util
 
 
 class Test(TestCase):
+
+  def testResolveParameter(self):
+    parameters = util.StackParameters({
+        "A": "One",
+        "B": "Two",
+        "C": "Three"
+    })
+
+    assert parameters.resolve({"Ref": "A"}) == "One"
+    assert parameters.resolve({"Fn::Ref": "B"}) == "Two"
+    assert parameters.resolve("Literal") == "Literal"
+    assert parameters.resolve(123) == 123
+    assert parameters.resolve({
+        "Fn::Join": [
+            ",",
+            [{"Ref": "A"}, {"Ref": "C"}]
+        ]
+    }) == "One,Three"
+    assert parameters.resolve({
+        "Fn::Split": [
+            ",",
+            "Hello,World"
+        ]
+    }) == ["Hello", "World"]
+    assert parameters.resolve({
+        "Fn::Split": [
+            ",",
+            {
+                "Fn::Join": [
+                    ",",
+                    [{"Ref": "B"}, {"Ref": "A"}, {"Ref": "C"}]
+                ]
+            }
+        ]
+    }) == ["Two", "One", "Three"]
 
   def testNoop(self):
 
@@ -146,7 +181,6 @@ class Test(TestCase):
     assert response["status"] == "success"
     assert response["requestId"] == event["requestId"]
     assert response["fragment"] == outputTemplate
-
 
   def testDifferentSizesVPC(self):
 
