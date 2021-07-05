@@ -1,0 +1,8 @@
+---
+template_path: Core/ParameterStoreStackSet.cfn.yaml
+parameters:
+  CentralisedVpcEndpointResolverRuleIds: !stack_output Networking/CentralisedVPCEndpoints.yaml::ResolverRuleIds
+  CentralisedDnsResolverRuleId: !stack_output Networking/Route53Resolver.yaml::ResolverRuleId
+  OrganizationRootId: !stack_output Core/Organization.yaml::RootId
+  StackTemplate: !file_contents "{{ project_path }}/templates/Core/ParameterStore.cfn.yaml"
+  TransitGatewayId: !stack_output Networking/TransitGateway.yaml::TransitGatewayId

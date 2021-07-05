@@ -210,3 +210,14 @@ Resources:
         - Ip: !Select [0, !Ref InboundResolverEndpointIpAddresses]
         - Ip: !Select [1, !Ref InboundResolverEndpointIpAddresses]
         - Ip: !Select [2, !Ref InboundResolverEndpointIpAddresses]
+Outputs:
+  ResolverRuleIds:
+    Value:
+      !Join [
+        ",",
+        [
+          !GetAtt Ec2MessagesResolverRule.ResolverRuleId,
+          !GetAtt SsmResolverRule.ResolverRuleId,
+          !GetAtt SsmMessagesResolverRule.ResolverRuleId,
+        ],
+      ]

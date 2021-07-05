@@ -1,0 +1,42 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange Parameter Store Shared Configuration Stack Sets
+Parameters:
+  CentralisedVpcEndpointResolverRuleIds:
+    Description: Resolver Rule IDs for Centralised VPC Endpoints
+    Type: CommaDelimitedList
+  CentralisedDnsResolverRuleId:
+    Description: Resolver Rule ID for Centralised DNS Domain
+    Type: String
+  OrganizationRootId:
+    Description: Root ID of the Organization to apply as deployment target
+    Type: String
+  StackTemplate:
+    Description: Stack template to deploy in set
+    Type: String
+  TransitGatewayId:
+    Description: Transit Gateway ID
+    Type: String
+Resources:
+  StackSet:
+    Type: AWS::CloudFormation::StackSet
+    Properties:
+      AutoDeployment:
+        Enabled: true
+        RetainStacksOnAccountRemoval: false
+      Description: Parameter Store Shared Configuration across Organization
+      Parameters:
+        - ParameterKey: CentralisedVpcEndpointResolverRuleIds
+          ParameterValue:
+            !Join [",", !Ref CentralisedVpcEndpointResolverRuleIds]
+        - ParameterKey: CentralisedDnsResolverRuleId
+          ParameterValue: !Ref CentralisedDnsResolverRuleId
+        - ParameterKey: TransitGatewayId
+          ParameterValue: !Ref TransitGatewayId
+      PermissionModel: SERVICE_MANAGED
+      StackInstancesGroup:
+        - DeploymentTargets:
+            OrganizationalUnitIds: [!Ref OrganizationRootId]
+          Regions: [!Ref "AWS::Region"]
+      StackSetName: !Sub "${AWS::StackName}"
+      TemplateBody: !Ref StackTemplate

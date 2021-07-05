@@ -1,0 +1,34 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Little Orange Parameter Store Shared Configuration
+Parameters:
+  CentralisedVpcEndpointResolverRuleIds:
+    Description: Resolver Rule IDs for Centralised VPC Endpoints
+    Type: CommaDelimitedList
+  CentralisedDnsResolverRuleId:
+    Description: Resolver Rule ID for Centralised DNS Domain
+    Type: String
+  TransitGatewayId:
+    Description: Transit Gateway ID
+    Type: String
+Resources:
+  CentralisedVpcEndpointParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /LittleOrange/CentralisedVPCEndpointResolverRuleIds
+      Type: StringList
+      Value: !Join [",", !Ref CentralisedVpcEndpointResolverRuleIds]
+
+  CentralisedDnsParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /LittleOrange/CentralisedDNSResolverRuleId
+      Type: String
+      Value: !Ref CentralisedDnsResolverRuleId
+
+  TransitGatewayParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /LittleOrange/TransitGatewayId
+      Type: String
+      Value: !Ref TransitGatewayId

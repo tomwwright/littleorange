@@ -95,6 +95,9 @@ Outputs:
   ResolverRuleArn:
     Description: Resolver Rule ARN for Little Orange AWS DNS
     Value: !GetAtt ResolverRule.Arn
+  ResolverRuleId:
+    Description: Resolver Rule ID for Little Orange AWS DNS
+    Value: !GetAtt ResolverRule.ResolverRuleId
   ResolverInboundEndpointIpAddresses:
     Description: IP Addresses for the Route 53 Resolver Inbound Endpoint
     Value: !Join [",", !GetAtt ResolverEndpointExtendedOutput.IpAddresses]
