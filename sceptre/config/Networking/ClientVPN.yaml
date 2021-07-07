@@ -1,7 +1,7 @@
 ---
 template_path: Networking/ClientVPN.cfn.yaml
 parameters:
-  CertificateArn: !stack_output Networking/NetworkingSubdomain.yaml::CertificateArn
+  CertificateId: "{{ var.client_vpn_certificate_id }}"
   ClientIpCidr: "{{ var.cidrs.client_vpn }}"
   DnsIpAddresses: !stack_output Networking/Route53Resolver.yaml::ResolverInboundEndpointIpAddresses
   LittleOrangeCidr: "{{ var.cidrs.littleorange }}"

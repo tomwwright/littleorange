@@ -3,6 +3,8 @@
 # Little Orange Configuration
 # ---
 
+client_vpn_certificate_id: b3d82534-8645-4cb9-824c-42e31051df64
+
 cidrs:
   littleorange: 10.1.0.0/16
   dns: 10.1.4.0/23

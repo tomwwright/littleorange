@@ -2,8 +2,8 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: Little Orange Client VPN
 Parameters:
-  CertificateArn:
-    Description: ACM Certificate ARN to configure as server certificate of Client VPN Endpoint
+  CertificateId:
+    Description: ACM Certificate ID to configure as server certificate of Client VPN Endpoint
     Type: String
   ClientIpCidr:
     Description: IPv4 CIDR to allocate for client connections
@@ -80,7 +80,7 @@ Resources:
       SecurityGroupIds:
         - !Ref SecurityGroup
       SelfServicePortal: false
-      ServerCertificateArn: !Ref CertificateArn
+      ServerCertificateArn: !Sub arn:aws:acm:${AWS::Region}:${AWS::AccountId}:certificate/${CertificateId}
       SplitTunnel: true
       TransportProtocol: tcp
       VpcId: !Ref VpcId
