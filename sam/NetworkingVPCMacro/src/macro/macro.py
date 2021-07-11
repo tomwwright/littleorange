@@ -67,7 +67,7 @@ class NetworkingVPCMacro(object):
   def buildRoute53ResolverRuleAssociations(self, vpcName, resolverRuleIds):
     for ruleId in resolverRuleIds:
       resolverRuleAssociationResourceName = "{}ResolverRule{}".format(
-          vpcName, ruleId)
+          vpcName, ruleId.replace("rslvr-rr-", ""))
       self.template["Resources"][resolverRuleAssociationResourceName] = {
           "Type": "AWS::Route53Resolver::ResolverRuleAssociation",
           "Properties": {
@@ -352,7 +352,7 @@ class NetworkingVPCMacro(object):
               properties[key], innerKey)
 
   def transformVpcAttributeLookupProperty(self, properties, key):
-    [resource, attribute] = properties[key]["Fn::GetAtt"]
+    (resource, attribute) = util.unpackGetAtt(properties[key]["Fn::GetAtt"])
 
     if attribute in ["CidrBlock", "CidrBlockAssociations", "DefaultNetworkAcl", "DefaultSecurityGroup", "Ipv6CidrBlocks"]:
       return  # leave unchanged as to resolve attributes of AWS::EC2::VPC resource type
@@ -362,8 +362,8 @@ class NetworkingVPCMacro(object):
 
     mapping = {
         re.compile(f"{tiers}NACLId"): lambda match: {"Ref": f"{resource}{match.group(1)}NACL"},
-        re.compile(f"{tiers}Subnet{azs}Id"): lambda match: {"Ref": f"{resource}{match.group(1)}Subnet{match.group(2)}"},
-        re.compile(f"{tiers}Subnet{azs}RouteTableId"): lambda match: {"Ref": f"{resource}{match.group(1)}Subnet{match.group(2)}RouteTable"}
+        re.compile(f"{tiers}Subnet{azs}Id"): lambda match: {"Ref": f"{resource}{match.group(1)}{match.group(2)}"},
+        re.compile(f"{tiers}Subnet{azs}RouteTableId"): lambda match: {"Ref": f"{resource}{match.group(1)}{match.group(2)}RouteTable"}
     }
 
     for pattern, resolver in mapping.items():
@@ -375,10 +375,8 @@ class NetworkingVPCMacro(object):
   def isVpcAttributeLookup(self, property):
     if not isinstance(property, dict) or "Fn::GetAtt" not in property:
       return False
-    getAtt = property["Fn::GetAtt"]
-    if not isinstance(getAtt, list):
-      return False
-    if not self.isResourceVpc(getAtt[0]):
+    (resource, _) = util.unpackGetAtt(property["Fn::GetAtt"])
+    if not self.isResourceVpc(resource):
       return False
     return True
 
@@ -397,10 +395,10 @@ class NetworkingVPCMacro(object):
 
     resources = self.template.get("Resources", {})
     initialResourceNames = list(resources.keys())
+    for name in initialResourceNames:  # perform all attribute transforms before VPC transforms
+      self.transformVpcAttributeLookups(name)
     for name in initialResourceNames:
       if self.isResourceVpc(name):
         self.transformVPCResource(name)
-      else:
-        self.transformVpcAttributeLookups(name)
 
     return self.template

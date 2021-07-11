@@ -10,8 +10,9 @@ class StackParameters(object):
 
     if "Fn::Join" in parameter:
       delimiter, values = parameter["Fn::Join"]
-      resolved = self.resolve(delimiter)
-      return resolved.join([self.resolve(value) for value in values])
+      resolvedDelimiter = self.resolve(delimiter)
+      resolvedValues = self.resolve(values)
+      return resolvedDelimiter.join([self.resolve(value) for value in resolvedValues])
 
     if "Fn::Split" in parameter:
       delimiter, string = parameter["Fn::Split"]
@@ -38,3 +39,12 @@ def find(collection, searchLambda):
   if matches == []:
     return None
   return matches[0]
+
+
+def unpackGetAtt(getAtt):
+  if isinstance(getAtt, list):
+    return (getAtt[0], getAtt[1])
+  if isinstance(getAtt, str):
+    dotIndex = getAtt.index(".")
+    return (getAtt[0:dotIndex], getAtt[dotIndex+1:])
+  raise ValueError("Invalid Fn::GetAtt passed to unpack!")

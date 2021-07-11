@@ -1,0 +1,127 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Little Orange Minimal VPC",
+  "Metadata": {
+    "cfn-lint": {
+      "config": {
+        "ignore_checks": ["E3001"]
+      }
+    }
+  },
+  "Parameters": {
+    "VPCCIDR": {
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "VPC": {
+      "Type": "LittleOrange::Networking::VPC",
+      "Properties": {
+        "AvailabilityZones": 3,
+        "CIDR": {
+          "Ref": "VPCCIDR"
+        },
+        "InternetGateway": false,
+        "NATGateways": false
+      }
+    },
+    "TransitGatewayAttachment": {
+      "Type": "AWS::EC2::TransitGatewayAttachment",
+      "Properties": {
+        "SubnetIds": [
+          {
+            "Fn::GetAtt": "VPC.NetworkingSubnetAId"
+          },
+          {
+            "Fn::GetAtt": "VPC.NetworkingSubnetBId"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "TransitGateway:AssociateWith",
+            "Value": "Test"
+          },
+          {
+            "Key": "TransitGateway:PropagateTo",
+            "Value": "Test"
+          }
+        ],
+        "TransitGatewayId": "tgw-xxxx",
+        "VpcId": {
+          "Ref": "Vpc"
+        }
+      }
+    },
+    "TransitGatewayPublicNACLEntry": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "NetworkAclId": {
+          "Fn::GetAtt": ["VPC", "PublicNACLId"]
+        },
+        "CidrBlock": "10.1.0.0/16",
+        "Protocol": -1,
+        "RuleAction": "allow",
+        "RuleNumber": 400
+      }
+    },
+    "TransitGatewayPublicRouteA": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "10.1.0.0/16",
+        "RouteTableId": {
+          "Fn::GetAtt": ["VPC", "PublicSubnetARouteTableId"]
+        },
+        "TransitGatewayId": "tgw-xxxx"
+      }
+    },
+    "TransitGatewayPublicRouteB": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "10.1.0.0/16",
+        "RouteTableId": {
+          "Fn::GetAtt": ["VPC", "PublicSubnetBRouteTableId"]
+        },
+        "TransitGatewayId": "tgw-xxxx"
+      }
+    },
+    "TransitGatewayPrivateNACLEntry": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "NetworkAclId": {
+          "Fn::GetAtt": ["VPC", "PrivateNACLId"]
+        },
+        "CidrBlock": "10.1.0.0/16",
+        "Protocol": -1,
+        "RuleAction": "allow",
+        "RuleNumber": 400
+      }
+    },
+    "TransitGatewayPrivateRouteA": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "10.1.0.0/16",
+        "RouteTableId": {
+          "Fn::GetAtt": ["VPC", "PrivateSubnetARouteTableId"]
+        },
+        "TransitGatewayId": "tgw-xxxx"
+      }
+    },
+    "TransitGatewayPrivateRouteB": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "10.1.0.0/16",
+        "RouteTableId": {
+          "Fn::GetAtt": ["VPC", "PrivateSubnetBRouteTableId"]
+        },
+        "TransitGatewayId": "tgw-xxxx"
+      }
+    }
+  },
+  "Outputs": {
+    "VPCCIDR": {
+      "Value": {
+        "Ref": "VPCCIDR"
+      }
+    }
+  }
+}

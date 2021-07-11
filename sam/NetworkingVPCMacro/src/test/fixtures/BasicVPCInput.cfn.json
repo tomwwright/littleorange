@@ -61,7 +61,7 @@
         "NATGateways": true,
         "TransitGatewayId": "tgw-xxxxxx",
         "TransitGatewayRouteCIDR": "10.16.0.0/24",
-        "ResolverRuleIds": ["rr-xxxx", "rr-yyyy", "rr-zzzz"]
+        "ResolverRuleIds": ["rslvr-rr-xxxx", "rslvr-rr-yyyy", "rslvr-rr-zzzz"]
       }
     }
   },

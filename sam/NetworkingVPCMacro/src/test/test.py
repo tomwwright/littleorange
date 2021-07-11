@@ -12,7 +12,8 @@ class Test(TestCase):
     parameters = util.StackParameters({
         "A": "One",
         "B": "Two",
-        "C": "Three"
+        "C": "Three",
+        "D": ["Four", "Five"]
     })
 
     assert parameters.resolve({"Ref": "A"}) == "One"
@@ -42,6 +43,25 @@ class Test(TestCase):
             }
         ]
     }) == ["Two", "One", "Three"]
+    assert parameters.resolve({
+        "Fn::Split": [
+            ",",
+            {
+                "Fn::Join": [
+                    ",",
+                    [
+                        {"Ref": "B"},
+                        {
+                            "Fn::Join": [
+                                ",",
+                                {"Ref": "D"}
+                            ]
+                        }
+                    ]
+                ]
+            }
+        ]
+    }) == ["Two", "Four", "Five"]
 
   def testNoop(self):
 
@@ -187,6 +207,32 @@ class Test(TestCase):
     with open(os.path.join(os.path.dirname(__file__), "fixtures/DifferentSizesVPCInput.cfn.json"), 'r') as f:
       inputTemplate = json.load(f)
     with open(os.path.join(os.path.dirname(__file__), "fixtures/DifferentSizesVPCOutput.cfn.json"), 'r') as f:
+      outputTemplate = json.load(f)
+
+    event = {
+        "region": "us-east-1",
+        "accountId": "000011112222",
+        "fragment": inputTemplate,
+        "transformId": "LittleOrange::Networking::VPC",
+        "params": {},
+        "requestId": "REQUEST_ID_0002",
+        "templateParameterValues": {
+            "VPCCIDR": "10.0.0.0/22"
+        }
+    }
+    context = {}
+
+    response = app.handler(event, context)
+
+    assert response["status"] == "success"
+    assert response["requestId"] == event["requestId"]
+    assert response["fragment"] == outputTemplate
+
+  def testGetAttVPC(self):
+
+    with open(os.path.join(os.path.dirname(__file__), "fixtures/GetAttVPCInput.cfn.json"), 'r') as f:
+      inputTemplate = json.load(f)
+    with open(os.path.join(os.path.dirname(__file__), "fixtures/GetAttVPCOutput.cfn.json"), 'r') as f:
       outputTemplate = json.load(f)
 
     event = {
