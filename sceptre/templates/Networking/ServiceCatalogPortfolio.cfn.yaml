@@ -8,6 +8,9 @@ Parameters:
   OrganizationRootId:
     Description: Root ID of the Organization to share portfolio with
     Type: String
+  ProductS3URLIntegratedVPCv1:
+    Description: S3 URL for Integrated VPC v1 Product
+    Type: String
   ProductS3URLMinimalVPCv1:
     Description: S3 URL for Minimal VPC v1 Product
     Type: String
@@ -24,34 +27,6 @@ Resources:
       Description: Networking CloudFormation products provided as part of the Little Orange AWS Blueprint
       DisplayName: Little Orange Networking
       ProviderName: Little Orange
-
-  MinimalVPCProduct:
-    Type: AWS::ServiceCatalog::CloudFormationProduct
-    Properties:
-      Description: Minimal VPC with 2 AZs and no external connectivity
-      Name: Minimal VPC
-      Owner: Little Orange
-      ProvisioningArtifactParameters:
-        - Description: Initial Version
-          Info:
-            LoadTemplateFromURL: !Ref ProductS3URLMinimalVPCv1
-          Name: v1
-      SupportUrl: https://github.com/tomwwright/littleorange
-
-  MinimalVPCProductLaunchConstraint:
-    Type: AWS::ServiceCatalog::LaunchRoleConstraint
-    DependsOn: [ManagementAccountRoleStack]
-    Properties:
-      Description: Link product to LittleOrange-defined Networking Role
-      LocalRoleName: LittleOrange/LittleOrangeNetworkingServiceCatalogRole
-      PortfolioId: !Ref Portfolio
-      ProductId: !Ref MinimalVPCProduct
-
-  MinimalVPCProductPortfolioAssociation:
-    Type: AWS::ServiceCatalog::PortfolioProductAssociation
-    Properties:
-      PortfolioId: !Ref Portfolio
-      ProductId: !Ref MinimalVPCProduct
 
   OrganizationPortfolioShare:
     Type: Custom::ServiceCatalogOrganizationPortfolioShare
@@ -84,3 +59,63 @@ Resources:
           Regions: [!Ref "AWS::Region"]
       StackSetName: !Sub "${AWS::StackName}Role"
       TemplateURL: !Ref StackTemplateURL
+
+  # Minimal VPC
+
+  MinimalVPCProduct:
+    Type: AWS::ServiceCatalog::CloudFormationProduct
+    Properties:
+      Description: Minimal VPC with 2 AZs and no external connectivity
+      Name: Minimal VPC
+      Owner: Little Orange
+      ProvisioningArtifactParameters:
+        - Description: Initial Version
+          Info:
+            LoadTemplateFromURL: !Ref ProductS3URLMinimalVPCv1
+          Name: v1
+      SupportUrl: https://github.com/tomwwright/littleorange
+
+  MinimalVPCProductLaunchConstraint:
+    Type: AWS::ServiceCatalog::LaunchRoleConstraint
+    DependsOn: [ManagementAccountRoleStack]
+    Properties:
+      Description: Link product to LittleOrange-defined Networking Role
+      LocalRoleName: LittleOrange/LittleOrangeNetworkingServiceCatalogRole
+      PortfolioId: !Ref Portfolio
+      ProductId: !Ref MinimalVPCProduct
+
+  MinimalVPCProductPortfolioAssociation:
+    Type: AWS::ServiceCatalog::PortfolioProductAssociation
+    Properties:
+      PortfolioId: !Ref Portfolio
+      ProductId: !Ref MinimalVPCProduct
+
+  # Integrated VPC
+
+  IntegratedVPCProduct:
+    Type: AWS::ServiceCatalog::CloudFormationProduct
+    Properties:
+      Description: Integrated VPC with 2 AZs
+      Name: Integrated VPC
+      Owner: Little Orange
+      ProvisioningArtifactParameters:
+        - Description: Initial Version
+          Info:
+            LoadTemplateFromURL: !Ref ProductS3URLIntegratedVPCv1
+          Name: v1
+      SupportUrl: https://github.com/tomwwright/littleorange
+
+  IntegratedVPCProductLaunchConstraint:
+    Type: AWS::ServiceCatalog::LaunchRoleConstraint
+    DependsOn: [ManagementAccountRoleStack]
+    Properties:
+      Description: Link product to LittleOrange-defined Networking Role
+      LocalRoleName: LittleOrange/LittleOrangeNetworkingServiceCatalogRole
+      PortfolioId: !Ref Portfolio
+      ProductId: !Ref IntegratedVPCProduct
+
+  IntegratedVPCProductPortfolioAssociation:
+    Type: AWS::ServiceCatalog::PortfolioProductAssociation
+    Properties:
+      PortfolioId: !Ref Portfolio
+      ProductId: !Ref IntegratedVPCProduct

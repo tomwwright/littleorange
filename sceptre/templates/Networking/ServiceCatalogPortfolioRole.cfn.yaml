@@ -33,6 +33,10 @@ Resources:
                   - cloudformation:UpdateStack
                   - s3:GetObject
                 Resource: "*"
+              - Sid: LittleOrangeParameters
+                Effect: Allow
+                Action: ssm:GetParameter*
+                Resource: !Sub arn:aws:ssm:*:${AWS::AccountId}:parameter/LittleOrange/*
         - PolicyName: NetworkingPermissions
           PolicyDocument:
             Version: 2012-10-17
@@ -46,6 +50,9 @@ Resources:
                 Effect: Allow
                 Action:
                   - ec2:*
+                  - route53resolver:AssociateResolverRule
+                  - route53resolver:DisassociateResolverRule
+                  - route53resolver:Get*
                 Resource: "*"
       RoleName: LittleOrangeNetworkingServiceCatalogRole
 Outputs:

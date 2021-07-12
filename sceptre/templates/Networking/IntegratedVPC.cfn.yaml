@@ -1,0 +1,127 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: Little Orange VPC integrated with Transit Gateway, Centralised DNS, Centralised VPC Endpoints
+Transform: NetworkingVPC
+Metadata:
+  cfn-lint:
+    config:
+      ignore_checks:
+        - E3001
+Parameters:
+  CentralisedDnsResolverRuleId:
+    Description: SSM Parameter containing Route53 Resolver Rule ID for Centralised DNS
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /LittleOrange/CentralisedDNSResolverRuleId
+  CentralisedVpcEndpointsResolverRuleIds:
+    Description: SSM Parameter containing Route53 Resolver Rule IDs for Centralised VPC Endpoints
+    Type: AWS::SSM::Parameter::Value<CommaDelimitedList>
+    Default: /LittleOrange/CentralisedVPCEndpointResolverRuleIds
+  VpcCidr:
+    Description: The IPv4 CIDR range of the VPC
+    Type: String
+  TransitGatewayId:
+    Description: SSM Parameter containing Transit Gateway ID
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /LittleOrange/TransitGatewayId
+  TransitGatewayRouteCIDR:
+    Description: The IPv4 CIDR to route via Transit Gateway
+    Type: String
+  TransitGatewayRouteTable:
+    Description: Name of the Transit Gateway Route Table to associate VPC with
+    Type: String
+    Default: LittleOrangeEastWest
+  TransitGatewayPropagationRouteTables:
+    Description: Name of the Transit Gateway Route Tables to propagate route to VPC to
+    Type: CommaDelimitedList
+    Default: LittleOrangeEastWest
+  AttachInternetGateway:
+    AllowedValues: [true, false]
+    Description: Configure internet gateway for deployed VPC
+    Type: String
+  AttachNATGateway:
+    AllowedValues: [true, false]
+    Description: Configure NAT gateway for deployed VPC
+    Type: String
+Resources:
+  Vpc:
+    Type: LittleOrange::Networking::VPC
+    Properties:
+      AvailabilityZones: 2
+      CIDR: !Ref VpcCidr
+      InternetGateway: !Ref AttachInternetGateway
+      NATGateways: !Ref AttachNATGateway
+      ResolverRuleIds:
+        !Split [
+          ",",
+          !Join [
+            ",",
+            [
+              !Ref CentralisedDnsResolverRuleId,
+              !Join [",", !Ref CentralisedVpcEndpointsResolverRuleIds],
+            ],
+          ],
+        ]
+
+  TransitGatewayAttachment:
+    Type: AWS::EC2::TransitGatewayAttachment
+    Properties:
+      SubnetIds:
+        - !GetAtt Vpc.NetworkingSubnetAId
+        - !GetAtt Vpc.NetworkingSubnetBId
+      Tags:
+        - Key: TransitGateway:AssociateWith
+          Value: !Ref TransitGatewayRouteTable
+        - Key: TransitGateway:PropagateTo
+          Value: !Join [",", !Ref TransitGatewayPropagationRouteTables]
+      TransitGatewayId: !Ref TransitGatewayId
+      VpcId: !Ref Vpc
+
+  TransitGatewayPublicNACLEntry:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      NetworkAclId: !GetAtt Vpc.PublicNACLId
+      CidrBlock: !Ref TransitGatewayRouteCIDR
+      Protocol: -1
+      RuleAction: allow
+      RuleNumber: 400
+
+  TransitGatewayPublicRouteA:
+    Type: AWS::EC2::Route
+    DependsOn: TransitGatewayAttachment
+    Properties:
+      DestinationCidrBlock: !Ref TransitGatewayRouteCIDR
+      RouteTableId: !GetAtt Vpc.PublicSubnetARouteTableId
+      TransitGatewayId: !Ref TransitGatewayId
+
+  TransitGatewayPublicRouteB:
+    Type: AWS::EC2::Route
+    DependsOn: TransitGatewayAttachment
+    Properties:
+      DestinationCidrBlock: !Ref TransitGatewayRouteCIDR
+      RouteTableId: !GetAtt Vpc.PublicSubnetBRouteTableId
+      TransitGatewayId: !Ref TransitGatewayId
+
+  TransitGatewayPrivateNACLEntry:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      NetworkAclId: !GetAtt Vpc.PrivateNACLId
+      CidrBlock: !Ref TransitGatewayRouteCIDR
+      Protocol: -1
+      RuleAction: allow
+      RuleNumber: 400
+
+  TransitGatewayPrivateRouteA:
+    Type: AWS::EC2::Route
+    DependsOn: TransitGatewayAttachment
+    Properties:
+      DestinationCidrBlock: !Ref TransitGatewayRouteCIDR
+      RouteTableId: !GetAtt Vpc.PrivateSubnetARouteTableId
+      TransitGatewayId: !Ref TransitGatewayId
+
+  TransitGatewayPrivateRouteB:
+    Type: AWS::EC2::Route
+    DependsOn: TransitGatewayAttachment
+    Properties:
+      DestinationCidrBlock: !Ref TransitGatewayRouteCIDR
+      RouteTableId: !GetAtt Vpc.PrivateSubnetBRouteTableId
+      TransitGatewayId: !Ref TransitGatewayId

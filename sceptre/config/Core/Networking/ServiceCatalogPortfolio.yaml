@@ -3,6 +3,10 @@ template_path: Networking/ServiceCatalogPortfolio.cfn.yaml
 parameters:
   OrganizationId: !stack_output Core/Organization.yaml::OrganizationId
   OrganizationRootId: !stack_output Core/Organization.yaml::RootId
+  ProductS3URLIntegratedVPCv1: !UploadS3
+    Bucket: littleorange-sam-deployment-resources
+    Content: !file_contents "{{ project_path }}/templates/Networking/IntegratedVPC.cfn.yaml"
+    Key: Sceptre/Networking/IntegratedVPC
   ProductS3URLMinimalVPCv1: !UploadS3
     Bucket: littleorange-sam-deployment-resources
     Content: !file_contents "{{ project_path }}/templates/Networking/MinimalVPC.cfn.yaml"
