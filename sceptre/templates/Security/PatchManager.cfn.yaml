@@ -1,0 +1,437 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Little Orange SSM Patch Manager Resources
+Parameters:
+  ArtifactBucket:
+    Description: S3 Bucket name to store output logs and reports
+    Type: String
+Resources:
+  UpdateSSMAgent:
+    Type: "AWS::SSM::Association"
+    Properties:
+      AssociationName: UpdateSSMAgent
+      Name: AWS-UpdateSSMAgent
+      Parameters:
+        allowDowngrade:
+          - "false"
+      ScheduleExpression: rate(30 days)
+      OutputLocation:
+        S3Location:
+          OutputS3BucketName: !Ref ArtifactBucket
+          OutputS3KeyPrefix: UpdateSSMAgent
+      Targets:
+        - Key: "tag:UpdateSSMAgent"
+          Values: ["true"]
+
+  RunPatchBaselineScan:
+    Type: "AWS::SSM::Association"
+    Properties:
+      AssociationName: RunPatchBaselineScan
+      Name: AWS-RunPatchBaseline
+      Parameters:
+        Operation: [Scan]
+        RebootOption: [NoReboot]
+      ScheduleExpression: cron(0 11 ? * SUN *)
+      OutputLocation:
+        S3Location:
+          OutputS3BucketName: !Ref ArtifactBucket
+          OutputS3KeyPrefix: UpdateSSMAgent
+      Targets:
+        - Key: InstanceIds
+          Values: ["*"]
+
+  NonProdWindowsPatchBaseline:
+    Type: "AWS::SSM::PatchBaseline"
+    Properties:
+      OperatingSystem: WINDOWS
+      PatchGroups: ["PreProdA", "PreProdB", "DR"]
+      Description: AWS Foundations Patch Baseline for non-production Windows
+      ApprovedPatches: []
+      ApprovedPatchesComplianceLevel: CRITICAL
+      ApprovalRules:
+        PatchRules:
+          - ApproveAfterDays: 7
+            ComplianceLevel: CRITICAL
+            PatchFilterGroup:
+              PatchFilters:
+                - Key: CLASSIFICATION
+                  Values:
+                    - CriticalUpdates
+                    - SecurityUpdates
+                - Key: MSRC_SEVERITY
+                  Values:
+                    - Critical
+                    - Important
+                - Key: PATCH_SET
+                  Values: ["OS"]
+                - Key: PRODUCT
+                  Values: ["*"]
+          - ApproveAfterDays: 7
+            ComplianceLevel: HIGH
+            PatchFilterGroup:
+              PatchFilters:
+                - Key: CLASSIFICATION
+                  Values:
+                    - CriticalUpdates
+                    - SecurityUpdates
+                - Key: MSRC_SEVERITY
+                  Values:
+                    - Moderate
+                    - Low
+                    - Unspecified
+                - Key: PATCH_SET
+                  Values: ["OS"]
+                - Key: PRODUCT
+                  Values: ["*"]
+      Name: FoundationsNonProdWindows
+      RejectedPatches: []
+
+  ProdWindowsPatchBaseline:
+    Type: "AWS::SSM::PatchBaseline"
+    Properties:
+      OperatingSystem: WINDOWS
+      PatchGroups: ["ProdA", "ProdB"]
+      Description: AWS Foundations Patch Baseline for production Windows
+      ApprovedPatches: []
+      ApprovedPatchesComplianceLevel: CRITICAL
+      ApprovalRules:
+        PatchRules:
+          - ApproveAfterDays: 14
+            ComplianceLevel: CRITICAL
+            PatchFilterGroup:
+              PatchFilters:
+                - Key: CLASSIFICATION
+                  Values:
+                    - CriticalUpdates
+                    - SecurityUpdates
+                - Key: MSRC_SEVERITY
+                  Values:
+                    - Critical
+                    - Important
+                - Key: PATCH_SET
+                  Values: ["OS"]
+                - Key: PRODUCT
+                  Values: ["*"]
+          - ApproveAfterDays: 14
+            ComplianceLevel: HIGH
+            PatchFilterGroup:
+              PatchFilters:
+                - Key: CLASSIFICATION
+                  Values:
+                    - CriticalUpdates
+                    - SecurityUpdates
+                - Key: MSRC_SEVERITY
+                  Values:
+                    - Moderate
+                    - Low
+                    - Unspecified
+                - Key: PATCH_SET
+                  Values: ["OS"]
+                - Key: PRODUCT
+                  Values: ["*"]
+      Name: FoundationsProdWindows
+      RejectedPatches: []
+
+  RegisterDefaultWindowsPatchBaseline:
+    Type: Custom::DefaultPatchBaseline
+    Properties:
+      ServiceToken: !GetAtt RegisterDefaultPatchBaselineLambdaFunction.Arn
+      PatchBaselineId: !Ref ProdWindowsPatchBaseline
+
+  #==================================================
+  # Maintenance Windows + Targets and Tasks
+  # - Monthly, 1st Tuesday at 6.30pm, patch PreProd A
+  # - Monthly, 1st Thursday at 6.30pm, patch DR and PreProd B
+  # - Monthly, 2nd Tuesday at 6.30pm, patch Prod A
+  # - Monthly, 2nd Thursday at 6.30pm, patch Prod B
+  #==================================================
+
+  # Monthly, 1st Tuesday at 6.30pm, patch PreProd A
+
+  MonthlyTuesdayFirstWeekMaintenanceWindow:
+    Type: "AWS::SSM::MaintenanceWindow"
+    Properties:
+      Name: MonthlyTuesdayFirstWeek
+      Description: Monthly, 1st Tuesday at 6.30pm
+      AllowUnassociatedTargets: true
+      Schedule: cron(30 18 ? * TUE#1 *)
+      Duration: 8
+      Cutoff: 1
+      ScheduleTimezone: Australia/Melbourne
+
+  PreProdAWindowTarget:
+    Type: "AWS::SSM::MaintenanceWindowTarget"
+    Properties:
+      Description: PreProd A patching with auto-reboot
+      WindowId: !Ref MonthlyTuesdayFirstWeekMaintenanceWindow
+      ResourceType: INSTANCE
+      Targets:
+        - Key: "tag:Patch Group"
+          Values:
+            - "PreProdA"
+      Name: PreProdA
+
+  PreProdAWindowTask:
+    Type: AWS::SSM::MaintenanceWindowTask
+    Properties:
+      Description: Runs patching for instances with auto-reboot
+      MaxErrors: "1"
+      TaskArn: AWS-RunPatchBaseline
+      MaxConcurrency: 100%
+      WindowId: !Ref MonthlyTuesdayFirstWeekMaintenanceWindow
+      Priority: 1
+      TaskType: RUN_COMMAND
+      TaskInvocationParameters:
+        MaintenanceWindowRunCommandParameters:
+          Comment: Runs patch baseline with reboot if required
+          TimeoutSeconds: 600
+          Parameters:
+            Operation: [Install]
+            RebootOption: [RebootIfNeeded]
+          OutputS3BucketName: !Ref ArtifactBucket
+      Targets:
+        - Key: WindowTargetIds
+          Values: [!Ref PreProdAWindowTarget]
+
+  # Monthly, 1st Thursday at 6.30pm, patch DR and PreProd B
+
+  MonthlyThursdayFirstWeekMaintenanceWindow:
+    Type: "AWS::SSM::MaintenanceWindow"
+    Properties:
+      Name: MonthlyThursdayFirstWeek
+      Description: Monthly, 1st Thursday at 6.30pm
+      AllowUnassociatedTargets: true
+      Schedule: cron(30 18 ? * THU#1 *)
+      Duration: 8
+      Cutoff: 1
+      ScheduleTimezone: Australia/Melbourne
+
+  PreProdBWindowTarget:
+    Type: "AWS::SSM::MaintenanceWindowTarget"
+    Properties:
+      Description: PreProd A patching with auto-reboot
+      WindowId: !Ref MonthlyThursdayFirstWeekMaintenanceWindow
+      ResourceType: INSTANCE
+      Targets:
+        - Key: "tag:Patch Group"
+          Values:
+            - "PreProdB"
+      Name: PreProdB
+
+  DRWindowTarget:
+    Type: "AWS::SSM::MaintenanceWindowTarget"
+    Properties:
+      Description: DR patching with auto-reboot
+      WindowId: !Ref MonthlyThursdayFirstWeekMaintenanceWindow
+      ResourceType: INSTANCE
+      Targets:
+        - Key: "tag:Patch Group"
+          Values:
+            - "DR"
+      Name: DR
+
+  DRAndPreProdBWindowTask:
+    Type: AWS::SSM::MaintenanceWindowTask
+    Properties:
+      Description: Runs patching for instances with auto-reboot
+      MaxErrors: "1"
+      TaskArn: AWS-RunPatchBaseline
+      MaxConcurrency: 100%
+      WindowId: !Ref MonthlyThursdayFirstWeekMaintenanceWindow
+      Priority: 1
+      TaskType: RUN_COMMAND
+      TaskInvocationParameters:
+        MaintenanceWindowRunCommandParameters:
+          Comment: Runs patch baseline with reboot if required
+          TimeoutSeconds: 600
+          Parameters:
+            Operation: [Install]
+            RebootOption: [RebootIfNeeded]
+          OutputS3BucketName: !Ref ArtifactBucket
+      Targets:
+        - Key: WindowTargetIds
+          Values:
+            - !Ref DRWindowTarget
+            - !Ref PreProdBWindowTarget
+
+  # Monthly, 2nd Tuesday at 6.30pm, patch Prod A
+
+  MonthlyTuesdaySecondWeekMaintenanceWindow:
+    Type: "AWS::SSM::MaintenanceWindow"
+    Properties:
+      Name: MonthlyTuesdaySecondWeek
+      Description: Monthly, 2nd Tuesday at 6.30pm
+      AllowUnassociatedTargets: true
+      Schedule: cron(30 18 ? * TUE#2 *)
+      Duration: 8
+      Cutoff: 1
+      ScheduleTimezone: Australia/Melbourne
+
+  ProdAWindowTarget:
+    Type: "AWS::SSM::MaintenanceWindowTarget"
+    Properties:
+      Description: Prod A patching with auto-reboot
+      WindowId: !Ref MonthlyTuesdaySecondWeekMaintenanceWindow
+      ResourceType: INSTANCE
+      Targets:
+        - Key: "tag:Patch Group"
+          Values:
+            - "ProdA"
+      Name: ProdA
+
+  ProdAWindowTask:
+    Type: AWS::SSM::MaintenanceWindowTask
+    Properties:
+      Description: Runs patching for instances with auto-reboot disabled
+      MaxErrors: "1"
+      TaskArn: AWS-RunPatchBaseline
+      MaxConcurrency: 100%
+      WindowId: !Ref MonthlyTuesdaySecondWeekMaintenanceWindow
+      Priority: 1
+      TaskType: RUN_COMMAND
+      TaskInvocationParameters:
+        MaintenanceWindowRunCommandParameters:
+          Comment: Runs patch baseline with reboot if required
+          TimeoutSeconds: 600
+          Parameters:
+            Operation: [Install]
+            RebootOption: [RebootIfNeeded]
+          OutputS3BucketName: !Ref ArtifactBucket
+      Targets:
+        - Key: WindowTargetIds
+          Values: [!Ref ProdAWindowTarget]
+
+  # Monthly, 2nd Thursday at 6.30pm, patch Prod A
+
+  MonthlyThursdaySecondWeekMaintenanceWindow:
+    Type: "AWS::SSM::MaintenanceWindow"
+    Properties:
+      Name: MonthlyThursdaySecondWeek
+      Description: Monthly, 2nd Thursday at 6.30pm
+      AllowUnassociatedTargets: true
+      Schedule: cron(30 18 ? * THU#2 *)
+      Duration: 8
+      Cutoff: 1
+      ScheduleTimezone: Australia/Melbourne
+
+  ProdBWindowTarget:
+    Type: "AWS::SSM::MaintenanceWindowTarget"
+    Properties:
+      Description: Prod B patching with auto-reboot
+      WindowId: !Ref MonthlyThursdaySecondWeekMaintenanceWindow
+      ResourceType: INSTANCE
+      Targets:
+        - Key: "tag:Patch Group"
+          Values:
+            - "ProdB"
+      Name: ProdB
+
+  ProdBWindowTask:
+    Type: AWS::SSM::MaintenanceWindowTask
+    Properties:
+      Description: Runs patching for instances with auto-reboot disabled
+      MaxErrors: "1"
+      TaskArn: AWS-RunPatchBaseline
+      MaxConcurrency: 100%
+      WindowId: !Ref MonthlyThursdaySecondWeekMaintenanceWindow
+      Priority: 1
+      TaskType: RUN_COMMAND
+      TaskInvocationParameters:
+        MaintenanceWindowRunCommandParameters:
+          Comment: Runs patch baseline with reboot if required
+          TimeoutSeconds: 600
+          Parameters:
+            Operation: [Install]
+            RebootOption: [RebootIfNeeded]
+          OutputS3BucketName: !Ref ArtifactBucket
+      Targets:
+        - Key: WindowTargetIds
+          Values: [!Ref ProdBWindowTarget]
+
+  #==================================================
+  # Custom Resource to register default Patch Baselines
+  #==================================================
+
+  LambdaRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: CloudWatchLogs
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "arn:aws:logs:*:*:*"
+        - PolicyName: PatchManagerBaseline
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:DescribePatchBaselines
+                  - ssm:GetDefaultPatchBaseline
+                  - ssm:GetPatchBaseline
+                  - ssm:RegisterDefaultPatchBaseline
+                Resource: "*"
+
+  RegisterDefaultPatchBaselineLambdaFunction:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      Code:
+        ZipFile: |
+          import boto3
+          import cfnresponse
+          import logging
+          import os
+
+          logger = logging.getLogger()
+          logger.setLevel(logging.INFO)
+
+          def delete(event, context, ssm):
+            baselineId = event["ResourceProperties"]["PatchBaselineId"]
+            response = ssm.get_patch_baseline(BaselineId=baselineId)
+            operatingSystem = response["OperatingSystem"]
+            awsProvidedPatchBaselines = ssm.describe_patch_baselines(Filters=[{"Key": "OWNER", "Values": ["AWS"]}])
+            defaultPatchBaselineId = [baseline["BaselineId"] for baseline in awsProvidedPatchBaselines["BaselineIdentities"] if baseline["OperatingSystem"] == operatingSystem][0]
+            response = ssm.register_default_patch_baseline(BaselineId=defaultPatchBaselineId)
+            cfnresponse.send(event, context, cfnresponse.SUCCESS, response)
+
+
+          def createOrUpdate(event, context, ssm):
+            baselineId = event["ResourceProperties"]["PatchBaselineId"]
+            response = ssm.register_default_patch_baseline(BaselineId=baselineId)
+            cfnresponse.send(event, context, cfnresponse.SUCCESS, response)
+
+          def handler(event, context):
+            
+            logger.info(event)
+            
+            try:
+              ssm = boto3.client('ssm')
+              requestType = event["RequestType"]
+              logger.info(f"Executing '{requestType}'")
+              if requestType == "Create" or requestType == "Update":
+                createOrUpdate(event, context, ssm)
+              elif requestType == "Delete":
+                delete(event, context, ssm)
+              else:
+                raise Exception(f"Unknown requestType '{requestType}'")
+            except Exception:
+              logger.exception('Signaling failure to CloudFormation.')
+              cfnresponse.send(event, context, cfnresponse.FAILED, {})
+
+      Handler: index.handler
+      MemorySize: 128
+      Role: !GetAtt LambdaRole.Arn
+      Runtime: python3.7
+      Timeout: 60
