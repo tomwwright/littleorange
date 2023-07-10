@@ -27,10 +27,10 @@ Perform a project search for the feature name to find where and how it is implem
       - [2.2.2 CloudFormation Macro Proxy](#222-cloudformation-macro-proxy)
       - [2.2.3 CloudFormation Self-Managed Roles using CloudFormation Stack Sets](#223-cloudformation-self-managed-roles-using-cloudformation-stack-sets)
     - [2.3 Cost Management](#23-cost-management)
-      - [2.3.1 Cost and Usage Reports](#231-cost-and-usage-reports)
+      - [2.3.1 CloudFormation Custom Resource for Cost and Usage Report Definitions](#231-cloudformation-custom-resource-for-cost-and-usage-report-definitions)
+      - [2.3.2 Billing Reporting](#232-billing-reporting)
       - [2.3.2 Querying of Cost and Usage Reports with Amazon Athena](#232-querying-of-cost-and-usage-reports-with-amazon-athena)
-      - [2.3.3 Budget](#233-budget)
-      - [2.3.4 Cost Explorer Anomaly Detection](#234-cost-explorer-anomaly-detection)
+      - [2.3.3 Cost Explorer Anomaly Detection](#233-cost-explorer-anomaly-detection)
   - [3 Logging and Audit](#3-logging-and-audit)
     - [3.1 AWS CloudTrail](#31-aws-cloudtrail)
       - [3.1.1 CloudFormation Custom Resource for Organizations CloudTrail Support](#311-cloudformation-custom-resource-for-organizations-cloudtrail-support)
@@ -173,7 +173,12 @@ Python dependencies are managed by [Pipenv](https://pipenv.pypa.io/en/latest/ins
 Little Orange configures tools and services with a "core" management account that support the operation and maintenance of the AWS multi-account footprint.
 ### 2.1 Account Management with AWS Organizations
 
-Little Orange manages multiple accounts via [AWS Organizations](https://aws.amazon.com/organizations/).
+Little Orange manages multiple accounts via [AWS Organizations](https://aws.amazon.com/organizations/). Little Orange manages resources across a number of specialised accounts:
+
+- `LittleOrangeManagement`
+- `LittleOrangeSecurity`
+- `LittleOrangeNetworking`
+
 #### 2.1.1 CloudFormation Resource Providers for AWS Organizations
 
 CloudFormation Resource Providers provide the ability to manage AWS Organizations resources. This allows for the structure of the AWS Organization to be defined declaratively using CloudFormation.
@@ -187,6 +192,7 @@ The `Quarantine` OU allows for a compromised AWS Account to be detained and all 
 ### 2.2 Resource Management with CloudFormation
 
 Little Orange provisions and manages all resources via the AWS CloudFormation service. Resources and services not natively supported by CloudFormation are implemented using CloudFormation Custom Resources or CloudFormation Resource Providers.
+
 #### 2.2.1 CloudFormation Custom Resource Proxy
 
 The CloudFormation Custom Resource Proxy allows for a single Custom Resource Lambda Function deployment to be leveraged from multiple accounts and regions. For Custom Resources implemented as AWS SAM projects this pattern is necessary as limitations exist for deploying the same AWS SAM template across many accounts or regions. The proxy is implemented as a lightweight, inlined Lambda Function that can be deployed across all accounts and regions -- Lambda-backed Custom Resources can only be invoked in the same account and region as the source CloudFormation Stack.
@@ -204,27 +210,59 @@ References:
 
 #### 2.2.2 CloudFormation Macro Proxy
 
+The CloudFormation Macro Proxy allows for a single CloudFormation Lambda Macro Function deployment to be leveraged by multiple regions. Usually, a CloudFormation Macro must invoke a Lambda function in the same region. 
 
+When using the CloudFormation Macro Proxy, the Macro function itself is deployed once in a central location ([reference](../sceptre/config/Core/Networking/VPCMacro.yaml)), and the Lambda ARN is stored in AWS SSM Parameter Store. The CloudFormation Macro Proxy is deployed via Stack Set across all accounts and regions ([reference](../sceptre/config/Core/CloudFormationMacroProxy.yaml)). 
+
+Defining a proxied Macro involves specifying the local proxy as the function to invoke. The CloudFormation Macro Proxy handles looking up the macro name (e.g. `NetworkingVPC` below) to determine the actual Lambda ARN that backs the Macro and handles performing a cross-account and cross-region invocation of the function and returning the result ([reference](../sam/CloudFormationMacroProxy/src/app.py)).
+
+```yaml
+Macro:
+  Type: AWS::CloudFormation::Macro
+  Properties:
+    Name: NetworkingVPC
+    Description: Expands LittleOrange::Networking::VPC Resources into CloudFormation VPC Resources
+    FunctionName: !Sub arn:aws:lambda:${AWS::Region}:${MacroProxyAccountId}:function:LittleOrangeCloudFormationMacroProxy
+    ...
+```
 
 #### 2.2.3 CloudFormation Self-Managed Roles using CloudFormation Stack Sets
 
+CloudFormation Stack Sets can be deployed using self-managed IAM Roles in target accounts that does not rely on the AWS Organizations integration for CloudFormation. Little Orange handles deploying this required trust relationship between the management and child accounts via a service-managed Stack Set as per the following AWS Documentation: 
+
+https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacksets-prereqs-self-managed.html
+
 ### 2.3 Cost Management
 
-#### 2.3.1 Cost and Usage Reports
+#### 2.3.1 CloudFormation Custom Resource for Cost and Usage Report Definitions
+
+Management of Cost and Usage Reports resources are not supported by CloudFormation. Little Orange provides an implementation of a CloudFormation Custom Resource for administering Cost and Usage Reports.
+
+#### 2.3.2 Billing Reporting
+
+Little Orange configures Cost and Usage Reports generation into S3. AWS Budgets is configured to provide a basic forecasted and actual spending alert.
 
 #### 2.3.2 Querying of Cost and Usage Reports with Amazon Athena
 
 _TBC_
 
-#### 2.3.3 Budget
+#### 2.3.3 Cost Explorer Anomaly Detection
 
-#### 2.3.4 Cost Explorer Anomaly Detection
+Little Orange configures AWS Cost Explorer to notify on daily and weekly anomaly detection.
+
+[AWS: Detecting unusual spend with AWS Cost Anomaly Detection](https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/manage-ad.html)
 
 ## 3 Logging and Audit
 
 ### 3.1 AWS CloudTrail
 
+AWS CloudTrail is configured across all accounts and regions via an AWS Organizations-integrated trail. 
+
+[AWS: Creating a trail for an organization](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/creating-trail-organization.html)
+
 #### 3.1.1 CloudFormation Custom Resource for Organizations CloudTrail Support
+
+CloudFormation support for AWS CloudTrail does not yet provide support for configuring AWS Organizations integration for a trail. Little Orange provides a CloudFormation Custom Resource for enabling AWS Organizations integration on an existing trail.
 
 ### 3.2 AWS Config
 
@@ -281,9 +319,13 @@ _TBC_
 ### 6.6 Amazon Client VPN
 
 _TBC_
+
+Add notes about setting up ACM Certificate
+
 ## 7 Workload Services
 
 _TBC_
+
 ## AWS SAM Support
 
 ## AWS Billing

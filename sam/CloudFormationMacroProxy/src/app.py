@@ -3,6 +3,8 @@ import boto3
 import logging
 import os
 
+# 2.2.2 CloudFormation Macro Proxy
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 

@@ -50,7 +50,7 @@ Resources:
             Resource: !Sub "${S3Bucket.Arn}/*"
 
   CostUsageReport:
-    Type: Custom::CostUsageReportDefinition
+    Type: Custom::CostUsageReportDefinition # 2.3.1 CloudFormation Custom Resource for Cost and Usage Report Definitions
     DependsOn: [BucketPolicy]
     Properties:
       ServiceToken: !Ref CostUsageReportDefinitionServiceToken

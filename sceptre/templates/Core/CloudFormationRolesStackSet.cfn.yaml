@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Little Orange CloudFormation StackSet Roles https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacksets-prereqs-self-managed.html
+Description: 2.2.3 Little Orange CloudFormation StackSet Roles https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacksets-prereqs-self-managed.html
 Parameters:
   MasterAccountId:
     AllowedPattern: "[0-9]{12}"

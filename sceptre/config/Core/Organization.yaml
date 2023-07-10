@@ -1,2 +1,3 @@
 ---
+# 2.1 Account Management with AWS Organizations
 template_path: Core/Organization.cfn.yaml

@@ -1,4 +1,5 @@
 ---
+# 2.2.2 CloudFormation Macro Proxy
 template_path: Core/CloudFormationMacroProxyStackSet.cfn.yaml
 parameters:
   Regions: "{{ var.enabled_regions | join(',') }}"

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# 2.2.2 CloudFormation Macro Proxy
+
 import os
 import yaml
 

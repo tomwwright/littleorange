@@ -1,4 +1,5 @@
 ---
+# 2.2.3 CloudFormation Self-Managed Roles using CloudFormation Stack Sets
 template_path: Core/CloudFormationRolesStackSet.cfn.yaml
 parameters:
   MasterAccountId: !stack_output Core/Organization.yaml::MasterAccountId
